@@ -26,7 +26,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchPersonalInfo,
   postPersonalInfo,
-} from "@/lib/queries/personal-info-queries";
+} from "@/lib/fetches/personal-info-fetches";
 import { toast } from "sonner";
 import { PersonalInfoFormSkeleton } from "./personal-info-form-skeleton";
 

@@ -32,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,7 +50,7 @@ import {
 import {
   fetchWorkExperience,
   postWorkExperience,
-} from "@/lib/queries/work-experience-queries";
+} from "@/lib/fetches/work-experience-fetches";
 import { WorkExperienceFormSkeleton } from "./work-experience-form-skeleton";
 
 interface WorkExperienceFormProps {

@@ -1,16 +1,6 @@
 "use client";
 
 import { PersonalInfoForm } from "@/components/personal-info-form";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,17 +12,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ArrowLeftIcon,
-  BadgeCheckIcon,
-  MoreHorizontalIcon,
-} from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCVData } from "@/lib/queries/cv-queries";
-import { useParams, useRouter } from "next/navigation";
-import { routes } from "@/const/routes";
-import { Input } from "./ui/input";
+import { useParams } from "next/navigation";
 import { WorkExperienceForm } from "./work-experience-form";
 import { SummaryForm } from "./summary-form";
 import { EducationForm } from "./education-form";
@@ -40,19 +22,24 @@ import { SkillsForm } from "./skills-form";
 import { CertificationsForm } from "./certifications-form";
 import { ProjectsForm } from "./projects-form";
 import { AwardsForm } from "./awards-form";
+import CVFormMenu from "./cv-form-menu";
+import { TemplateForm } from "./template-form";
+import CVFormStatus from "./cv-form-status";
+import { fetchCV } from "@/lib/fetches/cv-fetches";
+import { Skeleton } from "./ui/skeleton";
+import CVFormTitle from "./cv-form-title";
 
 export default function CVForm() {
   const params = useParams();
   const id = params.id as string;
-  const router = useRouter();
 
   const [activeTab, setActiveTab] = useState("personal-info");
   const [isDirtyForm, setIsDirtyForm] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["cv-data", id],
-    queryFn: () => fetchCVData(id),
+    queryKey: ["cv", id],
+    queryFn: () => fetchCV(id),
   });
 
   const handleTabChange = (value: string) => {
@@ -77,73 +64,35 @@ export default function CVForm() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        {data?.title || "CV"}
-      </h3>
+      <CVFormTitle id={id} />
 
       <div className="flex flex-row gap-4 items-center">
-        <ButtonGroup>
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="Go Back"
-            onClick={() => router.push(routes.dashboard)}
-          >
-            <ArrowLeftIcon />
-          </Button>
-        </ButtonGroup>
-        <ButtonGroup className="hidden sm:flex">
-          <Button variant="outline">Share</Button>
-          <Button variant="outline">Duplicate</Button>
-          <Button variant="outline">Download</Button>
-          <Button variant="destructive">Delete</Button>
-        </ButtonGroup>
-        <ButtonGroup className="flex sm:hidden">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" aria-label="Open menu">
-                <MoreHorizontalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Share</DropdownMenuItem>
-              <DropdownMenuItem>Duplicate</DropdownMenuItem>
-              <DropdownMenuItem>Download</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </ButtonGroup>
-
-        {data?.status === "draft" ? (
-          <Badge
-            variant="secondary"
-            className="bg-yellow-500 text-white dark:bg-yellow-600"
-          >
-            draft
-          </Badge>
-        ) : (
-          <Badge
-            variant="secondary"
-            className="bg-green-500 text-white dark:bg-green-600"
-          >
-            <BadgeCheckIcon />
-            Ready
-          </Badge>
-        )}
+        <CVFormMenu id={id} />
+        <CVFormStatus id={id} />
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <div className="overflow-auto scrollbar-hide snap-x snap-mandatory">
           <TabsList className="h-auto py-2">
-            <TabsTrigger value="personal-info">Personal Info</TabsTrigger>
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-            <TabsTrigger value="work-experience">Work Experience</TabsTrigger>
-            <TabsTrigger value="education">Education</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
+            <TabsTrigger value="personal-info">
+              Personal Info<span className="text-destructive">*</span>
+            </TabsTrigger>
+            <TabsTrigger value="summary">
+              Summary<span className="text-destructive">*</span>
+            </TabsTrigger>
+            <TabsTrigger value="work-experience">
+              Work Experience<span className="text-destructive">*</span>
+            </TabsTrigger>
+            <TabsTrigger value="education">
+              Education<span className="text-destructive">*</span>
+            </TabsTrigger>
+            <TabsTrigger value="skills">
+              Skills<span className="text-destructive">*</span>
+            </TabsTrigger>
             <TabsTrigger value="certifications">Certifications</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="awards">Awards</TabsTrigger>
+            <TabsTrigger value="cv-template">CV Template</TabsTrigger>
           </TabsList>
         </div>
 
@@ -170,6 +119,9 @@ export default function CVForm() {
         </TabsContent>
         <TabsContent value="awards">
           <AwardsForm setIsDirtyForm={setIsDirtyForm} id={id} />
+        </TabsContent>
+        <TabsContent value="cv-template">
+          <TemplateForm setIsDirtyForm={setIsDirtyForm} id={id} />
         </TabsContent>
       </Tabs>
 

@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-const personalInfoSchema = z.object({
+export const personalInfoSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   professionalTitle: z.string(),

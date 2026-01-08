@@ -1,7 +1,7 @@
 "use client";
 
 import CVList from "@/components/cv-list";
-import { fetchCVList } from "@/lib/queries/cv-queries";
+import { fetchCVList } from "@/lib/fetches/cv-fetches";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 

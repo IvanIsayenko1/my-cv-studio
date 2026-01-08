@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { EducationFormValues, educationSchema } from "@/types/education";
-import { fetchEducation, postEducation } from "@/lib/queries/education-queries";
+import { fetchEducation, postEducation } from "@/lib/fetches/education-fetches";
 import { EducationFormSkeleton } from "./education-form-skeleton";
 
 interface EducationFormProps {

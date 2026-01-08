@@ -1,3 +1,5 @@
+import { TemplateId } from "./template";
+
 export interface CV {
   // CV Data
   cvData: {
@@ -41,6 +43,7 @@ export interface CV {
     endDate: string | "Present";
     achievements: string[];
     technologies: string[];
+    sortOrder: number;
   }>;
 
   // Education
@@ -87,4 +90,6 @@ export interface CV {
     date: string;
     description: string;
   }>;
+
+  templateId: TemplateId;
 }

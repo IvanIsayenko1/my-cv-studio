@@ -25,7 +25,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Textarea } from "./ui/textarea";
 import { SummaryFormSkeleton } from "./summary-form-skeleton";
-import { fetchSummary, postSummary } from "@/lib/queries/summary-queries";
+import { fetchSummary, postSummary } from "@/lib/fetches/summary-fetches";
 
 const summarySchema = z.object({
   professionalSummary: z

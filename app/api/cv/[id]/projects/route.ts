@@ -39,7 +39,9 @@ export async function GET(
       url
     FROM cv_projects
     WHERE cv_id = ?
-    ORDER BY start_date DESC
+    ORDER BY
+      substr(start_date, 4, 4) DESC,  -- year
+      substr(start_date, 1, 2) DESC;  -- month
     `,
     [cvId]
   );

@@ -23,7 +23,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,7 +41,7 @@ import {
 import {
   fetchCertifications,
   postCertifications,
-} from "@/lib/queries/certifications-queries";
+} from "@/lib/fetches/certifications-fetches";
 import { CertificationsFormSkeleton } from "./certifications-form-skeleton";
 
 interface CertificationsFormProps {
@@ -65,15 +64,7 @@ export function CertificationsForm({
   const form = useForm<CertificationsFormValues>({
     resolver: zodResolver(certificationsSchema),
     defaultValues: {
-      certifications: [
-        {
-          name: "",
-          issuingOrg: "",
-          issueDate: "",
-          expirationDate: "",
-          credentialId: "",
-        },
-      ],
+      certifications: [],
     },
   });
 
@@ -93,15 +84,7 @@ export function CertificationsForm({
       certifications:
         data.certifications && data.certifications.length > 0
           ? data.certifications
-          : [
-              {
-                name: "",
-                issuingOrg: "",
-                issueDate: "",
-                expirationDate: "",
-                credentialId: "",
-              },
-            ],
+          : [],
     });
 
     setIsDirtyForm(false);
@@ -123,7 +106,19 @@ export function CertificationsForm({
   });
 
   const onSubmit = (values: CertificationsFormValues) => {
-    mutation.mutate(values);
+    const cleaned: CertificationsFormValues = {
+      certifications: (values.certifications ?? []).filter(
+        (c) =>
+          c.name.trim() ||
+          c.issuingOrg.trim() ||
+          c.issueDate.trim() ||
+          c.expirationDate?.trim() ||
+          c.credentialId?.trim()
+      ),
+    };
+
+    // if user cleared everything, send explicit empty array
+    mutation.mutate(cleaned);
   };
 
   // "Add another" button enabled only when last required fields are filled
@@ -131,12 +126,14 @@ export function CertificationsForm({
     control,
     name: "certifications",
   });
+  const hasAny = !!watchedCerts && watchedCerts.length > 0;
   const last = watchedCerts?.[watchedCerts.length - 1];
   const requiredFilledForLast =
     !!last &&
     last.name?.trim() &&
     last.issuingOrg?.trim() &&
     last.issueDate?.trim();
+  const canAddCertification = !hasAny || requiredFilledForLast;
 
   if (isLoading && !data) {
     return <CertificationsFormSkeleton />;
@@ -163,7 +160,7 @@ export function CertificationsForm({
                     <div className="font-medium text-sm text-muted-foreground">
                       Certification {index + 1}
                     </div>
-                    {fields.length > 1 && (
+                    {fields.length > 0 && (
                       <Button
                         type="button"
                         size="icon"
@@ -275,7 +272,7 @@ export function CertificationsForm({
               <Button
                 type="button"
                 variant="outline"
-                disabled={!requiredFilledForLast}
+                disabled={!canAddCertification}
                 onClick={() =>
                   append({
                     name: "",
@@ -286,7 +283,7 @@ export function CertificationsForm({
                   })
                 }
               >
-                Add another certification
+                {hasAny ? "Add another certification" : "Add certification"}
               </Button>
 
               <div className="flex justify-end gap-3">

@@ -50,7 +50,9 @@ export async function GET(
       description
     FROM cv_awards
     WHERE cv_id = ?
-    ORDER BY date DESC
+    ORDER BY 
+      substr(date, 4, 4) DESC,  -- year
+      substr(date, 1, 2) DESC;  -- month
     `,
     [cvId]
   );

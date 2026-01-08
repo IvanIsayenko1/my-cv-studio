@@ -1,4 +1,3 @@
-// src/components/forms/projects-form.tsx
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,7 +23,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,9 +34,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
-
 import { ProjectsFormValues, projectsSchema } from "@/types/projects";
-import { fetchProjects, postProjects } from "@/lib/queries/projects-queries";
+import { fetchProjects, postProjects } from "@/lib/fetches/projects-fetches";
 import ProjectsFormSkeleton from "./projects-form-skeleton";
 
 interface ProjectsFormProps {
@@ -59,16 +55,7 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
   const form = useForm<ProjectsFormValues>({
     resolver: zodResolver(projectsSchema),
     defaultValues: {
-      projects: [
-        {
-          name: "",
-          role: "",
-          startDate: "",
-          endDate: "",
-          description: "",
-          url: "",
-        },
-      ],
+      projects: [], // allow having no projects
     },
   });
 
@@ -80,24 +67,12 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
     name: "projects",
   });
 
-  // hydrate from API, but always ensure at least one project
+  // hydrate from API, allow empty array
   useEffect(() => {
     if (!data) return;
 
     reset({
-      projects:
-        data.projects && data.projects.length > 0
-          ? data.projects
-          : [
-              {
-                name: "",
-                role: "",
-                startDate: "",
-                endDate: "",
-                description: "",
-                url: "",
-              },
-            ],
+      projects: data.projects && data.projects.length > 0 ? data.projects : [],
     });
 
     setIsDirtyForm(false);
@@ -110,11 +85,22 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
   const mutation = useMutation({
     mutationKey: ["projects", id],
     mutationFn: (values: ProjectsFormValues) => {
+      // clean + allow sending explicit empty array
       const cleaned: ProjectsFormValues = {
-        projects: (values.projects ?? []).map((p) => ({
-          ...p,
-          url: p.url?.trim() || "",
-        })),
+        projects: (values.projects ?? [])
+          .filter(
+            (p) =>
+              p.name.trim() ||
+              p.role.trim() ||
+              p.startDate.trim() ||
+              p.endDate.trim() ||
+              p.description.trim() ||
+              p.url?.trim()
+          )
+          .map((p) => ({
+            ...p,
+            url: p.url?.trim() || "",
+          })),
       };
       return postProjects(id, cleaned);
     },
@@ -129,19 +115,21 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
     mutation.mutate(values);
   };
 
-  // For "Add another project" enabled state
+  // "Add project" button state: enabled if no projects OR last is complete
   const watchedProjects = useWatch({
     control,
     name: "projects",
   });
-  const last = watchedProjects?.[watchedProjects.length - 1];
-  const requiredFilledForLast =
+  const hasAny = !!watchedProjects && watchedProjects.length > 0;
+  const last = hasAny ? watchedProjects[watchedProjects.length - 1] : null;
+  const lastComplete =
     !!last &&
     last.name?.trim() &&
     last.role?.trim() &&
     last.startDate?.trim() &&
     last.endDate?.trim() &&
     last.description?.trim();
+  const canAddProject = !hasAny || lastComplete;
 
   if (isLoading && !data) {
     return <ProjectsFormSkeleton />;
@@ -168,7 +156,7 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
                     <div className="font-medium text-sm text-muted-foreground">
                       Project {index + 1}
                     </div>
-                    {fields.length > 1 && (
+                    {fields.length > 0 && (
                       <Button
                         type="button"
                         size="icon"
@@ -301,7 +289,7 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                disabled={!requiredFilledForLast}
+                disabled={!canAddProject}
                 onClick={() =>
                   append({
                     name: "",
@@ -313,7 +301,7 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
                   })
                 }
               >
-                Add another project
+                {hasAny ? "Add another project" : "Add project"}
               </Button>
 
               <div className="flex justify-end gap-3">

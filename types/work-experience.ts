@@ -1,6 +1,6 @@
 // "@/types/work-experience.ts"
 import { z } from "zod";
-
+import { monthYearRegex } from "./regex";
 export const workExperienceItemSchema = z.object({
   jobTitle: z.string().min(1, "Job title is required"),
   company: z.string().min(1, "Company is required"),
@@ -12,8 +12,17 @@ export const workExperienceItemSchema = z.object({
     "Freelance",
     "Internship",
   ]),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date or 'Present' is required"),
+  startDate: z
+    .string()
+    .min(1, "Start date is required")
+    .regex(monthYearRegex, "Use format MM/YYYY (e.g. 01/2022)"),
+  endDate: z
+    .string()
+    .min(1, "End date or 'Present' is required")
+    .refine(
+      (val) => val.toLowerCase() === "present" || monthYearRegex.test(val),
+      "Use 'Present' or MM/YYYY (e.g. 05/2024)"
+    ),
 
   // REQUIRED array, never undefined
   achievements: z.array(z.string()).catch([]),

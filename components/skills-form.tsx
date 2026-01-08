@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/select";
 
 import { SkillsFormValues, skillsSchema } from "@/types/skills";
-import { fetchSkills, postSkills } from "@/lib/queries/skills-queries";
+import { fetchSkills, postSkills } from "@/lib/fetches/skills-fetches";
 import { Textarea } from "./ui/textarea";
 import { SkillsFormSkeleton } from "./skills-form-skeleton";
 

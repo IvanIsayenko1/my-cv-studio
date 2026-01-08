@@ -37,7 +37,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { AwardsFormValues, awardsSchema } from "@/types/awards";
-import { fetchAwards, postAwards } from "@/lib/queries/awards-queries";
+import { fetchAwards, postAwards } from "@/lib/fetches/awards-fetches";
 import AwardsFormSkeleton from "./awards-form-skeleton";
 
 interface AwardsFormProps {
@@ -57,14 +57,7 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
   const form = useForm<AwardsFormValues>({
     resolver: zodResolver(awardsSchema),
     defaultValues: {
-      awards: [
-        {
-          name: "",
-          issuer: "",
-          date: "",
-          description: "",
-        },
-      ],
+      awards: [], // allow no awards
     },
   });
 
@@ -76,22 +69,12 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
     name: "awards",
   });
 
-  // hydrate from API, but ensure at least one award
+  // hydrate from API, allow empty list
   useEffect(() => {
     if (!data) return;
 
     reset({
-      awards:
-        data.awards && data.awards.length > 0
-          ? data.awards
-          : [
-              {
-                name: "",
-                issuer: "",
-                date: "",
-                description: "",
-              },
-            ],
+      awards: data.awards && data.awards.length > 0 ? data.awards : [],
     });
 
     setIsDirtyForm(false);
@@ -103,7 +86,18 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
 
   const mutation = useMutation({
     mutationKey: ["awards", id],
-    mutationFn: (values: AwardsFormValues) => postAwards(id, values),
+    mutationFn: (values: AwardsFormValues) => {
+      const cleaned: AwardsFormValues = {
+        awards: (values.awards ?? []).filter(
+          (a) =>
+            a.name.trim() ||
+            a.issuer.trim() ||
+            a.date.trim() ||
+            a.description.trim()
+        ),
+      };
+      return postAwards(id, cleaned);
+    },
     onSuccess: () => {
       toast.success("Awards have been updated");
       queryClient.invalidateQueries({ queryKey: ["awards", id] });
@@ -115,18 +109,20 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
     mutation.mutate(values);
   };
 
-  // For "Add another award" enabled state
+  // Add button state: enabled if no awards OR last is complete
   const watchedAwards = useWatch({
     control,
     name: "awards",
   });
-  const last = watchedAwards?.[watchedAwards.length - 1];
-  const requiredFilledForLast =
+  const hasAny = !!watchedAwards && watchedAwards.length > 0;
+  const last = hasAny ? watchedAwards[watchedAwards.length - 1] : null;
+  const lastComplete =
     !!last &&
     last.name?.trim() &&
     last.issuer?.trim() &&
     last.date?.trim() &&
     last.description?.trim();
+  const canAddAward = !hasAny || lastComplete;
 
   if (isLoading && !data) {
     return <AwardsFormSkeleton />;
@@ -153,7 +149,7 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
                     <div className="font-medium text-sm text-muted-foreground">
                       Award {index + 1}
                     </div>
-                    {fields.length > 1 && (
+                    {fields.length > 0 && (
                       <Button
                         type="button"
                         size="icon"
@@ -254,7 +250,7 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                disabled={!requiredFilledForLast}
+                disabled={!canAddAward}
                 onClick={() =>
                   append({
                     name: "",
@@ -264,7 +260,7 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
                   })
                 }
               >
-                Add another award
+                {hasAny ? "Add another award" : "Add award"}
               </Button>
 
               <div className="flex justify-end gap-3">

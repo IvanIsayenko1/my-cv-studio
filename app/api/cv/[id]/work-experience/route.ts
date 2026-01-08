@@ -41,7 +41,7 @@ export async function GET(
 
   // Ensure CV belongs to user
   const cv = await db.execute(
-    "SELECT id FROM cvs WHERE id = ? AND user_id = ? LIMIT 1",
+    "SELECT id FROM cvs WHERE id = ? AND user_id = ? LIMIT 1 ",
     [cvId, ownerId]
   );
   if (cv.rows.length === 0) {
@@ -61,7 +61,9 @@ export async function GET(
       we.end_date
     FROM cv_work_experience we
     WHERE we.cv_id = ?
-    ORDER BY we.start_date DESC
+    ORDER BY
+      substr(start_date, 4, 4) DESC,  -- year
+      substr(start_date, 1, 2) DESC;  -- month
     `,
     [cvId]
   );

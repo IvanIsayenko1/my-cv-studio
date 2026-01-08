@@ -37,7 +37,9 @@ export async function GET(
       credential_id
     FROM cv_certifications
     WHERE cv_id = ?
-    ORDER BY issue_date DESC
+    ORDER BY
+      substr(issue_date, 4, 4) DESC,  -- year
+      substr(issue_date, 1, 2) DESC;  -- month
     `,
     [cvId]
   );

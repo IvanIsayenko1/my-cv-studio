@@ -27,7 +27,7 @@ import {
 import { Input } from "./ui/input";
 import { useState } from "react";
 
-const FormSchema = z.object({
+export const FormSchema = z.object({
   name: z.string().min(5, {
     message: "Name must be at least 5 characters long.",
   }),

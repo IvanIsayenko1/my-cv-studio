@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { randomUUID } from "crypto";
 import { auth } from "@clerk/nextjs/server";
 
-// GET /api/cv  -> list all user's CVs
 export async function GET(_req: NextRequest) {
   const { userId } = await auth();
   if (!userId) {
@@ -12,10 +11,19 @@ export async function GET(_req: NextRequest) {
 
   const result = await db.execute(
     `
-    SELECT id, user_id, title, status, created_at, updated_at
-    FROM cvs
-    WHERE user_id = ?
-    ORDER BY created_at DESC
+    SELECT
+    c.id,
+    c.user_id,
+    c.title,
+    c.status,
+    c.created_at,
+    c.updated_at,
+    ct.template_id
+  FROM cvs c
+  LEFT JOIN cv_template ct
+    ON ct.cv_id = c.id
+  WHERE c.user_id = ?
+  ORDER BY c.created_at DESC
     `,
     [userId]
   );
@@ -24,9 +32,9 @@ export async function GET(_req: NextRequest) {
     id: row.id as string,
     userId: row.user_id as string,
     title: row.title as string,
-    status: row.status as string,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+    templateId: row.template_id as string | null,
   }));
 
   return NextResponse.json(cvs);
@@ -56,15 +64,14 @@ export async function POST(req: NextRequest) {
 
   await db.execute({
     sql: `
-      INSERT INTO cvs (id, user_id, title, status)
+      INSERT INTO cvs (id, user_id, title)
       VALUES (?, ?, ?, ?)
     `,
-    args: [id, userId, title || "Untitled CV", "draft"],
+    args: [id, userId, title || "Untitled CV"],
   });
 
   return NextResponse.json({
     id: id,
     title: title || "Untitled CV",
-    status: "draft",
   });
 }
