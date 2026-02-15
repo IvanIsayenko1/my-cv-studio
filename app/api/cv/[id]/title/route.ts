@@ -1,12 +1,14 @@
 // app/api/cv/[id]/title/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
 
-type Params = { params: { id: string } };
+import { db } from "@/lib/db/client";
 
-export async function PUT(req: NextRequest, { params }: Params) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     const body = (await req.json()) as { title?: string };
     const title = body.title?.trim();

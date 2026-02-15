@@ -1,17 +1,20 @@
 "use client";
 
-import CVList from "@/components/cv-list";
-import { fetchCVList } from "@/lib/fetches/cv-fetches";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
+
+import CVList from "@/components/cv/cv-list";
+
+import { getCVList } from "@/lib/api/cv";
+import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
 export default function Dashboard() {
   const { isLoaded, isSignedIn } = useUser();
   const { isLoaded: authLoaded } = useAuth();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["cv-list"],
-    queryFn: () => fetchCVList(),
+    queryKey: [QUERY_KEYS.CV_LIST],
+    queryFn: () => getCVList(),
   });
 
   if (!isLoaded || !authLoaded) {

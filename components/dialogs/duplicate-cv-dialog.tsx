@@ -1,11 +1,19 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import z from "zod";
+
+import { FormSchema } from "@/components/cv/cv-add";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -13,16 +21,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { FormSchema } from "../cv-add";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCVQueryData } from "@/hooks/cv-hooks";
-import { useEffect } from "react";
-import { Input } from "../ui/input";
-import { DialogClose } from "@radix-ui/react-dialog";
-import { Button } from "../ui/button";
-import { Spinner } from "../ui/spinner";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+
+import { useCVQueryData } from "@/hooks/cv/use-cv";
 
 export default function DuplicateCVDialog({
   id,

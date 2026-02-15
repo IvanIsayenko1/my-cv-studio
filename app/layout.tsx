@@ -1,9 +1,11 @@
-import "./globals.css";
-
-import { ThemeProvider } from "@/components/theme-provider";
-import Layout from "@/components/layout";
 import { ClerkProvider } from "@clerk/nextjs";
-import { QueryProvider } from "@/components/query-provider";
+import { GeistSans } from "geist/font/sans";
+
+import Layout from "@/components/layout/layout";
+import { QueryProvider } from "@/components/shared/providers/query-provider";
+import { ThemeProvider } from "@/components/shared/providers/theme-provider";
+
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -12,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning className={GeistSans.className}>
         <head />
         <body>
           <ThemeProvider

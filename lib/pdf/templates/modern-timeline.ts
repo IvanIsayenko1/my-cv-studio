@@ -1,30 +1,90 @@
 // @ts-ignore
 import PDFDocument from "pdfkit";
+
 import { CV } from "@/types/cv";
 
-const PAGE = {
-  width: 595.28,
-  margin: 60,
-};
-
 const COLORS = {
-  primary: "#0F172A",
-  secondary: "#475569",
+  primary: "#111827",
+  secondary: "#6B7280",
   accent: "#2563EB",
-  light: "#CBD5E1",
 };
 
-const FONTS = {
-  name: 32,
-  title: 14,
-  section: 14,
-  body: 11,
-  small: 10,
+const TYPO = {
+  name: { font: "Helvetica-Bold", size: 26 },
+  title: { font: "Helvetica", size: 13 },
+  section: { font: "Helvetica-Bold", size: 12 },
+  body: { font: "Helvetica", size: 10.5 },
+  small: { font: "Helvetica", size: 9.5 },
 };
 
-export function generateModernTimelineCV(cv: CV): Promise<Buffer> {
+const RHYTHM = {
+  sectionGap: 18,
+  blockGap: 12,
+  tightGap: 4,
+};
+
+function applyStyle(doc: any, style: any) {
+  doc.font(style.font).fontSize(style.size);
+}
+
+function addSection(doc: any, title: string) {
+  doc.y += RHYTHM.sectionGap;
+  applyStyle(doc, TYPO.section);
+  doc.fillColor(COLORS.accent).text(title.toUpperCase());
+  doc.y += 6;
+}
+
+function renderTwoColumnBlock(
+  doc: any,
+  leftRender: () => void,
+  rightRender: () => void
+) {
+  const startY = doc.y;
+
+  const pageWidth =
+    doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+  const leftWidth = pageWidth * 0.32;
+  const gap = 20;
+  const rightX = doc.page.margins.left + leftWidth + gap;
+
+  // LEFT
+  doc.y = startY;
+  doc.x = doc.page.margins.left;
+  leftRender();
+  const leftEndY = doc.y;
+
+  // RIGHT
+  doc.y = startY;
+  doc.x = rightX;
+  rightRender();
+  const rightEndY = doc.y;
+
+  // Reset cursor
+  doc.x = doc.page.margins.left;
+  doc.y = Math.max(leftEndY, rightEndY);
+}
+
+function renderBulletList(doc: any, items?: string[]) {
+  if (!items?.length) return;
+
+  applyStyle(doc, TYPO.body);
+  doc.fillColor(COLORS.primary);
+
+  doc.list(items, {
+    bulletRadius: 2,
+    textIndent: 12,
+    bulletIndent: 4,
+    lineGap: 2,
+  });
+}
+
+export function generateModernTwoColumnCV(cv: CV): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: "A4", margin: PAGE.margin });
+    const doc = new PDFDocument({
+      margin: 72,
+      size: "A4",
+    });
 
     const chunks: Buffer[] = [];
     doc.on("data", (c: Buffer) => chunks.push(c));
@@ -33,279 +93,293 @@ export function generateModernTimelineCV(cv: CV): Promise<Buffer> {
 
     /* =======================
        HEADER
-       ======================= */
+    ======================= */
 
-    const fullName = `${cv.personalInfo.firstName} ${cv.personalInfo.lastName}`;
-
+    applyStyle(doc, TYPO.name);
     doc
-      .font("Helvetica-Bold")
-      .fontSize(FONTS.name)
-      .fillColor(COLORS.primary)
-      .text(fullName);
+      .fillColor(COLORS.accent)
+      .text(`${cv.personalInfo.firstName} ${cv.personalInfo.lastName}`);
 
     if (cv.personalInfo.professionalTitle) {
-      doc
-        .font("Helvetica")
-        .fontSize(FONTS.title)
-        .fillColor(COLORS.accent)
-        .text(cv.personalInfo.professionalTitle);
+      applyStyle(doc, TYPO.title);
+      doc.fillColor(COLORS.primary).text(cv.personalInfo.professionalTitle);
     }
 
-    doc.moveDown(0.4);
+    const contact = [
+      cv.personalInfo.email,
+      cv.personalInfo.phone,
+      `${cv.personalInfo.city}, ${cv.personalInfo.country}`,
+      cv.personalInfo.linkedIn,
+      cv.personalInfo.portfolio,
+    ]
+      .filter(Boolean)
+      .join(" | ");
+
+    doc.y += RHYTHM.tightGap;
+
+    applyStyle(doc, TYPO.small);
+    doc.fillColor(COLORS.secondary).text(contact);
 
     doc
-      .font("Helvetica")
-      .fontSize(FONTS.small)
-      .fillColor(COLORS.secondary)
-      .text(
-        [
-          cv.personalInfo.city && cv.personalInfo.country
-            ? `${cv.personalInfo.city}, ${cv.personalInfo.country}`
-            : null,
-          cv.personalInfo.email,
-          cv.personalInfo.phone,
-          cv.personalInfo.linkedIn,
-          cv.personalInfo.portfolio,
-        ]
-          .filter(Boolean)
-          .join(" • "),
-        { width: PAGE.width - PAGE.margin * 2 }
-      );
-
-    doc.moveDown(1.2);
+      .moveTo(doc.page.margins.left, doc.y + 8)
+      .lineTo(doc.page.width - doc.page.margins.right, doc.y + 8)
+      .strokeColor(COLORS.accent)
+      .lineWidth(1)
+      .stroke();
 
     /* =======================
-       PROFILE
-       ======================= */
+       PROFESSIONAL PROFILE
+    ======================= */
 
     if (cv.professionalSummary) {
-      sectionTitle(doc, "Profile");
-      doc
-        .font("Helvetica")
-        .fontSize(FONTS.body)
-        .fillColor(COLORS.primary)
-        .text(sanitize(cv.professionalSummary));
-      doc.moveDown(1);
-    }
+      addSection(doc, "Professional Profile");
 
-    /* =======================
-       EXPERIENCE (TIMELINE)
-       ======================= */
-
-    if (cv.workExperience?.length) {
-      sectionTitle(doc, "Experience");
-
-      const timelineX = PAGE.margin + 10;
-      const contentX = PAGE.margin + 40;
-      const dotPositions: number[] = [];
-
-      cv.workExperience.forEach((job) => {
-        const start = formatDate(job.startDate);
-        const end =
-          job.endDate === "Present" ? "Present" : formatDate(job.endDate);
-
-        const entryStartY = doc.y;
-        dotPositions.push(entryStartY + 4);
-
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(FONTS.body)
-          .fillColor(COLORS.primary)
-          .text(job.jobTitle, contentX);
-
-        doc
-          .font("Helvetica")
-          .fontSize(FONTS.small)
-          .fillColor(COLORS.secondary)
-          .text(
-            `${job.company} • ${job.location} • ${start} – ${end}`,
-            contentX
-          );
-
-        doc.moveDown(0.3);
-
-        job.achievements?.forEach((a) => {
-          doc
-            .font("Helvetica")
-            .fontSize(FONTS.body)
-            .fillColor(COLORS.primary)
-            .text(`– ${sanitize(a)}`, {
-              width: PAGE.width - contentX - PAGE.margin,
-            });
-          doc.moveDown(0.2);
-        });
-
-        if (job.technologies?.length) {
-          doc
-            .font("Helvetica")
-            .fontSize(FONTS.small)
-            .fillColor(COLORS.secondary)
-            .text(`Tech: ${job.technologies.join(", ")}`, contentX);
-        }
-
-        doc.moveDown(1);
-      });
-
-      // draw timeline line FIRST
-      doc
-        .strokeColor(COLORS.light)
-        .lineWidth(2)
-        .moveTo(timelineX, dotPositions[0])
-        .lineTo(timelineX, dotPositions[dotPositions.length - 1])
-        .stroke();
-
-      // draw dots LAST (on top of the line)
-      dotPositions.forEach((y) => {
-        doc.circle(timelineX, y, 5).fill(COLORS.accent);
-      });
-
-      doc.moveDown(1);
+      applyStyle(doc, TYPO.body);
+      doc.fillColor(COLORS.primary).text(cv.professionalSummary);
     }
 
     /* =======================
        SKILLS
-       ======================= */
+    ======================= */
 
     if (cv.skills) {
-      sectionTitle(doc, "Skills");
+      addSection(doc, "Core Skills");
 
-      const groups = [
-        { label: "Frontend", values: cv.skills.technical },
-        { label: "Tools & Practices", values: cv.skills.hard },
-        { label: "Professional", values: cv.skills.soft },
-      ];
-
-      groups.forEach(({ label, values }) => {
+      const renderSkillRow = (label: string, values?: string[]) => {
         if (!values?.length) return;
 
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(FONTS.body)
-          .fillColor(COLORS.primary)
-          .text(label);
+        renderTwoColumnBlock(
+          doc,
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc.fillColor(COLORS.primary).font("Helvetica-Bold").text(label);
+          },
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc
+              .fillColor(COLORS.primary)
+              .font("Helvetica")
+              .text(values.join(" • "));
+          }
+        );
 
-        doc
-          .font("Helvetica")
-          .fontSize(FONTS.body)
-          .fillColor(COLORS.secondary)
-          .text(values.join(" • "), {
-            width: PAGE.width - PAGE.margin * 2,
-          });
+        doc.y += RHYTHM.tightGap;
+      };
 
-        doc.moveDown(0.4);
-      });
+      renderSkillRow("Core Competencies", cv.skills.coreCompetencies);
+
+      renderSkillRow("Tools & Technologies", cv.skills.toolsAndTechnologies);
+
+      renderSkillRow(
+        "Systems & Methodologies",
+        cv.skills.systemsAndMethodologies
+      );
+
+      renderSkillRow(
+        "Collaboration & Delivery",
+        cv.skills.collaborationAndDelivery
+      );
 
       if (cv.skills.languages?.length) {
-        doc
-          .font("Helvetica")
-          .fontSize(FONTS.body)
-          .fillColor(COLORS.primary)
-          .text(
-            `Languages: ${cv.skills.languages
-              .map((l) => `${l.language} (${l.proficiency})`)
-              .join(", ")}`
-          );
+        const langs = cv.skills.languages.map(
+          (l) => `${l.language} — ${l.proficiency}`
+        );
+        renderSkillRow("Languages", langs);
       }
+    }
 
-      doc.moveDown(1);
+    /* =======================
+       EXPERIENCE
+    ======================= */
+
+    if (cv.workExperience?.length) {
+      addSection(doc, "Professional Experience");
+
+      cv.workExperience.forEach((job, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
+
+        renderTwoColumnBlock(
+          doc,
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc
+              .fillColor(COLORS.primary)
+              .font("Helvetica-Bold")
+              .text(job.jobTitle);
+
+            doc
+              .font("Helvetica")
+              .fillColor(COLORS.secondary)
+              .text(`${job.company} — ${job.location}`);
+
+            doc.text(`${job.startDate} – ${job.endDate || "Present"}`);
+
+            doc.text(job.employmentType);
+          },
+          () => {
+            renderBulletList(doc, job.achievements);
+
+            if (job.technologies?.length) {
+              doc.moveDown(0.5);
+              applyStyle(doc, TYPO.small);
+              doc
+                .fillColor(COLORS.secondary)
+                .text(`Technologies: ${job.technologies.join(", ")}`);
+            }
+          }
+        );
+      });
+    }
+
+    /* =======================
+       EDUCATION
+    ======================= */
+
+    if (cv.education?.length) {
+      addSection(doc, "Education");
+
+      cv.education.forEach((edu, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
+
+        renderTwoColumnBlock(
+          doc,
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc
+              .fillColor(COLORS.primary)
+              .font("Helvetica-Bold")
+              .text(`${edu.degree} in ${edu.fieldOfStudy}`);
+
+            doc
+              .font("Helvetica")
+              .fillColor(COLORS.secondary)
+              .text(edu.institution);
+
+            doc.text(edu.location);
+            doc.text(edu.graduationDate);
+          },
+          () => {
+            if (edu.gpa || edu.honors) {
+              applyStyle(doc, TYPO.small);
+              doc
+                .fillColor(COLORS.primary)
+                .text(
+                  [edu.gpa && `GPA: ${edu.gpa}`, edu.honors]
+                    .filter(Boolean)
+                    .join(" | ")
+                );
+            }
+          }
+        );
+      });
+    }
+
+    /* =======================
+       CERTIFICATIONS
+    ======================= */
+
+    if (cv.certifications?.length) {
+      addSection(doc, "Certifications");
+
+      cv.certifications.forEach((cert, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
+
+        renderTwoColumnBlock(
+          doc,
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc
+              .fillColor(COLORS.primary)
+              .font("Helvetica-Bold")
+              .text(cert.name);
+
+            doc
+              .font("Helvetica")
+              .fillColor(COLORS.secondary)
+              .text(cert.issuingOrg);
+
+            doc.text(
+              `Issued: ${cert.issueDate}${
+                cert.expirationDate ? ` | Expires: ${cert.expirationDate}` : ""
+              }`
+            );
+          },
+          () => {
+            if (cert.credentialId) {
+              applyStyle(doc, TYPO.small);
+              doc
+                .fillColor(COLORS.primary)
+                .text(`Credential ID: ${cert.credentialId}`);
+            }
+          }
+        );
+      });
     }
 
     /* =======================
        PROJECTS
-       ======================= */
+    ======================= */
 
     if (cv.projects?.length) {
-      sectionTitle(doc, "Projects");
+      addSection(doc, "Projects");
 
-      cv.projects.slice(0, 3).forEach((p) => {
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(FONTS.body)
-          .fillColor(COLORS.primary)
-          .text(p.name);
+      cv.projects.forEach((p, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
 
-        doc
-          .font("Helvetica")
-          .fontSize(FONTS.small)
-          .fillColor(COLORS.secondary)
-          .text(
-            `${p.role} • ${formatDate(p.startDate)} – ${formatDate(p.endDate)}`
-          );
+        renderTwoColumnBlock(
+          doc,
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc.fillColor(COLORS.primary).font("Helvetica-Bold").text(p.name);
 
-        if (p.url) doc.text(p.url);
+            doc.font("Helvetica").fillColor(COLORS.secondary).text(`${p.role}`);
 
-        if (p.description) {
-          doc
-            .moveDown(0.1)
-            .fontSize(FONTS.body)
-            .fillColor(COLORS.primary)
-            .text(sanitize(p.description));
-        }
+            doc.text(`${p.startDate} – ${p.endDate}`);
 
-        doc.moveDown(0.8);
+            if (p.url) doc.text(p.url);
+          },
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc.fillColor(COLORS.primary).text(p.description);
+          }
+        );
       });
     }
 
     /* =======================
-       EDUCATION & CERTS
-       ======================= */
+       AWARDS
+    ======================= */
 
-    sectionTitle(doc, "Education & Certifications");
+    if (cv.awards?.length) {
+      addSection(doc, "Awards");
 
-    cv.education?.forEach((edu) => {
-      doc
-        .font("Helvetica-Bold")
-        .fontSize(FONTS.body)
-        .fillColor(COLORS.primary)
-        .text(edu.institution);
+      cv.awards.forEach((award, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
 
-      doc
-        .font("Helvetica")
-        .fontSize(FONTS.small)
-        .fillColor(COLORS.secondary)
-        .text(
-          `${edu.degree} in ${edu.fieldOfStudy} • ${formatDate(
-            edu.graduationDate
-          )}`
+        renderTwoColumnBlock(
+          doc,
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc
+              .fillColor(COLORS.primary)
+              .font("Helvetica-Bold")
+              .text(award.name);
+
+            doc
+              .font("Helvetica")
+              .fillColor(COLORS.secondary)
+              .text(award.issuer);
+
+            doc.text(award.date);
+          },
+          () => {
+            applyStyle(doc, TYPO.body);
+            doc.fillColor(COLORS.primary).text(award.description);
+          }
         );
-
-      doc.moveDown(0.4);
-    });
-
-    cv.certifications?.forEach((c) => {
-      doc
-        .font("Helvetica")
-        .fontSize(FONTS.body)
-        .fillColor(COLORS.primary)
-        .text(`${c.name} • ${c.issuingOrg}`);
-    });
+      });
+    }
 
     doc.end();
   });
-}
-
-/* =======================
-   HELPERS
-   ======================= */
-
-function sectionTitle(doc: any, title: string) {
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(FONTS.section)
-    .fillColor(COLORS.accent)
-    .text(title.toUpperCase());
-  doc.moveDown(0.4);
-}
-
-function formatDate(dateStr: string): string {
-  if (!dateStr || dateStr === "Present") return dateStr;
-  const match = dateStr.match(/(\d{1,2})[\/-](\d{4})/);
-  return match ? `${match[1].padStart(2, "0")}/${match[2]}` : dateStr;
-}
-
-function sanitize(text: string): string {
-  return text
-    .replace(/[–—]/g, "-")
-    .replace(/\s+/g, " ")
-    .replace(/[^\x00-\x7F]/g, "");
 }

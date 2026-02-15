@@ -1,7 +1,9 @@
-import { db } from "@/lib/db";
-import { getCompleteCV } from "@/lib/db-queries/cv-queries";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+
+import { auth } from "@clerk/nextjs/server";
+
+import { db } from "@/lib/db/client";
+import { getCompleteCV } from "@/lib/db/queries";
 
 export async function GET(
   _req: NextRequest,
@@ -14,13 +16,20 @@ export async function GET(
 
   const { id } = await context.params;
 
-  const cv = await getCompleteCV(id);
+  // const cv = await getCompleteCV(id);
 
-  if (!cv) {
+  const result = await db.execute({
+    sql: "SELECT id, user_id, title, created_at, updated_at FROM cvs WHERE id = ? AND user_id = ?",
+    args: [id, userId],
+  });
+
+  if (!result.rows.length) {
     return NextResponse.json({ error: "CV not found" }, { status: 404 });
   }
 
-  return NextResponse.json(cv);
+  const row: any = result.rows[0];
+
+  return NextResponse.json(row);
 }
 
 export async function DELETE(

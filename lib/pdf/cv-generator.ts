@@ -1,8 +1,9 @@
 import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
+
 import { generateATSCleanCV } from "./templates/ats-friendly-clean";
 import { generateATSCleanColoredCV } from "./templates/ats-friendly-clean-colored";
-import { generateModernTimelineCV } from "./templates/modern-timeline";
+import { generateModernTwoColumnCV } from "./templates/modern-timeline";
 
 export async function generateCVPDF(cv: CV): Promise<Buffer> {
   if (cv.templateId === TemplateId.ATS_FRIENDLY_CLEAN) {
@@ -12,7 +13,7 @@ export async function generateCVPDF(cv: CV): Promise<Buffer> {
     return generateATSCleanColoredCV(cv);
   }
   if (cv.templateId === TemplateId.MODERN_TIMELINE) {
-    return generateModernTimelineCV(cv);
+    return generateModernTwoColumnCV(cv);
   }
 
   return generateATSCleanCV(cv);

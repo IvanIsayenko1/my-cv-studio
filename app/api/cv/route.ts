@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { randomUUID } from "crypto";
+
 import { auth } from "@clerk/nextjs/server";
+import { randomUUID } from "crypto";
+
+import { db } from "@/lib/db/client";
 
 export async function GET(_req: NextRequest) {
   const { userId } = await auth();
@@ -15,7 +17,6 @@ export async function GET(_req: NextRequest) {
     c.id,
     c.user_id,
     c.title,
-    c.status,
     c.created_at,
     c.updated_at,
     ct.template_id
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
   await db.execute({
     sql: `
       INSERT INTO cvs (id, user_id, title)
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?, ?)
     `,
     args: [id, userId, title || "Untitled CV"],
   });

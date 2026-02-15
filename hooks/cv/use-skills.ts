@@ -1,0 +1,78 @@
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { fetchSkills, postSkills } from "@/lib/api/skills";
+import { QUERY_KEYS } from "@/lib/constants/query-keys";
+
+import { SkillsFormValues } from "@/types/skills";
+
+/**
+ * Mutation hook to save skills.
+ * Cleans the input data by filtering out empty skills in technical, hard, soft, and languages categories.
+ * @param id The ID of the CV/resume to update.
+ */
+export function useSaveSkills(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: [QUERY_KEYS.SKILLS, id],
+    mutationFn: (values: SkillsFormValues) => {
+      const cleaned: SkillsFormValues = {
+        skills: {
+          coreCompetencies: values.skills.coreCompetencies
+            ? values.skills.coreCompetencies
+                .map((s) => s.trim())
+                .filter(Boolean)
+            : [],
+          toolsAndTechnologies: values.skills.toolsAndTechnologies
+            ? values.skills.toolsAndTechnologies
+                .map((s) => s.trim())
+                .filter(Boolean)
+            : [],
+          systemsAndMethodologies: values.skills.systemsAndMethodologies
+            ? values.skills.systemsAndMethodologies
+                .map((s) => s.trim())
+                .filter(Boolean)
+            : [],
+          collaborationAndDelivery: values.skills.collaborationAndDelivery
+            ? values.skills.collaborationAndDelivery
+                .map((s) => s.trim())
+                .filter(Boolean)
+            : [],
+          languages: values.skills.languages
+            ? values.skills.languages
+                .map((l) => ({
+                  language: l.language.trim(),
+                  proficiency: l.proficiency,
+                }))
+                .filter((l) => l.language && l.proficiency)
+            : [],
+        },
+      };
+      return postSkills(id, cleaned);
+    },
+    onSuccess: () => {
+      toast.success("Skills have been updated");
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SKILLS, id] });
+    },
+    onError: (error) => {
+      toast.error("Failed to update skills");
+      console.error(error);
+    },
+  });
+}
+
+/**
+ * Suspense query hook to fetch skills data.
+ * @param id The ID of the CV/resume.
+ */
+export function useSkills(id: string) {
+  return useSuspenseQuery({
+    queryKey: [QUERY_KEYS.SKILLS, id],
+    queryFn: () => fetchSkills(id),
+  });
+}

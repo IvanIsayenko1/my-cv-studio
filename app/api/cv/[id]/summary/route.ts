@@ -1,8 +1,9 @@
-// app/api/cv/[id]/summary/route.ts
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+
+import { auth } from "@clerk/nextjs/server";
 import z from "zod";
+
+import { db } from "@/lib/db/client";
 
 export async function GET(
   _req: NextRequest,
@@ -22,6 +23,7 @@ export async function GET(
     "SELECT id FROM cvs WHERE id = ? AND user_id = ? LIMIT 1",
     [cvId, ownerId]
   );
+
   if (cvResult.rows.length === 0) {
     return NextResponse.json({ error: "CV not found" }, { status: 404 });
   }

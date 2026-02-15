@@ -1,8 +1,10 @@
-import { db } from "@/lib/db";
-import { getCompleteCV } from "@/lib/db-queries/cv-queries";
+import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
-import { NextRequest, NextResponse } from "next/server";
+
+import { db } from "@/lib/db/client";
+import { getCompleteCV } from "@/lib/db/queries";
 
 export async function POST(
   req: NextRequest,
@@ -51,10 +53,10 @@ export async function POST(
   // cv
   await db.execute({
     sql: `
-      INSERT INTO cvs (id, user_id, title, status)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO cvs (id, user_id, title)
+      VALUES (?, ?, ?)
     `,
-    args: [newRandomId, userId, title || "Untitled CV", "draft"],
+    args: [newRandomId, userId, title || "Untitled CV"],
   });
 
   // personal info

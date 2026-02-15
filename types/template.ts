@@ -1,10 +1,4 @@
-import { z } from "zod";
-
-export const templateSchema = z.object({
-  id: z.string().min(1, "Please select a template"),
-});
-
-export type TemplateFormValues = z.infer<typeof templateSchema>;
+export { templateSchema, type TemplateFormValues } from "@/schemas/template";
 
 export enum TemplateId {
   ATS_FRIENDLY_CLEAN = "ats-friendly-clean",

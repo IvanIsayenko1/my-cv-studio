@@ -1,9 +1,11 @@
 // app/api/cv/[id]/awards/route.ts
 import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
 import { z } from "zod";
-import { db } from "@/lib/db";
+
+import { db } from "@/lib/db/client";
 
 // You can also import this from "@/types/awards"
 const awardItemSchema = z.object({

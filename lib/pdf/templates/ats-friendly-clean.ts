@@ -1,5 +1,6 @@
 // @ts-ignore
 import PDFDocument from "pdfkit";
+
 import { CV } from "@/types/cv";
 
 const COLORS = {
@@ -7,13 +8,55 @@ const COLORS = {
   secondary: "#555555",
 };
 
-const FONTS = {
-  name: 26,
-  title: 13,
-  heading: 13,
-  body: 11,
-  small: 10,
+const TYPO = {
+  name: { font: "Helvetica-Bold", size: 24 },
+  title: { font: "Helvetica", size: 12 },
+  section: { font: "Helvetica-Bold", size: 11.5 },
+  body: { font: "Helvetica", size: 10.5 },
+  small: { font: "Helvetica", size: 9.5 },
 };
+
+const RHYTHM = {
+  sectionGap: 14,
+  sectionTitleGap: 6,
+  blockGap: 8,
+  tightGap: 3,
+};
+
+function applyStyle(doc: any, style: any) {
+  doc.font(style.font).fontSize(style.size);
+}
+
+function addSection(doc: any, title: string) {
+  doc.y += RHYTHM.sectionGap;
+
+  applyStyle(doc, TYPO.section);
+  doc.fillColor(COLORS.primary).text(title.toUpperCase());
+
+  doc.y += RHYTHM.sectionTitleGap;
+}
+
+function renderBulletList(doc: any, items: string[]) {
+  if (!items?.length) return;
+
+  applyStyle(doc, TYPO.body);
+  doc.fillColor(COLORS.primary);
+
+  doc.list(items, {
+    bulletRadius: 2,
+    textIndent: 12,
+    bulletIndent: 4,
+    lineGap: 2,
+  });
+
+  doc.y += RHYTHM.tightGap;
+}
+
+function formatATSDate(dateStr?: string): string {
+  if (!dateStr || dateStr === "Present") return dateStr || "";
+  const match = dateStr.match(/(\d{1,2})[\/-](\d{4})/);
+  return match ? `${match[1].padStart(2, "0")}/${match[2]}` : dateStr;
+}
 
 export function generateATSCleanCV(cv: CV): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -21,6 +64,8 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
       margin: 72,
       size: "A4",
     });
+
+    doc.lineGap(1.5);
 
     const chunks: Buffer[] = [];
     doc.on("data", (c: Buffer) => chunks.push(c));
@@ -33,21 +78,15 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
 
     const fullName = `${cv.personalInfo.firstName} ${cv.personalInfo.lastName}`;
 
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(FONTS.name)
-      .fillColor(COLORS.primary)
-      .text(fullName);
+    applyStyle(doc, TYPO.name);
+    doc.fillColor(COLORS.primary).text(fullName);
 
     if (cv.personalInfo.professionalTitle) {
-      doc
-        .font("Helvetica")
-        .fontSize(FONTS.title)
-        .fillColor(COLORS.secondary)
-        .text(cv.personalInfo.professionalTitle);
+      applyStyle(doc, TYPO.title);
+      doc.fillColor(COLORS.secondary).text(cv.personalInfo.professionalTitle);
     }
 
-    doc.moveDown(0.4);
+    doc.y += RHYTHM.tightGap;
 
     const contactLine = [
       cv.personalInfo.email,
@@ -59,13 +98,8 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
       .filter(Boolean)
       .join(" | ");
 
-    doc
-      .font("Helvetica")
-      .fontSize(FONTS.small)
-      .fillColor(COLORS.primary)
-      .text(contactLine);
-
-    doc.moveDown(1);
+    applyStyle(doc, TYPO.small);
+    doc.fillColor(COLORS.primary).text(contactLine);
 
     /* =======================
        PROFESSIONAL SUMMARY
@@ -73,11 +107,9 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
 
     if (cv.professionalSummary) {
       addSection(doc, "Professional Summary");
-      doc
-        .font("Helvetica")
-        .fontSize(FONTS.body)
-        .fillColor(COLORS.primary)
-        .text(cv.professionalSummary);
+
+      applyStyle(doc, TYPO.body);
+      doc.fillColor(COLORS.primary).text(cv.professionalSummary);
     }
 
     /* =======================
@@ -87,50 +119,44 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
     if (cv.skills) {
       addSection(doc, "Skills");
 
-      if (cv.skills.technical?.length) {
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(FONTS.body)
-          .text("Technical Skills");
-        doc
-          .font("Helvetica")
-          .fillColor(COLORS.secondary)
-          .text(cv.skills.technical.join(", "));
-        doc.moveDown(0.3);
-      }
+      const renderSkillCategory = (title: string, values?: string[]) => {
+        if (!values?.length) return;
 
-      if (cv.skills.hard?.length) {
-        doc
-          .font("Helvetica-Bold")
-          .fillColor(COLORS.primary)
-          .text("Tools & Practices");
-        doc
-          .font("Helvetica")
-          .fillColor(COLORS.secondary)
-          .text(cv.skills.hard.join(", "));
-        doc.moveDown(0.3);
-      }
+        applyStyle(doc, TYPO.body);
+        doc.fillColor(COLORS.primary).text(title);
 
-      if (cv.skills.soft?.length) {
-        doc
-          .font("Helvetica-Bold")
-          .fillColor(COLORS.primary)
-          .text("Professional Skills");
-        doc
-          .font("Helvetica")
-          .fillColor(COLORS.secondary)
-          .text(cv.skills.soft.join(", "));
-        doc.moveDown(0.3);
-      }
+        doc.y += RHYTHM.tightGap;
+
+        renderBulletList(doc, values);
+
+        doc.y += RHYTHM.blockGap;
+      };
+
+      renderSkillCategory("Core Competencies", cv.skills.coreCompetencies);
+      renderSkillCategory(
+        "Tools & Technologies",
+        cv.skills.toolsAndTechnologies
+      );
+      renderSkillCategory(
+        "Systems & Methodologies",
+        cv.skills.systemsAndMethodologies
+      );
+      renderSkillCategory(
+        "Collaboration & Delivery",
+        cv.skills.collaborationAndDelivery
+      );
 
       if (cv.skills.languages?.length) {
-        const langs = cv.skills.languages
-          .map((l) => `${l.language} (${l.proficiency})`)
-          .join(", ");
-        doc
-          .font("Helvetica")
-          .fillColor(COLORS.primary)
-          .text(`Languages: ${langs}`);
+        applyStyle(doc, TYPO.body);
+        doc.fillColor(COLORS.primary).text("Languages");
+
+        doc.y += RHYTHM.tightGap;
+
+        const langs = cv.skills.languages.map(
+          (l) => `${l.language} — ${l.proficiency}`
+        );
+
+        renderBulletList(doc, langs);
       }
     }
 
@@ -141,42 +167,31 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
     if (cv.workExperience?.length) {
       addSection(doc, "Work Experience");
 
-      cv.workExperience.forEach((job) => {
+      cv.workExperience.forEach((job, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
+
         const start = formatATSDate(job.startDate);
         const end =
           job.endDate === "Present" ? "Present" : formatATSDate(job.endDate);
 
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(FONTS.body)
-          .fillColor(COLORS.primary)
-          .text(job.jobTitle);
+        applyStyle(doc, TYPO.body);
+        doc.fillColor(COLORS.primary).font("Helvetica-Bold").text(job.jobTitle);
 
+        applyStyle(doc, TYPO.small);
         doc
-          .font("Helvetica")
-          .fontSize(FONTS.small)
           .fillColor(COLORS.secondary)
           .text(`${job.company}, ${job.location} | ${start} – ${end}`);
 
-        doc.moveDown(0.25);
+        doc.y += RHYTHM.tightGap;
 
-        job.achievements?.forEach((a) => {
-          doc
-            .font("Helvetica")
-            .fontSize(FONTS.body)
-            .fillColor(COLORS.primary)
-            .text(`- ${a}`);
-        });
+        renderBulletList(doc, job.achievements ?? []);
 
         if (job.technologies?.length) {
+          applyStyle(doc, TYPO.small);
           doc
-            .moveDown(0.2)
-            .fontSize(FONTS.small)
             .fillColor(COLORS.secondary)
             .text(`Technologies: ${job.technologies.join(", ")}`);
         }
-
-        doc.moveDown(0.8);
       });
     }
 
@@ -187,22 +202,23 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
     if (cv.education?.length) {
       addSection(doc, "Education");
 
-      cv.education.forEach((edu) => {
+      cv.education.forEach((edu, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
+
+        applyStyle(doc, TYPO.body);
         doc
-          .font("Helvetica-Bold")
-          .fontSize(FONTS.body)
           .fillColor(COLORS.primary)
+          .font("Helvetica-Bold")
           .text(`${edu.degree} in ${edu.fieldOfStudy}`);
 
+        applyStyle(doc, TYPO.small);
         doc
-          .font("Helvetica")
-          .fontSize(FONTS.small)
           .fillColor(COLORS.secondary)
           .text(`${edu.institution} | ${formatATSDate(edu.graduationDate)}`);
 
         if (edu.gpa || edu.honors) {
+          applyStyle(doc, TYPO.small);
           doc
-            .fontSize(FONTS.small)
             .fillColor(COLORS.primary)
             .text(
               [edu.gpa && `GPA: ${edu.gpa}`, edu.honors]
@@ -210,8 +226,6 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
                 .join(" | ")
             );
         }
-
-        doc.moveDown(0.6);
       });
     }
 
@@ -223,12 +237,11 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
       addSection(doc, "Certifications");
 
       cv.certifications.forEach((cert) => {
+        applyStyle(doc, TYPO.body);
         doc
-          .font("Helvetica")
-          .fontSize(FONTS.body)
           .fillColor(COLORS.primary)
           .text(
-            `${cert.name} – ${cert.issuingOrg}${
+            `${cert.name} — ${cert.issuingOrg}${
               cert.issueDate ? ` (${formatATSDate(cert.issueDate)})` : ""
             }`
           );
@@ -242,53 +255,62 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
     if (cv.projects?.length) {
       addSection(doc, "Projects");
 
-      cv.projects.slice(0, 3).forEach((p) => {
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(FONTS.body)
-          .fillColor(COLORS.primary)
-          .text(`${p.name} – ${p.role}`);
+      cv.projects.slice(0, 3).forEach((p, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
 
+        applyStyle(doc, TYPO.body);
         doc
-          .font("Helvetica")
-          .fontSize(FONTS.small)
+          .fillColor(COLORS.primary)
+          .font("Helvetica-Bold")
+          .text(`${p.name} — ${p.role}`);
+
+        applyStyle(doc, TYPO.small);
+        doc
           .fillColor(COLORS.secondary)
           .text(`${formatATSDate(p.startDate)} – ${formatATSDate(p.endDate)}`);
 
-        if (p.url) doc.text(p.url);
-
-        if (p.description) {
-          doc
-            .moveDown(0.1)
-            .fontSize(FONTS.body)
-            .fillColor(COLORS.primary)
-            .text(p.description);
+        if (p.url) {
+          applyStyle(doc, TYPO.small);
+          doc.fillColor(COLORS.secondary).text(p.url);
         }
 
-        doc.moveDown(0.7);
+        if (p.description) {
+          doc.y += RHYTHM.tightGap;
+          applyStyle(doc, TYPO.body);
+          doc.fillColor(COLORS.primary).text(p.description);
+        }
+      });
+    }
+
+    /* =======================
+       AWARDS
+       ======================= */
+
+    if (cv.awards?.length) {
+      addSection(doc, "Awards");
+
+      cv.awards.forEach((award, index) => {
+        if (index !== 0) doc.y += RHYTHM.blockGap;
+
+        applyStyle(doc, TYPO.body);
+        doc.fillColor(COLORS.primary).font("Helvetica-Bold").text(award.name);
+
+        applyStyle(doc, TYPO.small);
+        doc
+          .fillColor(COLORS.secondary)
+          .text(`${award.issuer} | ${formatATSDate(award.date)}`);
+
+        doc.y += RHYTHM.tightGap;
+
+        const descriptionLines = award.description
+          .split("\n")
+          .map((l: string) => l.trim())
+          .filter(Boolean);
+
+        renderBulletList(doc, descriptionLines);
       });
     }
 
     doc.end();
   });
-}
-
-/* =======================
-   HELPERS
-   ======================= */
-
-function addSection(doc: any, title: string) {
-  doc.moveDown(0.9);
-  doc
-    .font("Helvetica-Bold")
-    .fontSize(FONTS.heading)
-    .fillColor(COLORS.primary)
-    .text(title.toUpperCase());
-  doc.moveDown(0.4);
-}
-
-function formatATSDate(dateStr: string): string {
-  if (!dateStr || dateStr === "Present") return dateStr;
-  const match = dateStr.match(/(\d{1,2})[\/-](\d{4})/);
-  return match ? `${match[1].padStart(2, "0")}/${match[2]}` : dateStr;
 }

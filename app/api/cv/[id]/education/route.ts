@@ -1,8 +1,10 @@
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+
+import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
 import { z } from "zod";
+
+import { db } from "@/lib/db/client";
 
 export async function GET(
   _req: NextRequest,

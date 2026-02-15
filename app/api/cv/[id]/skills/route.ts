@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@clerk/nextjs/server";
-import { db } from "@/lib/db";
+
+import { db } from "@/lib/db/client";
+
 import { skillsSchema } from "@/types/skills";
 
 export async function GET(
@@ -27,7 +30,7 @@ export async function GET(
 
   const result = await db.execute(
     `
-    SELECT technical, hard, soft, languages
+    SELECT coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages
     FROM cv_skills
     WHERE cv_id = ?
     LIMIT 1
@@ -39,9 +42,10 @@ export async function GET(
     // Let the form fall back to its defaultValues
     return NextResponse.json({
       skills: {
-        technical: [],
-        hard: [],
-        soft: [],
+        coreCompetencies: [],
+        toolsAndTechnologies: [],
+        systemsAndMethodologies: [],
+        collaborationAndDelivery: [],
         languages: [],
       },
     });
@@ -51,9 +55,14 @@ export async function GET(
 
   return NextResponse.json({
     skills: {
-      technical: JSON.parse(row.technical as string),
-      hard: JSON.parse(row.hard as string),
-      soft: JSON.parse(row.soft as string),
+      coreCompetencies: JSON.parse(row.coreCompetencies as string),
+      toolsAndTechnologies: JSON.parse(row.toolsAndTechnologies as string),
+      systemsAndMethodologies: JSON.parse(
+        row.systemsAndMethodologies as string
+      ),
+      collaborationAndDelivery: JSON.parse(
+        row.collaborationAndDelivery as string
+      ),
       languages: JSON.parse(row.languages as string),
     },
   });
@@ -97,19 +106,21 @@ export async function POST(
   // Upsert into cv_skills
   await db.execute(
     `
-    INSERT INTO cv_skills (cv_id, technical, hard, soft, languages)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO cv_skills (cv_id, coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages)
+    VALUES (?, ?, ?, ?, ?, ?)
     ON CONFLICT(cv_id) DO UPDATE SET
-      technical = excluded.technical,
-      hard = excluded.hard,
-      soft = excluded.soft,
+      coreCompetencies = excluded.coreCompetencies,
+      toolsAndTechnologies = excluded.toolsAndTechnologies,
+      systemsAndMethodologies = excluded.systemsAndMethodologies,
+      collaborationAndDelivery = excluded.collaborationAndDelivery,
       languages = excluded.languages
     `,
     [
       cvId,
-      JSON.stringify(skills.technical),
-      JSON.stringify(skills.hard),
-      JSON.stringify(skills.soft),
+      JSON.stringify(skills.coreCompetencies),
+      JSON.stringify(skills.toolsAndTechnologies),
+      JSON.stringify(skills.systemsAndMethodologies),
+      JSON.stringify(skills.collaborationAndDelivery),
       JSON.stringify(skills.languages),
     ]
   );

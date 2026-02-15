@@ -6,7 +6,6 @@ export interface CV {
     id: string;
     userId: string;
     title: string;
-    status: "draft" | "published";
     createdAt: string;
     updatedAt: string;
   };
@@ -59,9 +58,10 @@ export interface CV {
 
   // Skills
   skills: {
-    technical: string[];
-    hard: string[];
-    soft: string[];
+    coreCompetencies: string[];
+    toolsAndTechnologies: string[];
+    systemsAndMethodologies: string[];
+    collaborationAndDelivery: string[];
     languages: Array<{ language: string; proficiency: string }>;
   };
 

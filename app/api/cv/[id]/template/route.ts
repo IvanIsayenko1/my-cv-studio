@@ -1,8 +1,11 @@
 // app/api/cv/[id]/template/route.ts
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+
+import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
+
+import { db } from "@/lib/db/client";
+
 import type { TemplateFormValues } from "@/types/template";
 
 const templateSchema = z.object({

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@clerk/nextjs/server";
-import { db } from "@/lib/db";
 import { randomUUID } from "crypto";
 import { z } from "zod";
+
+import { db } from "@/lib/db/client";
 
 export async function GET(
   _req: NextRequest,

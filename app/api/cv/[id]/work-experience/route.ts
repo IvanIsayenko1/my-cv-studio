@@ -1,9 +1,11 @@
 // app/api/cv/[id]/work-experience/route.ts
-import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
-import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
+
+import { db } from "@/lib/db/client";
 
 const workExperienceItemSchema = z.object({
   jobTitle: z.string(),

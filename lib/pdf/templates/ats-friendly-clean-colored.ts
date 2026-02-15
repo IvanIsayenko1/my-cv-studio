@@ -1,5 +1,6 @@
 // @ts-ignore
 import PDFDocument from "pdfkit";
+
 import { CV } from "@/types/cv";
 
 const COLORS = {

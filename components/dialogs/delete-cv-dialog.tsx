@@ -1,5 +1,5 @@
-import { Spinner } from "../ui/spinner";
 import { AlertDialog } from "@radix-ui/react-alert-dialog";
+
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -8,7 +8,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function DeleteCVDialog({
   isDialogOpen,

@@ -1,8 +1,11 @@
-export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@clerk/nextjs/server";
+
+import { getCompleteCV } from "@/lib/db/queries";
 import { generateCVPDF } from "@/lib/pdf/cv-generator";
-import { getCompleteCV } from "@/lib/db-queries/cv-queries";
+
+export const runtime = "nodejs";
 
 export async function GET(
   _req: NextRequest,

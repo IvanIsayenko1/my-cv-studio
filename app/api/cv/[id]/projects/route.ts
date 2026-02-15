@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
-import { db } from "@/lib/db";
+
+import { db } from "@/lib/db/client";
+
 import { projectsSchema } from "@/types/projects";
 
 // GET /api/cv/[id]/projects
