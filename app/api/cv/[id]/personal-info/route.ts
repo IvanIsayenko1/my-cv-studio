@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { db } from "@/lib/db/client";
 
-export const personalInfoSchema = z.object({
+const personalInfoSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   professionalTitle: z.string(),

@@ -49,15 +49,15 @@ export default function DuplicateCVDialog({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: cv?.cvData?.title || "",
+      name: cv?.title || "",
     },
   });
   const { reset } = form;
 
   useEffect(() => {
-    if (!cv?.cvData?.title) return;
-    reset({ name: cv.cvData.title });
-  }, [cv?.cvData?.title, reset]);
+    if (!cv?.title) return;
+    reset({ name: cv.title });
+  }, [cv?.title, reset]);
 
   useEffect(() => {
     if (!isDialogOpen) return;

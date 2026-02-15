@@ -201,19 +201,21 @@ export async function POST(
   // skills
   await db.execute(
     `
-    INSERT INTO cv_skills (cv_id, technical, hard, soft, languages)
+    INSERT INTO cv_skills (cv_id, coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages)
     VALUES (?, ?, ?, ?, ?)
     ON CONFLICT(cv_id) DO UPDATE SET
-      technical = excluded.technical,
-      hard = excluded.hard,
-      soft = excluded.soft,
+      coreCompetencies = excluded.coreCompetencies,
+      toolsAndTechnologies = excluded.toolsAndTechnologies,
+      systemsAndMethodologies = excluded.systemsAndMethodologies,
+      collaborationAndDelivery = excluded.collaborationAndDelivery,
       languages = excluded.languages
     `,
     [
       newRandomId,
-      JSON.stringify(skills.technical),
-      JSON.stringify(skills.hard),
-      JSON.stringify(skills.soft),
+      JSON.stringify(skills.coreCompetencies),
+      JSON.stringify(skills.toolsAndTechnologies),
+      JSON.stringify(skills.systemsAndMethodologies),
+      JSON.stringify(skills.collaborationAndDelivery),
       JSON.stringify(skills.languages),
     ]
   );

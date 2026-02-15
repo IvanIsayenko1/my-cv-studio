@@ -89,16 +89,28 @@ export function generateATSCleanColoredCV(cv: CV): Promise<Buffer> {
     if (cv.skills) {
       addAccentSection(doc, "Skills");
 
-      if (cv.skills.technical?.length) {
-        skillGroup(doc, "Technical", cv.skills.technical);
+      if (cv.skills.coreCompetencies?.length) {
+        skillGroup(doc, "Technical", cv.skills.coreCompetencies);
       }
 
-      if (cv.skills.hard?.length) {
-        skillGroup(doc, "Tools & Practices", cv.skills.hard);
+      if (cv.skills.toolsAndTechnologies?.length) {
+        skillGroup(doc, "Tools & Practices", cv.skills.toolsAndTechnologies);
       }
 
-      if (cv.skills.soft?.length) {
-        skillGroup(doc, "Professional", cv.skills.soft);
+      if (cv.skills.systemsAndMethodologies?.length) {
+        skillGroup(
+          doc,
+          "Systems & Methodologies",
+          cv.skills.systemsAndMethodologies
+        );
+      }
+
+      if (cv.skills.collaborationAndDelivery?.length) {
+        skillGroup(
+          doc,
+          "Collaboration & Delivery",
+          cv.skills.collaborationAndDelivery
+        );
       }
 
       if (cv.skills.languages?.length) {
