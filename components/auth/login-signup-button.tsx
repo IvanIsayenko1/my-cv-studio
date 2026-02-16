@@ -15,18 +15,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 
+import { Skeleton } from "../ui/skeleton";
+
 export default function LoginSignupButton() {
   const { isSignedIn, user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
 
   if (!isLoaded) {
-    return (
-      <Button variant="outline" disabled>
-        <Spinner />
-        Loading
-      </Button>
-    );
+    return <Skeleton className="w-[100px] h-[35px]" />;
   }
 
   if (isLoaded && isSignedIn) {
@@ -35,7 +32,7 @@ export default function LoginSignupButton() {
         <DropdownMenuTrigger>
           <Button variant="outline" aria-label="Submit">
             <User />
-            Welcome, {user?.firstName}
+            {user?.firstName}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>

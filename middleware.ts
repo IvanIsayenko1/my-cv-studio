@@ -1,8 +1,29 @@
 // middleware.ts
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-export default clerkMiddleware();
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+/**
+ * Define public routes that do not require authentication
+ */
+const isProtectedRoute = createRouteMatcher(["/cv(.*)"]);
+
+/**
+ * Middleware to protect routes
+ */
+export default clerkMiddleware(async (auth, req) => {
+  const { isAuthenticated } = await auth();
+
+  if (!isAuthenticated && isProtectedRoute(req)) {
+    // redirect to the login page here
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+});
+
+/**
+ * Configuration for the middleware.
+ * This tells the middleware which routes to run on.
+ */
 export const config = {
   matcher: [
     // run on all pages & APIs except static assets and _next
