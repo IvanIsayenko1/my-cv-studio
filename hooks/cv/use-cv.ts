@@ -5,7 +5,13 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-import { deleteCV, getCV, postCreateCV, postDuplicateCV } from "@/lib/api/cv";
+import {
+  deleteCV,
+  getCV,
+  getCVList,
+  postCreateCV,
+  postDuplicateCV,
+} from "@/lib/api/cv";
 import { downloadCV } from "@/lib/api/download";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { downloadBlob } from "@/lib/pdf/donwload-blob";
@@ -131,5 +137,15 @@ export function useCV(id: string) {
   return useSuspenseQuery<CV["cvData"] | null>({
     queryKey: [QUERY_KEYS.CV, id],
     queryFn: () => getCV(id),
+  });
+}
+
+/**
+ * Suspense query hook to fetch CV list.
+ */
+export function useCVList() {
+  return useSuspenseQuery<(CV["cvData"] & { templateId: string | null })[]>({
+    queryKey: [QUERY_KEYS.CV_LIST],
+    queryFn: () => getCVList(),
   });
 }

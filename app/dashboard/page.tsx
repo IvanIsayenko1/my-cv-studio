@@ -1,46 +1,17 @@
 "use client";
 
-import { useAuth, useUser } from "@clerk/nextjs";
-import { useQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
 
 import CVList from "@/components/cv/cv-list";
-
-import { getCVList } from "@/lib/api/cv";
-import { QUERY_KEYS } from "@/lib/constants/query-keys";
+import DashboardSkeleton from "@/components/dashboard-skeleton";
 
 export default function Dashboard() {
-  const { isLoaded, isSignedIn } = useUser();
-  const { isLoaded: authLoaded } = useAuth();
-
-  const { data, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.CV_LIST],
-    queryFn: () => getCVList(),
-  });
-
-  if (!isLoaded || !authLoaded) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!isSignedIn) {
-    return (
-      <div className="flex w-full flex-col gap-4 px-4 sm:px-6 lg:px-8">
-        Hero page
-      </div>
-    );
-  }
-
-  return isLoading ? (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-    </div>
-  ) : (
+  return (
     <div className="flex w-full flex-col gap-4 px-4 sm:px-6 lg:px-8">
-      <section className="">
-        <CVList cvList={data || []} />
+      <section>
+        <Suspense fallback={<DashboardSkeleton />}>
+          <CVList />
+        </Suspense>
       </section>
     </div>
   );

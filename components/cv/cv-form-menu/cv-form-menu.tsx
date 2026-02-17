@@ -8,7 +8,7 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { ROUTES } from "@/config/routes";
 
 import CVDesktopActions from "../cv-desktop-actions";
-import CVMobileDropdownActions from "../cv-mobile-dropdown-actions";
+import CVDropdownActions from "../cv-dropdown-actions";
 
 export default function CVFormMenu({ id }: { id: string }) {
   // router
@@ -31,7 +31,7 @@ export default function CVFormMenu({ id }: { id: string }) {
       <CVDesktopActions id={id} />
 
       {/* Mobile actions */}
-      <CVMobileDropdownActions id={id} />
+      <CVDropdownActions id={id} />
     </>
   );
 }

@@ -7,7 +7,7 @@ import { TemplateName } from "@/types/template";
 
 import { ROUTES } from "@/config/routes";
 
-import CVMobileDropdownActions from "../cv-mobile-dropdown-actions";
+import CVDropdownActions from "../cv-dropdown-actions";
 
 export default function CVItem({
   cv,
@@ -22,7 +22,7 @@ export default function CVItem({
       onClick={() => router.push(ROUTES.CV_DETAIL.replace(":id", cv.id))}
     >
       <div className="w-full flex justify-between items-center">
-        <CVMobileDropdownActions id={cv.id} isAutoHide={false} />
+        <CVDropdownActions id={cv.id} isAutoHide={false} />
       </div>
 
       <p className="leading-7 [&:not(:first-child)]:mt-6">{cv.title}</p>

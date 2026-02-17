@@ -30,7 +30,7 @@ import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
 import { ROUTES } from "@/config/routes";
 
-export default function CVMobileDropdownActions({
+export default function CVDropdownActions({
   id,
   isAutoHide = true,
 }: {
@@ -85,12 +85,9 @@ export default function CVMobileDropdownActions({
               <MoreHorizontalIcon />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-52 py-2 space-y-1 sm:w-48 sm:py-1" // more padding on mobile
-          >
+          <DropdownMenuContent align="end" className="w-52 py-2 space-y-1">
             <DropdownMenuItem
-              className="flex items-center gap-3 py-3 text-base active:bg-accent sm:py-2 sm:text-sm"
+              className="flex items-center gap-3 py-3 text-base active:bg-accent"
               disabled={!isCVReady}
             >
               <Share className="h-5 w-5" />
@@ -98,7 +95,7 @@ export default function CVMobileDropdownActions({
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={!isCVReady}
-              className="flex items-center gap-3 py-3 text-base active:bg-accent sm:py-2 sm:text-sm"
+              className="flex items-center gap-3 py-3 text-base active:bg-accent"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpenDuplicateDialog(true);
@@ -109,7 +106,7 @@ export default function CVMobileDropdownActions({
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={!isCVReady || isDownloadPending}
-              className="flex items-center gap-3 py-3 text-base active:bg-accent sm:py-2 sm:text-sm"
+              className="flex items-center gap-3 py-3 text-base active:bg-accent"
               onClick={(e) => {
                 e.stopPropagation();
                 downloadCV(id);
@@ -123,7 +120,7 @@ export default function CVMobileDropdownActions({
 
             <DropdownMenuItem
               variant="destructive"
-              className="flex items-center gap-3 py-3 text-base text-destructive focus:text-destructive active:bg-destructive/10 sm:py-2 sm:text-sm"
+              className="flex items-center gap-3 py-3 text-base text-destructive focus:text-destructive active:bg-destructive/10"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpenDeleteDialog(true);
