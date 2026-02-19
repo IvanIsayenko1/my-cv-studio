@@ -136,7 +136,7 @@ export function ForgotPasswordForm({
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push(ROUTES.DASHBOARD);
+        router.push(ROUTES.MAKER);
       } else {
         setError("Password reset could not be completed. Please try again.");
       }

@@ -6,7 +6,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 /**
  * Define public routes that require authentication
  */
-const isProtectedRoute = createRouteMatcher(["/cv(.*)", "/dashboard(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/cv(.*)", "/maker(.*)"]);
 
 /**
  * Middleware to protect routes

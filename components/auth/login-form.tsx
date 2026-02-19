@@ -29,6 +29,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+import { RESOLUTIONS } from "@/lib/constants/resolutions";
 import { cn } from "@/lib/utils/cn";
 
 import { ROUTES } from "@/config/routes";
@@ -49,6 +52,7 @@ export function LoginForm({
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -71,7 +75,7 @@ export function LoginForm({
 
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.push(ROUTES.DASHBOARD);
+        router.push(ROUTES.MAKER);
       } else {
         // Handle other statuses if needed (e.g., needs_first_factor, needs_second_factor for MFA)
         console.log("Sign-in status:", signInAttempt.status);

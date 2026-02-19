@@ -22,7 +22,7 @@ export default function HeaderDesktop() {
               asChild
               className={navigationMenuTriggerStyle()}
             >
-              <Link href={ROUTES.DASHBOARD}>Maker</Link>
+              <Link href={ROUTES.MAKER}>Maker</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>

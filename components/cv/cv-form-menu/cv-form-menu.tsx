@@ -28,7 +28,7 @@ export default function CVFormMenu({ id }: { id: string }) {
           variant="outline"
           size="icon"
           aria-label="Go Back"
-          onClick={() => router.push(ROUTES.DASHBOARD)}
+          onClick={() => router.push(ROUTES.MAKER)}
         >
           <ArrowLeftIcon />
         </Button>

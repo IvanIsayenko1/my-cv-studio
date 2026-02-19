@@ -4,6 +4,7 @@ import { ROUTES } from "@/config/routes";
 
 import HeaderDesktop from "../header/header-desktop";
 import HeaderMobile from "../header/header-mobile";
+import ResponsiveHeader from "../header/responsive-header";
 import { Button } from "../ui/button";
 
 export default function Header() {
@@ -14,13 +15,14 @@ export default function Header() {
           {/* Left: Branding/Title */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             <Button variant={"ghost"} asChild>
-              <Link href={ROUTES.HEROPAGE}>
+              <Link href={ROUTES.HOME}>
                 <h1 className="text-lg sm:text-xl font-semibold">MyCVStudio</h1>
               </Link>
             </Button>
           </div>
-          <HeaderDesktop />
-          <HeaderMobile />
+          {/* <HeaderDesktop />
+          <HeaderMobile /> */}
+          <ResponsiveHeader />
         </div>
       </div>
     </header>

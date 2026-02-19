@@ -1,8 +1,8 @@
 export const ROUTES = {
-  HEROPAGE: "/",
+  HOME: "/",
   SIGN_UP: "/signup",
   SIGN_IN: "/login",
-  DASHBOARD: "/dashboard",
+  MAKER: "/maker",
   SSO_CALLBACK: "/sso-callback",
   FORGOT_PASSWORD: "/forgot-password",
   CV_CREATE: "/cv/create/:id",

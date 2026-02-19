@@ -56,7 +56,7 @@ export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
 
       if (attempt.status === "complete") {
         await setActive({ session: attempt.createdSessionId });
-        router.push(ROUTES.DASHBOARD);
+        router.push(ROUTES.MAKER);
         return;
       }
 
@@ -73,7 +73,7 @@ export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
           await signUp.reload();
           if (signUp.status === "complete" && signUp.createdSessionId) {
             await setActive({ session: signUp.createdSessionId });
-            router.push(ROUTES.DASHBOARD);
+            router.push(ROUTES.MAKER);
             return;
           }
         } catch {
