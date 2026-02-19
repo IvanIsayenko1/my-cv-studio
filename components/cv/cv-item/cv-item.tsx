@@ -22,7 +22,7 @@ export default function CVItem({
       onClick={() => router.push(ROUTES.CV_DETAIL.replace(":id", cv.id))}
     >
       <div className="w-full flex justify-between items-center">
-        <CVDropdownActions id={cv.id} isAutoHide={false} />
+        <CVDropdownActions id={cv.id} />
       </div>
 
       <p className="leading-7 [&:not(:first-child)]:mt-6">{cv.title}</p>

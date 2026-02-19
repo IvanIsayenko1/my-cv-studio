@@ -3,22 +3,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Copy, Download, Share, Trash } from "lucide-react";
-import { toast } from "sonner";
 
 import DeleteCVDialog from "@/components/dialogs/delete-cv-dialog";
 import DuplicateCVDialog from "@/components/dialogs/duplicate-cv-dialog";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 
-import {
-  useCVQueryData,
-  useDeleteCV,
-  useDownloadCV,
-  useDuplicateCV,
-} from "@/hooks/cv/use-cv";
+import { useCVQueryData, useDownloadCV } from "@/hooks/cv/use-cv";
 import { useStatus } from "@/hooks/cv/use-status";
-
-import { ROUTES } from "@/config/routes";
 
 export default function CVDesktopActions({ id }: { id: string }) {
   // router
@@ -32,24 +24,6 @@ export default function CVDesktopActions({ id }: { id: string }) {
   const { mutate: downloadCV, isPending: isDownloadPending } = useDownloadCV(
     cv?.title || "cv.pdf"
   );
-  const {
-    mutate: duplicateCV,
-    isPending: isDuplicatePending,
-    error,
-  } = useDuplicateCV({
-    onSuccess: () => {
-      setIsOpenDuplicateDialog(false);
-      toast.success("CV has been duplicated");
-    },
-  });
-
-  const { mutate: deleteCV, isPending: isDeletePending } = useDeleteCV({
-    onSuccess: () => {
-      setIsOpenDeleteDialog(false);
-      toast.success("CV has been deleted");
-      router.push(ROUTES.DASHBOARD);
-    },
-  });
 
   // state of the dialog
   const [isOpenDuplicateDialog, setIsOpenDuplicateDialog] = useState(false);
@@ -89,18 +63,14 @@ export default function CVDesktopActions({ id }: { id: string }) {
 
       <DuplicateCVDialog
         id={id}
-        isDialogOpen={isOpenDuplicateDialog}
-        setIsDialogOpen={setIsOpenDuplicateDialog}
-        isLoading={isDuplicatePending}
-        onSubmitDuplicate={(data) => duplicateCV({ id, title: data.name })}
-        errorMessage={error?.message}
+        open={isOpenDuplicateDialog}
+        setOpen={setIsOpenDuplicateDialog}
       />
 
       <DeleteCVDialog
-        isDialogOpen={isOpenDeleteDialog}
-        setIsDialogOpen={setIsOpenDeleteDialog}
-        isLoading={isDeletePending}
-        onSubmitDelete={() => deleteCV({ id })}
+        id={id}
+        open={isOpenDeleteDialog}
+        setOpen={setIsOpenDeleteDialog}
       />
     </>
   );

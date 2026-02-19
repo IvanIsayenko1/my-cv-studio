@@ -5,6 +5,10 @@ import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+import { RESOLUTIONS } from "@/lib/constants/resolutions";
+
 import { ROUTES } from "@/config/routes";
 
 import CVDesktopActions from "../cv-desktop-actions";
@@ -13,6 +17,9 @@ import CVDropdownActions from "../cv-dropdown-actions";
 export default function CVFormMenu({ id }: { id: string }) {
   // router
   const router = useRouter();
+
+  // custom hooks
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   return (
     <>
@@ -28,10 +35,10 @@ export default function CVFormMenu({ id }: { id: string }) {
       </ButtonGroup>
 
       {/* Desktop actions */}
-      <CVDesktopActions id={id} />
+      {isDesktop && <CVDesktopActions id={id} />}
 
       {/* Mobile actions */}
-      <CVDropdownActions id={id} />
+      {!isDesktop && <CVDropdownActions id={id} />}
     </>
   );
 }

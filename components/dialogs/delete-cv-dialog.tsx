@@ -1,6 +1,20 @@
-import { AlertDialog } from "@radix-ui/react-alert-dialog";
+import { useRouter } from "next/navigation";
+
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { Spinner } from "@/components/ui/spinner";
+
+import { useDeleteCV } from "@/hooks/cv/use-cv";
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+import { QUERY_KEYS } from "@/lib/constants/query-keys";
+import { RESOLUTIONS } from "@/lib/constants/resolutions";
+
+import { ROUTES } from "@/config/routes";
 
 import {
+  AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
@@ -8,50 +22,115 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Spinner } from "@/components/ui/spinner";
+} from "../ui/alert-dialog";
+import { Button } from "../ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../ui/drawer";
 
 export default function DeleteCVDialog({
-  isDialogOpen,
-  setIsDialogOpen,
-  isLoading,
-  onSubmitDelete,
+  id,
+  open,
+  setOpen,
 }: {
-  isDialogOpen: boolean;
-  setIsDialogOpen: (isDialogOpen: boolean) => void;
-  isLoading: boolean;
-  onSubmitDelete: () => void;
+  id: string;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }) {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
+
+  const { mutate: deleteCV, isPending: isDeletePending } = useDeleteCV({
+    onSuccess: () => {
+      setOpen(false);
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_LIST] });
+      toast.success("CV has been deleted");
+      router.push(ROUTES.DASHBOARD);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete CV");
+    },
+  });
+
+  const handleDelete = () => {
+    deleteCV({ id });
+  };
+
+  if (isDesktop) {
+    return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete CV</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to delete this CV. This action cannot be undone. Are
+              you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={(e) => e.stopPropagation()}
+              disabled={isDeletePending}
+            >
+              Keep the CV
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeletePending}
+            >
+              {isDeletePending && <Spinner />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
   return (
-    <AlertDialog
-      open={isDialogOpen}
-      onOpenChange={!isLoading ? setIsDialogOpen : undefined}
-    >
-      <AlertDialogContent
-        onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete CV</AlertDialogTitle>
-          <AlertDialogDescription>
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerContent>
+        <DrawerHeader className="text-left">
+          <DrawerTitle>Delete CV</DrawerTitle>
+          <DrawerDescription>
             You are about to delete this CV. This action cannot be undone. Are
             you sure you want to continue?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
-            Keep the CV
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => onSubmitDelete()}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            disabled={isLoading}
+          </DrawerDescription>
+        </DrawerHeader>
+
+        <DrawerFooter className="pt-2">
+          <DrawerClose asChild>
+            <Button
+              variant="outline"
+              disabled={isDeletePending}
+              onClick={(e) => e.stopPropagation()}
+            >
+              Keep the CV
+            </Button>
+          </DrawerClose>
+          <Button
+            type="button"
+            onClick={handleDelete}
+            disabled={isDeletePending}
+            variant="destructive"
           >
-            {isLoading && <Spinner />}
+            {isDeletePending && <Spinner />}
             Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

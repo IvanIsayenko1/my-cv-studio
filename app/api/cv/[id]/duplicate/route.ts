@@ -202,7 +202,7 @@ export async function POST(
   await db.execute(
     `
     INSERT INTO cv_skills (cv_id, coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages)
-    VALUES (?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?)
     ON CONFLICT(cv_id) DO UPDATE SET
       coreCompetencies = excluded.coreCompetencies,
       toolsAndTechnologies = excluded.toolsAndTechnologies,

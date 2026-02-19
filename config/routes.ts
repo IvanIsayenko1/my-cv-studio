@@ -1,4 +1,5 @@
 export const ROUTES = {
+  HEROPAGE: "/",
   SIGN_UP: "/signup",
   SIGN_IN: "/login",
   DASHBOARD: "/dashboard",

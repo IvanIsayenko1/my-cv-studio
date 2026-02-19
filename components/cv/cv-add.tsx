@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import z from "zod";
 
 import { A4 } from "@/components/shared/a4";
 import { Button } from "@/components/ui/button";
@@ -33,12 +32,7 @@ import { Input } from "@/components/ui/input";
 import { useCreateCV } from "@/hooks/cv/use-cv";
 
 import { ROUTES } from "@/config/routes";
-
-export const FormSchema = z.object({
-  name: z.string().min(5, {
-    message: "Name must be at least 5 characters long.",
-  }),
-});
+import { CVNameFormValues, cvNameSchema } from "@/schemas/cv-name";
 
 export default function CVAdd() {
   const [isOpenDialog, setIsOpenDialog] = useState(false);
@@ -62,14 +56,14 @@ export default function CVAdd() {
     },
   });
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<CVNameFormValues>({
+    resolver: zodResolver(cvNameSchema),
     defaultValues: {
       name: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (data: CVNameFormValues) => {
     createCV({ title: data.name });
   };
 

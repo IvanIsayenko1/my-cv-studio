@@ -1,5 +1,10 @@
-import LoginSignupButton from "@/components/auth/login-signup-button";
-import { ThemeSwitcher } from "@/components/layout/theme-switcher";
+import Link from "next/link";
+
+import { ROUTES } from "@/config/routes";
+
+import HeaderDesktop from "../header/header-desktop";
+import HeaderMobile from "../header/header-mobile";
+import { Button } from "../ui/button";
 
 export default function Header() {
   return (
@@ -8,14 +13,14 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Left: Branding/Title */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <h1 className="text-lg sm:text-xl font-semibold">MyCVStudio</h1>
+            <Button variant={"ghost"} asChild>
+              <Link href={ROUTES.HEROPAGE}>
+                <h1 className="text-lg sm:text-xl font-semibold">MyCVStudio</h1>
+              </Link>
+            </Button>
           </div>
-
-          {/* Right: Action Buttons */}
-          <div className="flex items-center space-x-1 sm:space-x-2 gap-1 sm:gap-2">
-            <LoginSignupButton />
-            <ThemeSwitcher />
-          </div>
+          <HeaderDesktop />
+          <HeaderMobile />
         </div>
       </div>
     </header>
