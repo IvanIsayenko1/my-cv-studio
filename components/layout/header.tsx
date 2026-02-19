@@ -2,8 +2,6 @@ import Link from "next/link";
 
 import { ROUTES } from "@/config/routes";
 
-import HeaderDesktop from "../header/header-desktop";
-import HeaderMobile from "../header/header-mobile";
 import ResponsiveHeader from "../header/responsive-header";
 import { Button } from "../ui/button";
 
@@ -20,8 +18,7 @@ export default function Header() {
               </Link>
             </Button>
           </div>
-          {/* <HeaderDesktop />
-          <HeaderMobile /> */}
+
           <ResponsiveHeader />
         </div>
       </div>

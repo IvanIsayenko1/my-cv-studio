@@ -1,11 +1,10 @@
 import { useState } from "react";
 
 import { useTheme } from "next-themes";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useClerk, useUser } from "@clerk/nextjs";
-import { Menu, User } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 
 import { ROUTES } from "@/config/routes";
 
@@ -39,7 +38,7 @@ export default function HeaderMobile() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Open menu">
+        <Button variant="ghost" size="icon-lg" aria-label="Open menu">
           <Menu />
         </Button>
       </SheetTrigger>
@@ -48,24 +47,24 @@ export default function HeaderMobile() {
         <SheetHeader className="px-4 py-3 border-b">
           <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
-        <nav className="flex flex-col p-2">
+        <nav className="flex flex-col p-2 gap-2">
           <Button
             variant="ghost"
-            className="justify-start h-12"
+            className="font-normal h-14 flex flex-row justify-between"
             onClick={() => navigateAndCloseSheet(ROUTES.HOME)}
           >
             Home
           </Button>
           <Button
             variant="ghost"
-            className="justify-start h-12"
+            className="font-normal h-14 flex flex-row justify-between"
             onClick={() => navigateAndCloseSheet(ROUTES.MAKER)}
           >
             Maker
           </Button>
           <Button
             variant="ghost"
-            className="justify-start h-12"
+            className="font-normal h-14 flex flex-row justify-between"
             onClick={() => navigateAndCloseSheet(ROUTES.HOME)}
           >
             Checker
@@ -80,7 +79,11 @@ export default function HeaderMobile() {
               type="single"
               onValueChange={setTheme}
             >
-              <ToggleGroupItem value="system" aria-label="Toggle system">
+              <ToggleGroupItem
+                value="system"
+                aria-label="Toggle system"
+                className="h-10"
+              >
                 System
               </ToggleGroupItem>
               <ToggleGroupItem value="dark" aria-label="Toggle dark">
@@ -97,7 +100,6 @@ export default function HeaderMobile() {
             <Button
               variant="destructive"
               aria-label="Submit"
-              className="w-full"
               size="lg"
               onClick={() => {
                 signOut();
@@ -112,6 +114,7 @@ export default function HeaderMobile() {
               aria-label="Submit"
               onClick={() => navigateAndCloseSheet(ROUTES.SIGN_IN)}
               size="lg"
+              className=""
             >
               <User />
               <span>Login/Signup</span>

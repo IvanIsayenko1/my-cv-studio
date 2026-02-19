@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+import { cn } from "@/lib/utils/cn";
+import { isURLActive } from "@/lib/utils/url-helper";
+
 import { ROUTES } from "@/config/routes";
 
 import LoginSignupButton from "../auth/login-signup-button";
@@ -20,7 +23,19 @@ export default function HeaderDesktop() {
           <NavigationMenuItem>
             <NavigationMenuLink
               asChild
+              className={cn(
+                navigationMenuTriggerStyle(),
+                isURLActive(ROUTES.HOME) && "text-primary bg-primary/10"
+              )}
+            >
+              <Link href={ROUTES.HOME}>Home</Link>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuLink
+              asChild
               className={navigationMenuTriggerStyle()}
+              active={isURLActive(ROUTES.MAKER)}
             >
               <Link href={ROUTES.MAKER}>Maker</Link>
             </NavigationMenuLink>

@@ -1,17 +1,19 @@
 "use client";
 
-import { Suspense } from "react";
+import dynamic from "next/dynamic";
 
-import CVList from "@/components/cv/cv-list";
-import DashboardSkeleton from "@/components/dashboard-skeleton";
+import MakerPageSeleton from "@/components/maker-page-skeleton";
 
-export default function Dashboard() {
+const CVList = dynamic(() => import("@/components/cv/cv-list"), {
+  ssr: false,
+  loading: () => <MakerPageSeleton />,
+});
+
+export default function MakerPage() {
   return (
     <div className="flex w-full flex-col gap-4 px-4 sm:px-6 lg:px-8">
       <section>
-        <Suspense fallback={<DashboardSkeleton />}>
-          <CVList />
-        </Suspense>
+        <CVList />
       </section>
     </div>
   );
