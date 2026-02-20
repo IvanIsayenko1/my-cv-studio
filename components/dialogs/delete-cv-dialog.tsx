@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { useRouter } from "next/navigation";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -64,6 +66,23 @@ export default function DeleteCVDialog({
     deleteCV({ id });
   };
 
+  useEffect(() => {
+    if (isDesktop || !open) return;
+
+    const closeOnOutsideTouch = (event: Event) => {
+      const target = event.target as Element | null;
+      if (!target) return;
+      if (target.closest("[data-delete-cv-drawer-content='true']")) return;
+      setOpen(false);
+    };
+
+    document.addEventListener("touchstart", closeOnOutsideTouch, true);
+
+    return () => {
+      document.removeEventListener("touchstart", closeOnOutsideTouch, true);
+    };
+  }, [isDesktop, open, setOpen]);
+
   if (isDesktop) {
     return (
       <AlertDialog open={open} onOpenChange={setOpen}>
@@ -101,7 +120,11 @@ export default function DeleteCVDialog({
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent>
+      <DrawerContent
+        className="mb-4"
+        data-delete-cv-drawer-content="true"
+        onPointerDownOutside={() => setOpen(false)}
+      >
         <DrawerHeader className="text-left">
           <DrawerTitle>Delete CV</DrawerTitle>
           <DrawerDescription>
@@ -116,6 +139,7 @@ export default function DeleteCVDialog({
               variant="outline"
               disabled={isDeletePending}
               onClick={(e) => e.stopPropagation()}
+              size={"lg"}
             >
               Keep the CV
             </Button>
@@ -125,6 +149,7 @@ export default function DeleteCVDialog({
             onClick={handleDelete}
             disabled={isDeletePending}
             variant="destructive"
+            size={"lg"}
           >
             {isDeletePending && <Spinner />}
             Delete

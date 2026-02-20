@@ -94,6 +94,23 @@ export default function DuplicateCVDialog({
     clearErrors("name");
   }, [open, clearErrors]);
 
+  useEffect(() => {
+    if (isDesktop || !open) return;
+
+    const closeOnOutsideTouch = (event: Event) => {
+      const target = event.target as Element | null;
+      if (!target) return;
+      if (target.closest("[data-duplicate-cv-drawer-content='true']")) return;
+      setOpen(false);
+    };
+
+    document.addEventListener("touchstart", closeOnOutsideTouch, true);
+
+    return () => {
+      document.removeEventListener("touchstart", closeOnOutsideTouch, true);
+    };
+  }, [isDesktop, open, setOpen]);
+
   // Surface mutation error inline on the name field.
   useEffect(() => {
     if (!error?.message) return;
@@ -162,7 +179,11 @@ export default function DuplicateCVDialog({
   // Mobile presentation
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent>
+      <DrawerContent
+        className="mb-4"
+        data-duplicate-cv-drawer-content="true"
+        onPointerDownOutside={() => setOpen(false)}
+      >
         <DrawerHeader className="text-left">
           <DrawerTitle>Duplicate existing CV</DrawerTitle>
         </DrawerHeader>
@@ -181,11 +202,17 @@ export default function DuplicateCVDialog({
               variant="outline"
               disabled={isDuplicatePending}
               onClick={(e) => e.stopPropagation()}
+              size={"lg"}
             >
               Cancel
             </Button>
           </DrawerClose>
-          <Button type="submit" form={formId} disabled={isDuplicatePending}>
+          <Button
+            type="submit"
+            form={formId}
+            disabled={isDuplicatePending}
+            size={"lg"}
+          >
             {isDuplicatePending && <Spinner />}
             {isDuplicatePending ? "Duplicating..." : "Continue"}
           </Button>

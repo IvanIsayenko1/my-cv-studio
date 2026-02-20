@@ -4,7 +4,10 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
 import { useClerk, useUser } from "@clerk/nextjs";
-import { Menu, User, X } from "lucide-react";
+import { Menu, User } from "lucide-react";
+
+import { cn } from "@/lib/utils/cn";
+import { useIsURLActive } from "@/lib/utils/url-helper";
 
 import { ROUTES } from "@/config/routes";
 
@@ -24,6 +27,7 @@ export default function HeaderMobile() {
   const { isSignedIn, user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
+  const isURLActive = useIsURLActive();
 
   // state of the sheet
   const [open, setOpen] = useState(false);
@@ -50,22 +54,33 @@ export default function HeaderMobile() {
         <nav className="flex flex-col p-2 gap-2">
           <Button
             variant="ghost"
-            className="font-normal h-14 flex flex-row justify-between"
+            className={cn(
+              "font-normal h-14 flex flex-row justify-between",
+              isURLActive(ROUTES.HOME, { exact: true }) &&
+                "text-primary bg-primary/10"
+            )}
             onClick={() => navigateAndCloseSheet(ROUTES.HOME)}
           >
             Home
           </Button>
           <Button
             variant="ghost"
-            className="font-normal h-14 flex flex-row justify-between"
+            className={cn(
+              "font-normal h-14 flex flex-row justify-between",
+              isURLActive(ROUTES.MAKER) && "text-primary bg-primary/10"
+            )}
             onClick={() => navigateAndCloseSheet(ROUTES.MAKER)}
           >
             Maker
           </Button>
           <Button
             variant="ghost"
-            className="font-normal h-14 flex flex-row justify-between"
-            onClick={() => navigateAndCloseSheet(ROUTES.HOME)}
+            className={cn(
+              "font-normal h-14 flex flex-row justify-between",
+              isURLActive(ROUTES.CHECKER, { exact: true }) &&
+                "text-primary bg-primary/10"
+            )}
+            onClick={() => navigateAndCloseSheet(ROUTES.CHECKER)}
           >
             Checker
           </Button>
@@ -96,30 +111,35 @@ export default function HeaderMobile() {
           </div>
 
           <Separator className="my-4" />
-          {isSignedIn ? (
-            <Button
-              variant="destructive"
-              aria-label="Submit"
-              size="lg"
-              onClick={() => {
-                signOut();
-                setOpen(false);
-              }}
-            >
-              Logout
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              aria-label="Submit"
-              onClick={() => navigateAndCloseSheet(ROUTES.SIGN_IN)}
-              size="lg"
-              className=""
-            >
-              <User />
-              <span>Login/Signup</span>
-            </Button>
-          )}
+          <div className="flex items-center justify-between h-12 mx-4 text-sm">
+            {isLoaded && isSignedIn ? (
+              <span>{user?.emailAddresses[0].emailAddress}</span>
+            ) : null}
+            {isSignedIn ? (
+              <Button
+                variant="destructive"
+                aria-label="Submit"
+                size="lg"
+                onClick={() => {
+                  signOut();
+                  setOpen(false);
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                aria-label="Submit"
+                onClick={() => navigateAndCloseSheet(ROUTES.SIGN_IN)}
+                size="lg"
+                className="w-full"
+              >
+                <User />
+                <span>Login/Signup</span>
+              </Button>
+            )}
+          </div>
         </nav>
       </SheetContent>
     </Sheet>

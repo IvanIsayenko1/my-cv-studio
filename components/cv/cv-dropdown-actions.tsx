@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -40,6 +40,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
   // state of dialogs
   const [openedDelete, setOpenendDelete] = useState(false);
   const [openedDuplicate, setOpenendDuplicate] = useState(false);
+  const [openedMenu, setOpenedMenu] = useState(false);
 
   // Keep markup split by viewport to preserve native-feeling interactions:
   // dropdown menu on desktop, bottom drawer on mobile.
@@ -105,14 +106,26 @@ export default function CVDropdownActions({ id }: { id: string }) {
         </DropdownMenu>
       );
     }
+
     return (
-      <Drawer>
+      <Drawer open={openedMenu} onOpenChange={setOpenedMenu}>
         <DrawerTrigger asChild>
-          <Button variant="outline" aria-label="Open menu">
+          <Button
+            variant="outline"
+            aria-label="Open menu"
+            size={"icon-lg"}
+            data-cv-actions-trigger="true"
+            onClick={(e) => e.stopPropagation()}
+          >
             <MoreHorizontalIcon />
           </Button>
         </DrawerTrigger>
-        <DrawerContent className="p-2 flex flex-col gap-2">
+        <DrawerContent
+          className="p-2 flex flex-col gap-2 mb-4"
+          data-cv-actions-drawer-content="true"
+          onPointerDownOutside={() => setOpenedMenu(false)}
+          onInteractOutside={() => setOpenedMenu(false)}
+        >
           {/* Mobile actions mirror desktop behavior with larger touch targets. */}
           <Button
             size={"lg"}
@@ -128,7 +141,10 @@ export default function CVDropdownActions({ id }: { id: string }) {
             variant="ghost"
             className="font-normal h-14 flex flex-row justify-between"
             disabled={!isCVReady}
-            onClick={() => setOpenendDuplicate(true)}
+            onClick={() => {
+              setOpenedMenu(false);
+              setOpenendDuplicate(true);
+            }}
           >
             <span>Duplicate</span>
             <Copy />
@@ -138,7 +154,10 @@ export default function CVDropdownActions({ id }: { id: string }) {
             variant="ghost"
             className="font-normal h-14 flex flex-row justify-between"
             disabled={!isCVReady || isDownloadPending}
-            onClick={() => downloadCV(id)}
+            onClick={() => {
+              setOpenedMenu(false);
+              downloadCV(id);
+            }}
           >
             <span>Download</span>
             <Download />
@@ -147,7 +166,10 @@ export default function CVDropdownActions({ id }: { id: string }) {
             size={"lg"}
             variant="ghost"
             className="font-normal h-14 text-destructive flex flex-row justify-between"
-            onClick={() => setOpenendDelete(true)}
+            onClick={() => {
+              setOpenedMenu(false);
+              setOpenendDelete(true);
+            }}
           >
             <span>Delete</span>
             <Trash />
@@ -157,9 +179,31 @@ export default function CVDropdownActions({ id }: { id: string }) {
     );
   };
 
+  useEffect(() => {
+    if (!openedMenu) return;
+
+    const closeOnOutsideTouch = (event: Event) => {
+      const target = event.target as Element | null;
+      if (!target) return;
+
+      if (target.closest("[data-cv-actions-drawer-content='true']")) return;
+      if (target.closest("[data-cv-actions-trigger='true']")) return;
+
+      setOpenedMenu(false);
+    };
+
+    document.addEventListener("touchstart", closeOnOutsideTouch, true);
+
+    return () => {
+      document.removeEventListener("touchstart", closeOnOutsideTouch, true);
+    };
+  }, [openedMenu]);
+
   return (
     // Stop click bubbling to CV item/card wrapper.
-    <div onClick={(e) => e.stopPropagation()}>
+    <div
+      onClick={(e) => e.stopPropagation()}
+    >
       {getMenu()}
       {/* Mount dialogs at container root to avoid nested trigger reopen loops. */}
       <DeleteCVDialog id={id} open={openedDelete} setOpen={setOpenendDelete} />
