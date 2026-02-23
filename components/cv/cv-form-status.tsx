@@ -11,7 +11,7 @@ export default function CVFormStatus({ id }: { id: string }) {
   return isCVReady ? (
     <Badge
       variant="secondary"
-      className="bg-green-500 text-white dark:bg-green-600"
+      className={`bg-green-500 text-white dark:bg-green-600 `}
     >
       <BadgeCheckIcon />
       Ready
@@ -19,7 +19,7 @@ export default function CVFormStatus({ id }: { id: string }) {
   ) : (
     <Badge
       variant="secondary"
-      className="bg-yellow-500 text-white dark:bg-yellow-600"
+      className={`bg-yellow-500 text-white dark:bg-yellow-600`}
     >
       Draft
     </Badge>

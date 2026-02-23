@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { Copy, Download, MoreHorizontalIcon, Share, Trash } from "lucide-react";
+import {
+  Copy,
+  Download,
+  EditIcon,
+  MoreHorizontalIcon,
+  MoreVerticalIcon,
+  Share,
+  Trash,
+} from "lucide-react";
 
 import DeleteCVDialog from "@/components/dialogs/delete-cv-dialog";
 import DuplicateCVDialog from "@/components/dialogs/duplicate-cv-dialog";
@@ -21,6 +29,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
+import RenameCVDialog from "../dialogs/rename-cv-dialog";
 import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 
 export default function CVDropdownActions({ id }: { id: string }) {
@@ -41,6 +50,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
   const [openedDelete, setOpenendDelete] = useState(false);
   const [openedDuplicate, setOpenendDuplicate] = useState(false);
   const [openedMenu, setOpenedMenu] = useState(false);
+  const [openedRename, setOpenedRename] = useState(false);
 
   // Keep markup split by viewport to preserve native-feeling interactions:
   // dropdown menu on desktop, bottom drawer on mobile.
@@ -54,7 +64,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
               aria-label="Open menu"
               onClick={(e) => e.stopPropagation()}
             >
-              <MoreHorizontalIcon />
+              <MoreVerticalIcon />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52 py-2 space-y-1">
@@ -87,6 +97,17 @@ export default function CVDropdownActions({ id }: { id: string }) {
               <span>Download</span>
             </DropdownMenuItem>
 
+            <DropdownMenuItem
+              disabled={!isCVReady || isDownloadPending}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenedRename(true);
+              }}
+            >
+              <EditIcon className="h-5 w-5" />
+              <span>Rename</span>
+            </DropdownMenuItem>
+
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
@@ -117,7 +138,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             data-cv-actions-trigger="true"
             onClick={(e) => e.stopPropagation()}
           >
-            <MoreHorizontalIcon />
+            <MoreVerticalIcon />
           </Button>
         </DrawerTrigger>
         <DrawerContent
@@ -165,6 +186,19 @@ export default function CVDropdownActions({ id }: { id: string }) {
           <Button
             size={"lg"}
             variant="ghost"
+            className="font-normal h-14 flex flex-row justify-between"
+            disabled={!isCVReady || isDownloadPending}
+            onClick={() => {
+              setOpenedMenu(false);
+              setOpenedRename(true);
+            }}
+          >
+            <span>Rename</span>
+            <EditIcon />
+          </Button>
+          <Button
+            size={"lg"}
+            variant="ghost"
             className="font-normal h-14 text-destructive flex flex-row justify-between"
             onClick={() => {
               setOpenedMenu(false);
@@ -201,9 +235,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
 
   return (
     // Stop click bubbling to CV item/card wrapper.
-    <div
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div onClick={(e) => e.stopPropagation()}>
       {getMenu()}
       {/* Mount dialogs at container root to avoid nested trigger reopen loops. */}
       <DeleteCVDialog id={id} open={openedDelete} setOpen={setOpenendDelete} />
@@ -211,6 +243,11 @@ export default function CVDropdownActions({ id }: { id: string }) {
         id={id}
         open={openedDuplicate}
         setOpen={setOpenendDuplicate}
+      />
+      <RenameCVDialog
+        id={id}
+        isOpenDialog={openedRename}
+        setIsOpenDialog={setOpenedRename}
       />
     </div>
   );

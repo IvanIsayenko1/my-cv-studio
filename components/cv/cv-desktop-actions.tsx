@@ -2,7 +2,15 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { Copy, Download, Share, Trash } from "lucide-react";
+import {
+  Copy,
+  Download,
+  EditIcon,
+  MailCheckIcon,
+  MoreHorizontalIcon,
+  Share,
+  Trash,
+} from "lucide-react";
 
 import DeleteCVDialog from "@/components/dialogs/delete-cv-dialog";
 import DuplicateCVDialog from "@/components/dialogs/duplicate-cv-dialog";
@@ -11,6 +19,16 @@ import { ButtonGroup } from "@/components/ui/button-group";
 
 import { useCVQueryData, useDownloadCV } from "@/hooks/cv/use-cv";
 import { useStatus } from "@/hooks/cv/use-status";
+
+import RenameCVDialog from "../dialogs/rename-cv-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 export default function CVDesktopActions({ id }: { id: string }) {
   // router
@@ -28,6 +46,7 @@ export default function CVDesktopActions({ id }: { id: string }) {
   // state of the dialog
   const [isOpenDuplicateDialog, setIsOpenDuplicateDialog] = useState(false);
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
+  const [isOpenRenameDialog, setIsOpenRenameDialog] = useState(false);
 
   return (
     <>
@@ -38,27 +57,47 @@ export default function CVDesktopActions({ id }: { id: string }) {
         </Button>
         <Button
           variant="outline"
-          disabled={!isCVReady}
-          onClick={() => setIsOpenDuplicateDialog(true)}
-        >
-          <Copy />
-          Duplicate
-        </Button>
-        <Button
-          variant="outline"
           onClick={() => downloadCV(id)}
           disabled={isDownloadPending || !isCVReady}
         >
           <Download />
           Download
         </Button>
-        <Button
-          variant="destructive"
-          onClick={() => setIsOpenDeleteDialog(true)}
-        >
-          <Trash />
-          Delete
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" aria-label="More Options">
+              <MoreHorizontalIcon />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                disabled={!isCVReady}
+                onClick={() => setIsOpenDuplicateDialog(true)}
+              >
+                <Copy />
+                Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={!isCVReady}
+                onClick={() => setIsOpenRenameDialog(true)}
+              >
+                <EditIcon />
+                Rename
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setIsOpenDeleteDialog(true)}
+              >
+                <Trash />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </ButtonGroup>
 
       <DuplicateCVDialog
@@ -71,6 +110,12 @@ export default function CVDesktopActions({ id }: { id: string }) {
         id={id}
         open={isOpenDeleteDialog}
         setOpen={setIsOpenDeleteDialog}
+      />
+
+      <RenameCVDialog
+        id={id}
+        isOpenDialog={isOpenRenameDialog}
+        setIsOpenDialog={setIsOpenRenameDialog}
       />
     </>
   );

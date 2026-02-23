@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <Toaster position="bottom-center" />
+      <Toaster position="top-center" richColors />
 
       {/* Optional Footer
       <footer className="w-full border-t bg-background">

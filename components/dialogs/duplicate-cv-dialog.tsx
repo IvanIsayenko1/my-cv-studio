@@ -133,12 +133,7 @@ export default function DuplicateCVDialog({
         <FormItem>
           <FormLabel>Name</FormLabel>
           <FormControl>
-            <Input
-              type="text"
-              placeholder="CV name"
-              {...field}
-              className={isDesktop ? "" : "h-10"}
-            />
+            <Input type="text" {...field} className={isDesktop ? "" : "h-10"} />
           </FormControl>
           <FormMessage />
         </FormItem>

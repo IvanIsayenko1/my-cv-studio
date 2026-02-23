@@ -2,7 +2,9 @@
 
 import { Suspense, useState } from "react";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+
+import { ArrowLeftIcon } from "lucide-react";
 
 import { AwardsForm } from "@/components/forms/awards/awards-form";
 import AwardsFormSkeleton from "@/components/forms/awards/awards-form-skeleton";
@@ -33,9 +35,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { useCV } from "@/hooks/cv/use-cv";
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+import { RESOLUTIONS } from "@/lib/constants/resolutions";
+
+import { ROUTES } from "@/config/routes";
 
 import { PersonalInfoFormSkeleton } from "../forms/personal-info/personal-info-form-skeleton";
+import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import CVFormMenu from "./cv-form-menu/cv-form-menu";
 import CVFormMenuSkeleton from "./cv-form-menu/cv-form-menu-skeleton";
@@ -49,6 +56,12 @@ export default function CVForm() {
   const [activeTab, setActiveTab] = useState("personal-info");
   const [isDirtyForm, setIsDirtyForm] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
+
+  // router
+  const router = useRouter();
+
+  // custom hooks
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const handleTabChange = (value: string) => {
     if (isDirtyForm) {
@@ -71,23 +84,34 @@ export default function CVForm() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <Suspense fallback={<Skeleton className="h-9 w-32" />}>
-        <CVFormTitle id={id} />
-      </Suspense>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-start">
+        <Button
+          variant="link"
+          size={isDesktop ? "default" : "lg"}
+          aria-label="Go Back"
+          onClick={() => router.push(ROUTES.MAKER)}
+          className="!p-0"
+        >
+          <ArrowLeftIcon /> To the list
+        </Button>
+      </div>
 
-      <div className="flex flex-row gap-4 items-center">
-        <Suspense fallback={<CVFormMenuSkeleton />}>
-          <CVFormMenu id={id} />
+      <div className="flex items-center gap-4">
+        <Suspense fallback={<Skeleton className="h-9 w-32" />}>
+          <CVFormTitle id={id} />
         </Suspense>
         <Suspense fallback={<Skeleton className="h-6 w-16" />}>
           <CVFormStatus id={id} />
+        </Suspense>
+        <Suspense fallback={<CVFormMenuSkeleton />}>
+          <CVFormMenu id={id} />
         </Suspense>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <div className="overflow-auto scrollbar-hide snap-x snap-mandatory">
-          <TabsList className="h-auto py-2">
+          <TabsList className={`h-auto py-2 ${isDesktop ? "" : "h-12"}`}>
             <TabsTrigger value="personal-info">
               Personal Info<span className="text-destructive">*</span>
             </TabsTrigger>
