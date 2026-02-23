@@ -130,4 +130,12 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  .cv-form-actions {
+    @apply flex justify-end pt-2;
+  }
+
+  .cv-form-primary-action {
+    @apply w-full sm:w-auto;
+  }
 }

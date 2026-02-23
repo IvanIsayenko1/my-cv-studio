@@ -235,8 +235,12 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
                 {hasAny ? "Add another award" : "Add award"}
               </Button>
 
-              <div className="flex justify-end gap-3">
-                <Button type="submit" disabled={isPending}>
+              <div className="cv-form-actions">
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="cv-form-primary-action"
+                >
                   {isPending ? "Saving..." : "Save"}
                 </Button>
               </div>

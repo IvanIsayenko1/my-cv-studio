@@ -5,8 +5,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import { useIsURLActive } from "@/lib/utils/url-helper";
 
-import { ROUTES } from "@/config/routes";
-
 import LoginSignupButton from "../auth/login-signup-button";
 import { ThemeSwitcher } from "../layout/theme-switcher";
 import {
@@ -16,57 +14,38 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "../ui/navigation-menu";
+import { HEADER_NAV_ITEMS } from "./header-nav-items";
 
 export default function HeaderDesktop() {
   const isURLActive = useIsURLActive();
 
   return (
-    <div className="hidden sm:flex items-center justify-end space-x-1 sm:space-x-2 gap-1 sm:gap-2 w-full">
+    <div className="flex items-center justify-end gap-3">
       <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuLink
-              active={isURLActive(ROUTES.HOME, { exact: true })}
-              asChild
-              className={cn(
-                navigationMenuTriggerStyle(),
-                isURLActive(ROUTES.HOME, { exact: true }) &&
-                  "text-primary bg-primary/10"
-              )}
-            >
-              <Link href={ROUTES.HOME}>Home</Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink
-              active={isURLActive(ROUTES.MAKER)}
-              asChild
-              className={cn(
-                navigationMenuTriggerStyle(),
-                isURLActive(ROUTES.MAKER) && "text-primary bg-primary/10"
-              )}
-            >
-              <Link href={ROUTES.MAKER}>Maker</Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink
-              active={isURLActive(ROUTES.CHECKER, { exact: true })}
-              asChild
-              className={cn(
-                navigationMenuTriggerStyle(),
-                isURLActive(ROUTES.CHECKER, { exact: true }) &&
-                  "text-primary bg-primary/10"
-              )}
-            >
-              <Link href={ROUTES.CHECKER}>Checker</Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+        <NavigationMenuList className="gap-1">
+          {HEADER_NAV_ITEMS.map((item) => {
+            const isActive = isURLActive(item.href, { exact: item.exact });
+
+            return (
+              <NavigationMenuItem key={item.href}>
+                <NavigationMenuLink
+                  active={isActive}
+                  asChild
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    "px-3",
+                    isActive && "bg-primary/10 text-primary"
+                  )}
+                >
+                  <Link href={item.href}>{item.label}</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            );
+          })}
         </NavigationMenuList>
       </NavigationMenu>
 
-      {/* Right: Action Buttons */}
-      <div className="flex items-center space-x-1 sm:space-x-2 gap-1 sm:gap-2">
+      <div className="shrink-0 flex items-center gap-2">
         <LoginSignupButton />
         <ThemeSwitcher />
       </div>

@@ -334,8 +334,12 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                 Add another education
               </Button>
 
-              <div className="flex justify-end gap-3">
-                <Button type="submit" disabled={isPending}>
+              <div className="cv-form-actions">
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="cv-form-primary-action"
+                >
                   {isPending ? "Saving..." : "Save"}
                 </Button>
               </div>

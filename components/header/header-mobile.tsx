@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { useClerk, useUser } from "@clerk/nextjs";
 import { Menu, User } from "lucide-react";
@@ -16,28 +16,22 @@ import { Separator } from "../ui/separator";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { HEADER_NAV_ITEMS } from "./header-nav-items";
 
 export default function HeaderMobile() {
   const { theme, setTheme } = useTheme();
   const { isSignedIn, user, isLoaded } = useUser();
   const { signOut } = useClerk();
-  const router = useRouter();
   const isURLActive = useIsURLActive();
 
   // state of the sheet
   const [open, setOpen] = useState(false);
-
-  const navigateAndCloseSheet = (
-    href: (typeof ROUTES)[keyof typeof ROUTES]
-  ) => {
-    router.push(href);
-    setOpen(false);
-  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -48,78 +42,91 @@ export default function HeaderMobile() {
       </SheetTrigger>
 
       <SheetContent side="top" className="h-[100dvh] max-h-[100dvh] p-0">
-        <SheetHeader className="px-4 py-3 border-b">
+        <SheetHeader className="border-b px-4 py-3">
           <SheetTitle>Menu</SheetTitle>
+          <SheetDescription>Navigate and manage your account.</SheetDescription>
         </SheetHeader>
-        <nav className="flex flex-col p-2 gap-2">
-          <Button
-            variant="ghost"
-            className={cn(
-              "font-normal h-14 flex flex-row justify-between",
-              isURLActive(ROUTES.HOME, { exact: true }) &&
-                "text-primary bg-primary/10"
-            )}
-            onClick={() => navigateAndCloseSheet(ROUTES.HOME)}
-          >
-            Home
-          </Button>
-          <Button
-            variant="ghost"
-            className={cn(
-              "font-normal h-14 flex flex-row justify-between",
-              isURLActive(ROUTES.MAKER) && "text-primary bg-primary/10"
-            )}
-            onClick={() => navigateAndCloseSheet(ROUTES.MAKER)}
-          >
-            Maker
-          </Button>
-          <Button
-            variant="ghost"
-            className={cn(
-              "font-normal h-14 flex flex-row justify-between",
-              isURLActive(ROUTES.CHECKER, { exact: true }) &&
-                "text-primary bg-primary/10"
-            )}
-            onClick={() => navigateAndCloseSheet(ROUTES.CHECKER)}
-          >
-            Checker
-          </Button>
-          <Separator className="my-4" />
-          <div className="flex items-center justify-between h-12 mx-4 text-sm">
-            <span>Theme</span>
-            <ToggleGroup
-              size="lg"
-              defaultValue={theme}
-              variant="outline"
-              type="single"
-              onValueChange={setTheme}
-            >
-              <ToggleGroupItem
-                value="system"
-                aria-label="Toggle system"
-                className="h-10"
-              >
-                System
-              </ToggleGroupItem>
-              <ToggleGroupItem value="dark" aria-label="Toggle dark">
-                Dark
-              </ToggleGroupItem>
-              <ToggleGroupItem value="light" aria-label="Toggle light">
-                Light
-              </ToggleGroupItem>
-            </ToggleGroup>
+        <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-4">
+          <div className="space-y-2">
+            <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Navigation
+            </p>
+            {HEADER_NAV_ITEMS.map((item) => {
+              const isActive = isURLActive(item.href, { exact: item.exact });
+
+              return (
+                <Button
+                  key={item.href}
+                  asChild
+                  variant="ghost"
+                  className={cn(
+                    "h-14 w-full justify-between px-4 font-normal",
+                    isActive && "bg-primary/10 text-primary"
+                  )}
+                >
+                  <Link href={item.href} onClick={() => setOpen(false)}>
+                    {item.label}
+                  </Link>
+                </Button>
+              );
+            })}
           </div>
 
-          <Separator className="my-4" />
-          <div className="flex items-center justify-between h-12 mx-4 text-sm">
+          <Separator className="my-5" />
+
+          <div className="space-y-3">
+            <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Appearance
+            </p>
+            <div className="flex min-h-12 items-center justify-between gap-3 px-2">
+              <span className="text-sm">Theme</span>
+              <ToggleGroup
+                size="lg"
+                defaultValue={theme}
+                variant="outline"
+                type="single"
+                onValueChange={(value) => {
+                  if (value) {
+                    setTheme(value);
+                  }
+                }}
+              >
+                <ToggleGroupItem
+                  value="system"
+                  aria-label="Toggle system"
+                  className="h-10"
+                >
+                  System
+                </ToggleGroupItem>
+                <ToggleGroupItem value="dark" aria-label="Toggle dark">
+                  Dark
+                </ToggleGroupItem>
+                <ToggleGroupItem value="light" aria-label="Toggle light">
+                  Light
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+          </div>
+
+          <Separator className="my-5" />
+
+          <div className="space-y-3">
+            <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Account
+            </p>
             {isLoaded && isSignedIn ? (
-              <span>{user?.emailAddresses[0].emailAddress}</span>
+              <p className="px-2 text-sm text-muted-foreground">
+                Signed in as{" "}
+                <span className="block max-w-[70vw] truncate text-foreground">
+                  {user?.emailAddresses[0].emailAddress}
+                </span>
+              </p>
             ) : null}
             {isSignedIn ? (
               <Button
                 variant="destructive"
-                aria-label="Submit"
                 size="lg"
+                className="w-full"
                 onClick={() => {
                   signOut();
                   setOpen(false);
@@ -128,15 +135,11 @@ export default function HeaderMobile() {
                 Logout
               </Button>
             ) : (
-              <Button
-                variant="outline"
-                aria-label="Submit"
-                onClick={() => navigateAndCloseSheet(ROUTES.SIGN_IN)}
-                size="lg"
-                className="w-full"
-              >
-                <User />
-                <span>Login/Signup</span>
+              <Button asChild variant="outline" size="lg">
+                <Link href={ROUTES.SIGN_IN} onClick={() => setOpen(false)}>
+                  <User />
+                  <span>Login/Signup</span>
+                </Link>
               </Button>
             )}
           </div>

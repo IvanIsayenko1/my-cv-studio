@@ -169,11 +169,10 @@ export function TemplateForm({ id, setIsDirtyForm }: TemplateFormProps) {
               )}
             />
 
-            <div className="flex justify-end gap-2 sm:gap-3">
+            <div className="cv-form-actions">
               <Button
                 type="submit"
-                size="sm"
-                className="sm:h-9 sm:px-4"
+                className="cv-form-primary-action"
                 disabled={isPending}
               >
                 {isPending ? "Saving..." : "Save"}

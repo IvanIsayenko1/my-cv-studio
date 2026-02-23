@@ -1,17 +1,25 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+import { RESOLUTIONS } from "@/lib/constants/resolutions";
+
 export default function CVFormMenuSkeleton() {
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
+
   return (
     <>
-      <div className="hidden sm:flex gap-4">
-        <Skeleton className="w-9 h-9" />
-        <Skeleton className="w-[405px] h-9" />
-      </div>
+      {isDesktop && (
+        <div className=" gap-4">
+          <Skeleton className="w-[200px] h-9" />
+        </div>
+      )}
 
-      <div className="flex sm:hidden gap-4">
-        <Skeleton className="w-9 h-9" />
-        <Skeleton className="w-10 h-9" />
-      </div>
+      {!isDesktop && (
+        <div className=" gap-4">
+          <Skeleton className="w-10 h-9" />
+        </div>
+      )}
     </>
   );
 }

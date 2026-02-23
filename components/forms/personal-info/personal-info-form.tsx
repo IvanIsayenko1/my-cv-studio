@@ -30,10 +30,8 @@ import {
   usePersonalInfo,
   useSavePersonalInfo,
 } from "@/hooks/cv/use-personal-info";
-import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
-import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
 import {
   PersonalInfoFormValues,
@@ -52,7 +50,6 @@ export function PersonalInfoForm({
   const { data } = usePersonalInfo(id);
   const { mutate, isPending } = useSavePersonalInfo(id);
   const queryClient = useQueryClient();
-  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const form = useForm<PersonalInfoFormValues>({
     resolver: zodResolver(personalInfoSchema),
@@ -283,12 +280,11 @@ export function PersonalInfoForm({
               />
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="cv-form-actions">
               <Button
                 type="submit"
                 disabled={isPending}
-                size={isDesktop ? "default" : "lg"}
-                className={isDesktop ? "" : "w-full"}
+                className="cv-form-primary-action"
               >
                 {isPending && <Spinner />}
                 {isPending ? "Saving..." : "Save"}

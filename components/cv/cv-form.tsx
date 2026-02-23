@@ -1,8 +1,14 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
-import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 
 import { ArrowLeftIcon } from "lucide-react";
 
@@ -49,13 +55,36 @@ import CVFormMenuSkeleton from "./cv-form-menu/cv-form-menu-skeleton";
 import CVFormStatus from "./cv-form-status";
 import CVFormTitle from "./cv-form-title";
 
+const FORM_TABS = [
+  "personal-info",
+  "summary",
+  "work-experience",
+  "education",
+  "skills",
+  "certifications",
+  "projects",
+  "awards",
+  "cv-template",
+] as const;
+
+type FormTab = (typeof FORM_TABS)[number];
+
+const isFormTab = (value: string | null): value is FormTab =>
+  Boolean(value && FORM_TABS.includes(value as FormTab));
+
 export default function CVForm() {
   const params = useParams();
   const id = params.id as string;
 
-  const [activeTab, setActiveTab] = useState("personal-info");
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const urlTab = searchParams.get("tab");
+  const initialTab = isFormTab(urlTab) ? urlTab : "personal-info";
+
+  const [activeTab, setActiveTab] = useState<FormTab>(initialTab);
   const [isDirtyForm, setIsDirtyForm] = useState(false);
-  const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const [pendingTab, setPendingTab] = useState<FormTab | null>(null);
 
   // router
   const router = useRouter();
@@ -63,17 +92,43 @@ export default function CVForm() {
   // custom hooks
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
+  const syncTabToUrl = useCallback(
+    (nextTab: FormTab) => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.set("tab", nextTab);
+      router.replace(`${pathname}?${nextParams.toString()}`, {
+        scroll: false,
+      });
+    },
+    [pathname, router, searchParams]
+  );
+
+  useEffect(() => {
+    if (!isFormTab(urlTab)) {
+      syncTabToUrl("personal-info");
+      return;
+    }
+
+    if (pendingTab === null && urlTab !== activeTab) {
+      setActiveTab(urlTab);
+    }
+  }, [activeTab, pendingTab, syncTabToUrl, urlTab]);
+
   const handleTabChange = (value: string) => {
+    if (!isFormTab(value)) return;
+
     if (isDirtyForm) {
       setPendingTab(value);
     } else {
       setActiveTab(value);
+      syncTabToUrl(value);
     }
   };
 
   const confirmTabChange = () => {
     if (pendingTab) {
       setActiveTab(pendingTab);
+      syncTabToUrl(pendingTab);
       setPendingTab(null);
       setIsDirtyForm(false);
     }
@@ -87,52 +142,63 @@ export default function CVForm() {
     <div className="flex flex-col gap-6">
       <div className="flex items-start">
         <Button
+          asChild
           variant="link"
           size={isDesktop ? "default" : "lg"}
-          aria-label="Go Back"
-          onClick={() => router.push(ROUTES.MAKER)}
           className="!p-0"
         >
-          <ArrowLeftIcon /> To the list
+          <Link href={ROUTES.MAKER} aria-label="Go Back">
+            <ArrowLeftIcon aria-hidden="true" /> To the list
+          </Link>
         </Button>
       </div>
 
-      <div className="flex items-center gap-4">
-        <Suspense fallback={<Skeleton className="h-9 w-32" />}>
-          <CVFormTitle id={id} />
-        </Suspense>
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <Suspense fallback={<Skeleton className="h-9 w-32" />}>
+            <CVFormTitle id={id} />
+          </Suspense>
+        </div>
         <Suspense fallback={<Skeleton className="h-6 w-16" />}>
           <CVFormStatus id={id} />
         </Suspense>
-        <Suspense fallback={<CVFormMenuSkeleton />}>
-          <CVFormMenu id={id} />
-        </Suspense>
+        <div className="shrink-0">
+          <Suspense fallback={<CVFormMenuSkeleton />}>
+            <CVFormMenu id={id} />
+          </Suspense>
+        </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <div className="overflow-auto scrollbar-hide snap-x snap-mandatory">
-          <TabsList className={`h-auto py-2 ${isDesktop ? "" : "h-12"}`}>
-            <TabsTrigger value="personal-info">
-              Personal Info<span className="text-destructive">*</span>
-            </TabsTrigger>
-            <TabsTrigger value="summary">
-              Summary<span className="text-destructive">*</span>
-            </TabsTrigger>
-            <TabsTrigger value="work-experience">
-              Work Experience<span className="text-destructive">*</span>
-            </TabsTrigger>
-            <TabsTrigger value="education">
-              Education<span className="text-destructive">*</span>
-            </TabsTrigger>
-            <TabsTrigger value="skills">
-              Skills<span className="text-destructive">*</span>
-            </TabsTrigger>
-            <TabsTrigger value="certifications">Certifications</TabsTrigger>
-            <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="awards">Awards</TabsTrigger>
-            <TabsTrigger value="cv-template">CV Template</TabsTrigger>
-          </TabsList>
-        </div>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-4">
+        {/* <div className="sticky top-[4rem] z-30 border-b border-border bg-background/95 py-2 backdrop-blur sm:top-[4.5rem] lg:top-[4.3rem]">
+          <div className="pointer-events-none absolute top-2 bottom-2 left-0 z-10 w-6 bg-gradient-to-r from-background to-transparent sm:hidden" />
+          <div className="pointer-events-none absolute top-2 right-0 bottom-2 z-10 w-6 bg-gradient-to-l from-background to-transparent sm:hidden" />
+          <div className="overflow-x-auto scrollbar-hide [touch-action:pan-x]"> */}
+        <TabsList
+          className={`h-auto min-w-max py-1 ${isDesktop ? "" : "h-12"}`}
+        >
+          <TabsTrigger value="personal-info">
+            Personal Info<span className="text-destructive">*</span>
+          </TabsTrigger>
+          <TabsTrigger value="summary">
+            Summary<span className="text-destructive">*</span>
+          </TabsTrigger>
+          <TabsTrigger value="work-experience">
+            Work Experience<span className="text-destructive">*</span>
+          </TabsTrigger>
+          <TabsTrigger value="education">
+            Education<span className="text-destructive">*</span>
+          </TabsTrigger>
+          <TabsTrigger value="skills">
+            Skills<span className="text-destructive">*</span>
+          </TabsTrigger>
+          <TabsTrigger value="certifications">Certifications</TabsTrigger>
+          <TabsTrigger value="projects">Projects</TabsTrigger>
+          <TabsTrigger value="awards">Awards</TabsTrigger>
+          <TabsTrigger value="cv-template">CV Template</TabsTrigger>
+        </TabsList>
+        {/* </div>
+        </div> */}
 
         <TabsContent value="personal-info">
           <Suspense fallback={<PersonalInfoFormSkeleton />}>
