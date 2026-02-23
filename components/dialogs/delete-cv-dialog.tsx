@@ -97,6 +97,7 @@ export default function DeleteCVDialog({
               you sure you want to continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
+
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={(e) => e.stopPropagation()}
@@ -110,7 +111,7 @@ export default function DeleteCVDialog({
               disabled={isDeletePending}
             >
               {isDeletePending && <Spinner />}
-              Delete
+              {isDeletePending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -152,7 +153,7 @@ export default function DeleteCVDialog({
             size={"lg"}
           >
             {isDeletePending && <Spinner />}
-            Delete
+            {isDeletePending ? "Deleting..." : "Delete"}
           </Button>
         </DrawerFooter>
       </DrawerContent>

@@ -88,9 +88,9 @@ export default function CreateCVDialog({
       name="name"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Name</FormLabel>
+          <FormLabel>New CV Name</FormLabel>
           <FormControl>
-            <Input type="text" placeholder="CV name" {...field} />
+            <Input type="text" {...field} className={isDesktop ? "" : "h-10"} />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -115,14 +115,15 @@ export default function CreateCVDialog({
               {formInput}
 
               <DialogFooter>
+                <Button type="submit" disabled={isCreatePending}>
+                  {isCreatePending && <Spinner />}
+                  {isCreatePending ? "Creating..." : "Create"}
+                </Button>
                 <DialogClose asChild>
                   <Button type="button" variant="outline">
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={isCreatePending}>
-                  {isCreatePending ? "Creating..." : "Continue"}
-                </Button>
               </DialogFooter>
             </form>
           </Form>
@@ -151,6 +152,15 @@ export default function CreateCVDialog({
           </form>
         </Form>
         <DrawerFooter className="pt-2">
+          <Button
+            type="submit"
+            form={formId}
+            disabled={isCreatePending}
+            size={"lg"}
+          >
+            {isCreatePending && <Spinner />}
+            {isCreatePending ? "Creating..." : "Create"}
+          </Button>
           <DrawerClose asChild>
             <Button
               variant="outline"
@@ -161,15 +171,6 @@ export default function CreateCVDialog({
               Cancel
             </Button>
           </DrawerClose>
-          <Button
-            type="submit"
-            form={formId}
-            disabled={isCreatePending}
-            size={"lg"}
-          >
-            {isCreatePending && <Spinner />}
-            {isCreatePending ? "Creating..." : "Create"}
-          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

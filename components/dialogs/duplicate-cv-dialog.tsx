@@ -133,7 +133,12 @@ export default function DuplicateCVDialog({
         <FormItem>
           <FormLabel>Name</FormLabel>
           <FormControl>
-            <Input type="text" placeholder="CV name" {...field} />
+            <Input
+              type="text"
+              placeholder="CV name"
+              {...field}
+              className={isDesktop ? "" : "h-10"}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -166,7 +171,7 @@ export default function DuplicateCVDialog({
                 </DialogClose>
                 <Button type="submit" disabled={isDuplicatePending}>
                   {isDuplicatePending && <Spinner />}
-                  {isDuplicatePending ? "Duplicating..." : "Continue"}
+                  {isDuplicatePending ? "Duplicating..." : "Duplicate"}
                 </Button>
               </DialogFooter>
             </form>
@@ -214,7 +219,7 @@ export default function DuplicateCVDialog({
             size={"lg"}
           >
             {isDuplicatePending && <Spinner />}
-            {isDuplicatePending ? "Duplicating..." : "Continue"}
+            {isDuplicatePending ? "Duplicating..." : "Duplicate"}
           </Button>
         </DrawerFooter>
       </DrawerContent>
