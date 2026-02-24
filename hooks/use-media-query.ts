@@ -1,36 +1,39 @@
-import { useLayoutEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 export function useMediaQuery(query: string): boolean {
-  const getMatches = (query: string): boolean => {
-    // Prevent SSR issues
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      if (typeof window === "undefined") {
+        return () => {};
+      }
+
+      const mediaQueryList = window.matchMedia(query);
+      mediaQueryList.addEventListener("change", onStoreChange);
+
+      return () => {
+        mediaQueryList.removeEventListener("change", onStoreChange);
+      };
+    },
+    [query]
+  );
+
+  const getSnapshot = useCallback(() => {
     if (typeof window === "undefined") {
       return false;
     }
 
     return window.matchMedia(query).matches;
-  };
-
-  const [matches, setMatches] = useState<boolean>(() => getMatches(query));
-
-  useLayoutEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const mediaQuery = window.matchMedia(query);
-
-    const handleChange = () => {
-      setMatches(mediaQuery.matches);
-    };
-
-    // Set initial value
-    setMatches(mediaQuery.matches);
-
-    // Modern browsers
-    mediaQuery.addEventListener("change", handleChange);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
   }, [query]);
 
-  return matches;
+  const getServerSnapshot = useCallback(() => {
+    // During client hydration this can still read window and avoid the
+    // "always false on first paint" flicker.
+    if (typeof window !== "undefined") {
+      return window.matchMedia(query).matches;
+    }
+
+    return false;
+  }, [query]);
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

@@ -6,7 +6,6 @@ import {
   Copy,
   Download,
   EditIcon,
-  MoreHorizontalIcon,
   MoreVerticalIcon,
   Share,
   Trash,

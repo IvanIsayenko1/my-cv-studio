@@ -41,10 +41,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { useMediaQuery } from "@/hooks/use-media-query";
-
-import { RESOLUTIONS } from "@/lib/constants/resolutions";
-
 import { ROUTES } from "@/config/routes";
 
 import { PersonalInfoFormSkeleton } from "../forms/personal-info/personal-info-form-skeleton";
@@ -88,9 +84,6 @@ export default function CVForm() {
 
   // router
   const router = useRouter();
-
-  // custom hooks
-  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const syncTabToUrl = useCallback(
     (nextTab: FormTab) => {
@@ -141,12 +134,7 @@ export default function CVForm() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-start">
-        <Button
-          asChild
-          variant="link"
-          size={isDesktop ? "default" : "lg"}
-          className="!p-0"
-        >
+        <Button asChild variant="link" size="lg" className="!p-0">
           <Link href={ROUTES.MAKER} aria-label="Go Back">
             <ArrowLeftIcon aria-hidden="true" /> To the list
           </Link>
@@ -170,35 +158,31 @@ export default function CVForm() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-4">
-        {/* <div className="sticky top-[4rem] z-30 border-b border-border bg-background/95 py-2 backdrop-blur sm:top-[4.5rem] lg:top-[4.3rem]">
-          <div className="pointer-events-none absolute top-2 bottom-2 left-0 z-10 w-6 bg-gradient-to-r from-background to-transparent sm:hidden" />
-          <div className="pointer-events-none absolute top-2 right-0 bottom-2 z-10 w-6 bg-gradient-to-l from-background to-transparent sm:hidden" />
-          <div className="overflow-x-auto scrollbar-hide [touch-action:pan-x]"> */}
-        <TabsList
-          className={`h-auto min-w-max py-1 ${isDesktop ? "" : "h-12"}`}
-        >
-          <TabsTrigger value="personal-info">
-            Personal Info<span className="text-destructive">*</span>
-          </TabsTrigger>
-          <TabsTrigger value="summary">
-            Summary<span className="text-destructive">*</span>
-          </TabsTrigger>
-          <TabsTrigger value="work-experience">
-            Work Experience<span className="text-destructive">*</span>
-          </TabsTrigger>
-          <TabsTrigger value="education">
-            Education<span className="text-destructive">*</span>
-          </TabsTrigger>
-          <TabsTrigger value="skills">
-            Skills<span className="text-destructive">*</span>
-          </TabsTrigger>
-          <TabsTrigger value="certifications">Certifications</TabsTrigger>
-          <TabsTrigger value="projects">Projects</TabsTrigger>
-          <TabsTrigger value="awards">Awards</TabsTrigger>
-          <TabsTrigger value="cv-template">CV Template</TabsTrigger>
-        </TabsList>
-        {/* </div>
-        </div> */}
+        <div className="sticky top-[3.5rem] z-30 py-2 sm:top-[3.8rem] lg:top-[3.8rem]">
+          <div className="overflow-x-auto scrollbar-hide [touch-action:pan-x]">
+            <TabsList className="h-12 min-w-max py-1 sm:h-auto">
+              <TabsTrigger value="personal-info">
+                Personal Info<span className="text-destructive">*</span>
+              </TabsTrigger>
+              <TabsTrigger value="summary">
+                Summary<span className="text-destructive">*</span>
+              </TabsTrigger>
+              <TabsTrigger value="work-experience">
+                Work Experience<span className="text-destructive">*</span>
+              </TabsTrigger>
+              <TabsTrigger value="education">
+                Education<span className="text-destructive">*</span>
+              </TabsTrigger>
+              <TabsTrigger value="skills">
+                Skills<span className="text-destructive">*</span>
+              </TabsTrigger>
+              <TabsTrigger value="certifications">Certifications</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="awards">Awards</TabsTrigger>
+              <TabsTrigger value="cv-template">CV Template</TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
 
         <TabsContent value="personal-info">
           <Suspense fallback={<PersonalInfoFormSkeleton />}>

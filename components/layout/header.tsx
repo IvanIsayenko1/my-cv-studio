@@ -15,7 +15,7 @@ export default function Header() {
           {/* Left: Branding/Title */}
           <div className="shrink-0">
             <Link href={ROUTES.HOME} aria-label="Go to mycvstudio home page">
-              <p className="text-xl leading-none font-light tracking-tight sm:text-2xl">
+              <p className="text-xl leading-none font-normal tracking-tight sm:text-2xl">
                 my<span className="font-bold">cv</span>studio
               </p>
             </Link>
