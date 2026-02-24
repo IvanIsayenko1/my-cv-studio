@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@clerk/nextjs/server";
-import { z } from "zod";
 
 import { db } from "@/lib/db/client";
-
-const personalInfoSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  professionalTitle: z.string(),
-  email: z.string(),
-  phone: z.string(),
-  city: z.string(),
-  country: z.string(),
-  linkedIn: z.string().nullable().optional(),
-  portfolio: z.string().nullable().optional(),
-  photo: z.string().nullable().optional(),
-});
+import {
+  parseProfessionalLinksFromStorage,
+  serializeProfessionalLinksForStorage,
+} from "@/lib/utils/personal-links-transform";
+import { personalInfoSchema } from "@/types/personal-info";
 
 export async function GET(
   _req: NextRequest,
@@ -76,6 +67,10 @@ export async function GET(
     phone: row.phone as string,
     city: row.city as string,
     country: row.country as string,
+    professionalLinks: parseProfessionalLinksFromStorage({
+      linkedIn: (row.linkedin as string | null) ?? "",
+      portfolio: (row.portfolio as string | null) ?? "",
+    }),
     linkedIn: (row.linkedin as string | null) ?? "",
     portfolio: (row.portfolio as string | null) ?? "",
     photo: (row.photo as string | null) ?? "",
@@ -104,6 +99,7 @@ export async function POST(
 
   const body = await req.json();
   const data = personalInfoSchema.parse(body);
+  const linksStorage = serializeProfessionalLinksForStorage(data);
 
   // upsert by primary key cv_id
   await db.execute(
@@ -142,8 +138,8 @@ export async function POST(
       data.phone,
       data.city,
       data.country,
-      data.linkedIn ?? null,
-      data.portfolio ?? null,
+      linksStorage.linkedIn,
+      linksStorage.portfolio,
       data.photo ?? null,
     ]
   );

@@ -17,11 +17,16 @@ const workExperienceItemSchema = z.object({
     "Contract",
     "Freelance",
     "Internship",
+    "Temporary",
+    "Seasonal",
+    "Apprenticeship",
+    "Volunteer",
+    "Self-employed",
   ]),
   startDate: z.string(),
   endDate: z.string(),
   achievements: z.array(z.string()).default([]),
-  technologies: z.array(z.string()).default([]),
+  toolsAndMethods: z.array(z.string()).default([]),
 });
 
 const workExperienceBodySchema = z.object({
@@ -83,7 +88,7 @@ export async function GET(
     [cvId]
   );
 
-  // Fetch technologies
+  // Fetch tools/methods from legacy technologies table
   const technologies = await db.execute(
     `
     SELECT work_experience_id, name
@@ -104,12 +109,12 @@ export async function GET(
     achievementsByRole.set(wid, list);
   }
 
-  const technologiesByRole = new Map<string, string[]>();
+  const toolsAndMethodsByRole = new Map<string, string[]>();
   for (const row of technologies.rows as any[]) {
     const wid = row.work_experience_id as string;
-    const list = technologiesByRole.get(wid) ?? [];
+    const list = toolsAndMethodsByRole.get(wid) ?? [];
     list.push(row.name as string);
-    technologiesByRole.set(wid, list);
+    toolsAndMethodsByRole.set(wid, list);
   }
 
   const workExperience = (roles.rows as any[]).map((row) => ({
@@ -121,11 +126,16 @@ export async function GET(
       | "Part-time"
       | "Contract"
       | "Freelance"
-      | "Internship",
+      | "Internship"
+      | "Temporary"
+      | "Seasonal"
+      | "Apprenticeship"
+      | "Volunteer"
+      | "Self-employed",
     startDate: row.start_date as string,
     endDate: row.end_date as string,
     achievements: achievementsByRole.get(row.id as string) ?? [],
-    technologies: technologiesByRole.get(row.id as string) ?? [],
+    toolsAndMethods: toolsAndMethodsByRole.get(row.id as string) ?? [],
   }));
 
   return NextResponse.json({ workExperience });
@@ -208,7 +218,7 @@ export async function POST(
       );
     }
 
-    for (const name of w.technologies ?? []) {
+    for (const name of w.toolsAndMethods ?? []) {
       await db.execute(
         `
         INSERT INTO cv_work_experience_technology (

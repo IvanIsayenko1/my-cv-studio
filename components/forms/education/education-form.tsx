@@ -63,7 +63,8 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
           institution: "",
           location: "",
           graduationDate: "",
-          gpa: undefined,
+          grade: "",
+          gradingScale: "",
           honors: "",
         },
       ],
@@ -91,7 +92,8 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
               institution: edu.institution ?? "",
               location: edu.location ?? "",
               graduationDate: edu.graduationDate ?? "",
-              gpa: edu.gpa ?? undefined,
+              grade: edu.grade ?? "",
+              gradingScale: edu.gradingScale ?? "",
               honors: edu.honors ?? "",
             }))
           : [
@@ -101,7 +103,8 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                 institution: "",
                 location: "",
                 graduationDate: "",
-                gpa: undefined,
+                grade: "",
+                gradingScale: "",
                 honors: "",
               },
             ],
@@ -139,13 +142,13 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardHeader className="px-5 sm:px-6">
           <CardTitle>Education</CardTitle>
           <CardDescription>
             Add your degrees and relevant academic qualifications.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -172,7 +175,7 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                   </div>
 
                   {/* Degree / Field of Study */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`education.${index}.degree`}
@@ -210,7 +213,7 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                   </div>
 
                   {/* Institution / Location */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`education.${index}.institution`}
@@ -247,8 +250,8 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                     />
                   </div>
 
-                  {/* Graduation date / GPA */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Graduation date / Grade / Scale */}
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <FormField
                       control={control}
                       name={`education.${index}.graduationDate`}
@@ -267,27 +270,28 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                     />
                     <FormField
                       control={control}
-                      name={`education.${index}.gpa`}
+                      name={`education.${index}.grade`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>GPA (optional)</FormLabel>
+                          <FormLabel>Grade (optional)</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              step="0.01"
-                              placeholder="3.8"
-                              value={
-                                field.value === undefined
-                                  ? ""
-                                  : String(field.value)
-                              }
-                              onChange={(e) => {
-                                const v = e.target.value;
-                                field.onChange(
-                                  v === "" ? undefined : Number(v)
-                                );
-                              }}
+                              placeholder="e.g., 3.8 or A"
+                              {...field}
                             />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={control}
+                      name={`education.${index}.gradingScale`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Grading Scale (optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., 4.0 scale" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -326,7 +330,8 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                     institution: "",
                     location: "",
                     graduationDate: "",
-                    gpa: undefined,
+                    grade: "",
+                    gradingScale: "",
                     honors: "",
                   })
                 }

@@ -15,7 +15,7 @@ import { WorkExperienceFormValues } from "@/types/work-experience";
 
 /**
  * Mutation hook to save work experience.
- * Cleans the technologies array by trimming and filtering empty strings.
+ * Cleans the tools/methods array by trimming and filtering empty strings.
  * @param id The ID of the CV/resume to update.
  */
 export function useSaveWorkExperience(id: string) {
@@ -27,7 +27,7 @@ export function useSaveWorkExperience(id: string) {
       const cleaned: WorkExperienceFormValues = {
         workExperience: values.workExperience.map((w) => ({
           ...w,
-          technologies: (w.technologies ?? [])
+          toolsAndMethods: (w.toolsAndMethods ?? [])
             .map((t) => t.trim())
             .filter(Boolean),
         })),

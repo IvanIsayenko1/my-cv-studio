@@ -42,9 +42,14 @@ import { ProjectsFormValues, projectsSchema } from "@/types/projects";
 interface ProjectsFormProps {
   setIsDirtyForm: (isDirty: boolean) => void;
   id: string;
+  sectionTitle?: string;
 }
 
-export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
+export function ProjectsForm({
+  setIsDirtyForm,
+  id,
+  sectionTitle = "Projects",
+}: ProjectsFormProps) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
   const { data } = useProjects(id);
@@ -106,13 +111,13 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>Projects</CardTitle>
+        <CardHeader className="px-5 sm:px-6">
+          <CardTitle>{sectionTitle}</CardTitle>
           <CardDescription>
             Add notable projects that showcase your skills and impact.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -139,7 +144,7 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
                   </div>
 
                   {/* Name / Role */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`projects.${index}.name`}
@@ -177,7 +182,7 @@ export function ProjectsForm({ setIsDirtyForm, id }: ProjectsFormProps) {
                   </div>
 
                   {/* Dates */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`projects.${index}.startDate`}

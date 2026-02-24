@@ -132,19 +132,9 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
         doc.y += RHYTHM.blockGap;
       };
 
-      renderSkillCategory("Core Competencies", cv.skills.coreCompetencies);
-      renderSkillCategory(
-        "Tools & Technologies",
-        cv.skills.toolsAndTechnologies
-      );
-      renderSkillCategory(
-        "Systems & Methodologies",
-        cv.skills.systemsAndMethodologies
-      );
-      renderSkillCategory(
-        "Collaboration & Delivery",
-        cv.skills.collaborationAndDelivery
-      );
+      (cv.skills.categories ?? []).forEach((category) => {
+        renderSkillCategory(category.name, category.items);
+      });
 
       if (cv.skills.languages?.length) {
         applyStyle(doc, TYPO.body);
@@ -186,11 +176,11 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
 
         renderBulletList(doc, job.achievements ?? []);
 
-        if (job.technologies?.length) {
+        if (job.toolsAndMethods?.length) {
           applyStyle(doc, TYPO.small);
           doc
             .fillColor(COLORS.secondary)
-            .text(`Technologies: ${job.technologies.join(", ")}`);
+            .text(`Tools & Methods: ${job.toolsAndMethods.join(", ")}`);
         }
       });
     }
@@ -216,12 +206,18 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
           .fillColor(COLORS.secondary)
           .text(`${edu.institution} | ${formatATSDate(edu.graduationDate)}`);
 
-        if (edu.gpa || edu.honors) {
+        if (edu.grade || edu.gradingScale || edu.honors) {
           applyStyle(doc, TYPO.small);
           doc
             .fillColor(COLORS.primary)
             .text(
-              [edu.gpa && `GPA: ${edu.gpa}`, edu.honors]
+              [
+                edu.grade &&
+                  `Grade: ${edu.grade}${
+                    edu.gradingScale ? ` (${edu.gradingScale})` : ""
+                  }`,
+                edu.honors,
+              ]
                 .filter(Boolean)
                 .join(" | ")
             );

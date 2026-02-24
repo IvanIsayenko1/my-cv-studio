@@ -114,13 +114,13 @@ export function CertificationsForm({
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardHeader className="px-5 sm:px-6">
           <CardTitle>Certifications</CardTitle>
           <CardDescription>
             List your relevant certifications and credentials.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -147,7 +147,7 @@ export function CertificationsForm({
                   </div>
 
                   {/* Name / Issuing organization */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`certifications.${index}.name`}
@@ -189,7 +189,7 @@ export function CertificationsForm({
                   </div>
 
                   {/* Issue date / Expiration date */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`certifications.${index}.issueDate`}

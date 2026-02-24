@@ -103,13 +103,13 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardHeader className="px-5 sm:px-6">
           <CardTitle>Awards</CardTitle>
           <CardDescription>
             Add notable awards or recognitions relevant to your career.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -136,7 +136,7 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
                   </div>
 
                   {/* Name / Issuer */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`awards.${index}.name`}

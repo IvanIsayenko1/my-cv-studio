@@ -11,13 +11,8 @@ export const educationItemSchema = z.object({
     .string()
     .min(1, "Graduation date is required")
     .regex(monthYearRegex, "Use format MM/YYYY (e.g. 01/2022)"),
-  gpa: z
-    .number()
-    .min(0, "GPA must be at least 0")
-    .max(10, "GPA must be at most 10")
-    .or(z.nan())
-    .transform((v) => (Number.isNaN(v) ? undefined : v))
-    .optional(),
+  grade: z.string().optional(),
+  gradingScale: z.string().optional(),
   honors: z.string().optional(),
 });
 

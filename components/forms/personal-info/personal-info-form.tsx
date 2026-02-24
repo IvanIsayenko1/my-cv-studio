@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,15 +39,7 @@ import {
   personalInfoSchema,
 } from "@/types/personal-info";
 
-interface PersonalInfoFormProps {
-  setIsDirtyForm: (isDirty: boolean) => void;
-  id: string;
-}
-
-export function PersonalInfoForm({
-  setIsDirtyForm,
-  id,
-}: PersonalInfoFormProps) {
+export function PersonalInfoForm({ id }: { id: string }) {
   const { data } = usePersonalInfo(id);
   const { mutate, isPending } = useSavePersonalInfo(id);
   const queryClient = useQueryClient();
@@ -61,9 +54,15 @@ export function PersonalInfoForm({
       phone: "",
       city: "",
       country: "",
+      professionalLinks: [],
       linkedIn: "",
       portfolio: "",
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "professionalLinks",
   });
 
   useEffect(() => {
@@ -78,21 +77,24 @@ export function PersonalInfoForm({
         country: data.country ?? "",
         linkedIn: data.linkedIn ?? "",
         portfolio: data.portfolio ?? "",
+        professionalLinks:
+          data.professionalLinks && data.professionalLinks.length > 0
+            ? data.professionalLinks
+            : [
+                ...(data.linkedIn
+                  ? [{ label: "LinkedIn", url: data.linkedIn }]
+                  : []),
+                ...(data.portfolio
+                  ? [{ label: "Portfolio", url: data.portfolio }]
+                  : []),
+              ],
       });
-      setIsDirtyForm(false);
     }
-  }, [data, form, setIsDirtyForm]);
-
-  const { isDirty } = form.formState;
-
-  useEffect(() => {
-    setIsDirtyForm(isDirty);
-  }, [isDirty, setIsDirtyForm]);
+  }, [data, form]);
 
   const onSubmit = async (values: PersonalInfoFormValues) => {
     mutate(values, {
       onSuccess: () => {
-        setIsDirtyForm(false);
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
       },
     });
@@ -100,18 +102,18 @@ export function PersonalInfoForm({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="px-5 sm:px-6">
         <CardTitle>Personal Information</CardTitle>
         <CardDescription>
           Enter your basic contact information. This will appear at the top of
           your CV.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-5 sm:px-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <FormField
                 control={form.control}
                 name="firstName"
@@ -121,7 +123,11 @@ export function PersonalInfoForm({
                       First Name <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} />
+                      <Input
+                        placeholder="John"
+                        autoComplete="given-name"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -136,7 +142,11 @@ export function PersonalInfoForm({
                       Last Name <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Doe" {...field} />
+                      <Input
+                        placeholder="Doe"
+                        autoComplete="family-name"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,6 +167,7 @@ export function PersonalInfoForm({
                   <FormControl>
                     <Input
                       placeholder="e.g., Software Engineer, Marketing Manager, Civil Engineer"
+                      autoComplete="organization-title"
                       {...field}
                     />
                   </FormControl>
@@ -169,7 +180,7 @@ export function PersonalInfoForm({
             />
 
             {/* Contact Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -182,6 +193,8 @@ export function PersonalInfoForm({
                       <Input
                         type="email"
                         placeholder="john.doe@example.com"
+                        autoComplete="email"
+                        inputMode="email"
                         {...field}
                       />
                     </FormControl>
@@ -198,7 +211,13 @@ export function PersonalInfoForm({
                       Phone Number <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 (555) 123-4567" {...field} />
+                      <Input
+                        type="tel"
+                        placeholder="+1 (555) 123-4567"
+                        autoComplete="tel"
+                        inputMode="tel"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -207,7 +226,7 @@ export function PersonalInfoForm({
             </div>
 
             {/* Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <FormField
                 control={form.control}
                 name="city"
@@ -217,7 +236,11 @@ export function PersonalInfoForm({
                       City <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="San Francisco" {...field} />
+                      <Input
+                        placeholder="San Francisco"
+                        autoComplete="address-level2"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -232,7 +255,11 @@ export function PersonalInfoForm({
                       Country <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="United States" {...field} />
+                      <Input
+                        placeholder="United States"
+                        autoComplete="country-name"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -241,43 +268,73 @@ export function PersonalInfoForm({
             </div>
 
             {/* Optional Links */}
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="text-sm font-medium">Optional Links</h3>
-              <FormField
-                control={form.control}
-                name="linkedIn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>LinkedIn Profile</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="https://www.linkedin.com/in/johndoe"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Your LinkedIn profile URL (recommended)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="portfolio"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Portfolio/Website</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://www.johndoe.com" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Personal website, portfolio, or GitHub profile
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="space-y-4 rounded-lg border border-border/70 bg-muted/20 p-4">
+              <h3 className="text-sm font-medium text-foreground">
+                Professional Links
+              </h3>
+              <FormDescription>
+                Add any relevant links (LinkedIn, portfolio, Dribbble, Behance,
+                publications, etc.).
+              </FormDescription>
+              {fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="space-y-3 rounded-md border border-border/70 bg-background/80 p-3"
+                >
+                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_2fr_auto]">
+                    <FormField
+                      control={form.control}
+                      name={`professionalLinks.${index}.label`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Label</FormLabel>
+                          <FormControl>
+                            <Input placeholder="LinkedIn" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`professionalLinks.${index}.url`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>URL</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="https://example.com/profile"
+                              autoComplete="url"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex items-end">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => remove(index)}
+                        aria-label="Remove link"
+                        disabled={fields.length === 0}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => append({ label: "", url: "" })}
+              >
+                Add another link
+              </Button>
             </div>
 
             <div className="cv-form-actions">

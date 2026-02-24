@@ -1,4 +1,5 @@
 export {
+  skillCategorySchema,
   skillsSchema,
   languageItemSchema,
   type SkillsFormValues,

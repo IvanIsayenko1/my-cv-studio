@@ -5,6 +5,10 @@ import { randomUUID } from "crypto";
 import { z } from "zod";
 
 import { db } from "@/lib/db/client";
+import {
+  parseEducationMeta,
+  serializeEducationMeta,
+} from "@/lib/utils/education-grade-transform";
 
 export async function GET(
   _req: NextRequest,
@@ -47,14 +51,16 @@ export async function GET(
   );
 
   const education = (result.rows as any[]).map((row) => ({
+    ...parseEducationMeta({
+      gpa:
+        row.gpa === null || row.gpa === undefined ? null : Number(row.gpa),
+      honors: (row.honors as string | null) ?? "",
+    }),
     degree: row.degree as string,
     fieldOfStudy: row.field_of_study as string,
     institution: row.institution as string,
     location: row.location as string,
     graduationDate: row.graduation_date as string,
-    gpa:
-      row.gpa === null || row.gpa === undefined ? undefined : Number(row.gpa),
-    honors: (row.honors as string | null) ?? "",
   }));
 
   return NextResponse.json({ education });
@@ -66,7 +72,8 @@ const educationItemSchema = z.object({
   institution: z.string(),
   location: z.string(),
   graduationDate: z.string(),
-  gpa: z.number().optional(),
+  grade: z.string().optional(),
+  gradingScale: z.string().optional(),
   honors: z.string().optional(),
 });
 
@@ -104,6 +111,11 @@ export async function POST(
 
   // Insert all education entries
   for (const ed of education) {
+    const serialized = serializeEducationMeta({
+      grade: ed.grade,
+      gradingScale: ed.gradingScale,
+      honors: ed.honors,
+    });
     await db.execute(
       `
       INSERT INTO cv_education (
@@ -126,8 +138,8 @@ export async function POST(
         ed.institution,
         ed.location,
         ed.graduationDate,
-        ed.gpa ?? null,
-        ed.honors ?? null,
+        serialized.gpa,
+        serialized.honors,
       ]
     );
   }

@@ -74,14 +74,14 @@ export function SummaryForm({ setIsDirtyForm, id }: SummaryFormProps) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="px-5 sm:px-6">
         <CardTitle>Professional Summary</CardTitle>
         <CardDescription>
           Write a concise, 3–5 sentence summary that highlights your key skills,
           experience, and target role.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-5 sm:px-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField

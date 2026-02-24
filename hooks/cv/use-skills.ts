@@ -23,25 +23,17 @@ export function useSaveSkills(id: string) {
     mutationFn: (values: SkillsFormValues) => {
       const cleaned: SkillsFormValues = {
         skills: {
-          coreCompetencies: values.skills.coreCompetencies
-            ? values.skills.coreCompetencies
-                .map((s) => s.trim())
-                .filter(Boolean)
-            : [],
-          toolsAndTechnologies: values.skills.toolsAndTechnologies
-            ? values.skills.toolsAndTechnologies
-                .map((s) => s.trim())
-                .filter(Boolean)
-            : [],
-          systemsAndMethodologies: values.skills.systemsAndMethodologies
-            ? values.skills.systemsAndMethodologies
-                .map((s) => s.trim())
-                .filter(Boolean)
-            : [],
-          collaborationAndDelivery: values.skills.collaborationAndDelivery
-            ? values.skills.collaborationAndDelivery
-                .map((s) => s.trim())
-                .filter(Boolean)
+          categories: values.skills.categories
+            ? values.skills.categories
+                .map((category) => ({
+                  name: category.name.trim(),
+                  items: (category.items ?? [])
+                    .map((item) => item.trim())
+                    .filter(Boolean),
+                }))
+                .filter(
+                  (category) => category.name && category.items.length > 0
+                )
             : [],
           languages: values.skills.languages
             ? values.skills.languages

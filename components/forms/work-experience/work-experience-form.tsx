@@ -82,7 +82,7 @@ export function WorkExperienceForm({
           startDate: "",
           endDate: "Present",
           achievements: [],
-          technologies: [],
+          toolsAndMethods: [],
         },
       ],
     },
@@ -112,7 +112,7 @@ export function WorkExperienceForm({
                 startDate: "",
                 endDate: "Present",
                 achievements: [],
-                technologies: [],
+                toolsAndMethods: [],
               },
             ],
     });
@@ -151,13 +151,13 @@ export function WorkExperienceForm({
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardHeader className="px-5 sm:px-6">
           <CardTitle>Work Experience</CardTitle>
           <CardDescription>
             Add your recent roles, focusing on achievements and impact.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -185,7 +185,7 @@ export function WorkExperienceForm({
                   </div>
 
                   {/* Job title / company */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`workExperience.${index}.jobTitle`}
@@ -223,7 +223,7 @@ export function WorkExperienceForm({
                   </div>
 
                   {/* Location / Employment Type */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`workExperience.${index}.location`}
@@ -275,6 +275,21 @@ export function WorkExperienceForm({
                                 <SelectItem value="Internship">
                                   Internship
                                 </SelectItem>
+                                <SelectItem value="Temporary">
+                                  Temporary
+                                </SelectItem>
+                                <SelectItem value="Seasonal">
+                                  Seasonal
+                                </SelectItem>
+                                <SelectItem value="Apprenticeship">
+                                  Apprenticeship
+                                </SelectItem>
+                                <SelectItem value="Volunteer">
+                                  Volunteer
+                                </SelectItem>
+                                <SelectItem value="Self-employed">
+                                  Self-employed
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -285,7 +300,7 @@ export function WorkExperienceForm({
                   </div>
 
                   {/* Dates */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`workExperience.${index}.startDate`}
@@ -342,25 +357,26 @@ export function WorkExperienceForm({
                     )}
                   />
 
-                  {/* Technologies */}
+                  {/* Tools / Systems / Methods */}
                   <FormField
                     control={control}
-                    name={`workExperience.${index}.technologies`}
+                    name={`workExperience.${index}.toolsAndMethods`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Technologies</FormLabel>
+                        <FormLabel>Tools / Systems / Methods</FormLabel>
                         <FormControl>
                           <div className="space-y-2">
                             <div className="flex flex-wrap gap-2">
                               {field.value?.map((tech, i) => (
                                 <span
                                   key={tech + i}
-                                  className="inline-flex items-center rounded-full border px-2 py-1 text-xs"
+                                  className="inline-flex min-h-9 items-center rounded-full border px-3 py-1.5 text-sm sm:min-h-7 sm:px-2 sm:py-1 sm:text-xs"
                                 >
                                   {tech}
                                   <button
                                     type="button"
-                                    className="ml-1 text-muted-foreground hover:text-destructive"
+                                    className="-mr-1 ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:h-5 sm:w-5"
+                                    aria-label={`Remove tool/method ${tech}`}
                                     onClick={() =>
                                       field.onChange(
                                         (field.value ?? []).filter(
@@ -375,7 +391,7 @@ export function WorkExperienceForm({
                               ))}
                             </div>
                             <Input
-                              placeholder="Type a technology and press Enter"
+                              placeholder="Type a tool, system, or method and press Enter"
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                   e.preventDefault();
@@ -413,7 +429,7 @@ export function WorkExperienceForm({
                     startDate: "",
                     endDate: "Present",
                     achievements: [],
-                    technologies: [],
+                    toolsAndMethods: [],
                   })
                 }
               >

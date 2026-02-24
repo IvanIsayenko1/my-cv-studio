@@ -166,19 +166,9 @@ export function generateModernTwoColumnCV(cv: CV): Promise<Buffer> {
         doc.y += RHYTHM.tightGap;
       };
 
-      renderSkillRow("Core Competencies", cv.skills.coreCompetencies);
-
-      renderSkillRow("Tools & Technologies", cv.skills.toolsAndTechnologies);
-
-      renderSkillRow(
-        "Systems & Methodologies",
-        cv.skills.systemsAndMethodologies
-      );
-
-      renderSkillRow(
-        "Collaboration & Delivery",
-        cv.skills.collaborationAndDelivery
-      );
+      (cv.skills.categories ?? []).forEach((category) => {
+        renderSkillRow(category.name, category.items);
+      });
 
       if (cv.skills.languages?.length) {
         const langs = cv.skills.languages.map(
@@ -219,12 +209,12 @@ export function generateModernTwoColumnCV(cv: CV): Promise<Buffer> {
           () => {
             renderBulletList(doc, job.achievements);
 
-            if (job.technologies?.length) {
+            if (job.toolsAndMethods?.length) {
               doc.moveDown(0.5);
               applyStyle(doc, TYPO.small);
               doc
                 .fillColor(COLORS.secondary)
-                .text(`Technologies: ${job.technologies.join(", ")}`);
+                .text(`Tools & Methods: ${job.toolsAndMethods.join(", ")}`);
             }
           }
         );
@@ -259,12 +249,18 @@ export function generateModernTwoColumnCV(cv: CV): Promise<Buffer> {
             doc.text(edu.graduationDate);
           },
           () => {
-            if (edu.gpa || edu.honors) {
+            if (edu.grade || edu.gradingScale || edu.honors) {
               applyStyle(doc, TYPO.small);
               doc
                 .fillColor(COLORS.primary)
                 .text(
-                  [edu.gpa && `GPA: ${edu.gpa}`, edu.honors]
+                  [
+                    edu.grade &&
+                      `Grade: ${edu.grade}${
+                        edu.gradingScale ? ` (${edu.gradingScale})` : ""
+                      }`,
+                    edu.honors,
+                  ]
                     .filter(Boolean)
                     .join(" | ")
                 );

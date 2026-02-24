@@ -1,14 +1,9 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { type ReactNode, Suspense, useState } from "react";
 
 import Link from "next/link";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useParams } from "next/navigation";
 
 import { ArrowLeftIcon } from "lucide-react";
 
@@ -29,106 +24,105 @@ import { TemplateForm } from "@/components/forms/template/template-form";
 import TemplateFormSkeleton from "@/components/forms/template/template-form-skeleton";
 import { WorkExperienceForm } from "@/components/forms/work-experience/work-experience-form";
 import { WorkExperienceFormSkeleton } from "@/components/forms/work-experience/work-experience-form-skeleton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ROUTES } from "@/config/routes";
 
 import { PersonalInfoFormSkeleton } from "../forms/personal-info/personal-info-form-skeleton";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
+import { Toggle } from "../ui/toggle";
 import CVFormMenu from "./cv-form-menu/cv-form-menu";
 import CVFormMenuSkeleton from "./cv-form-menu/cv-form-menu-skeleton";
 import CVFormStatus from "./cv-form-status";
 import CVFormTitle from "./cv-form-title";
+import CVPreview from "./cv-preview";
+import CVPreviewSkeleton from "./cv-preview-skeleton";
 
-const FORM_TABS = [
-  "personal-info",
-  "summary",
-  "work-experience",
-  "education",
-  "skills",
-  "certifications",
-  "projects",
-  "awards",
-  "cv-template",
-] as const;
+const noopDirtyHandler = () => {};
+type SectionKey =
+  | "personalInfo"
+  | "summary"
+  | "workExperience"
+  | "education"
+  | "skills"
+  | "certifications"
+  | "projects"
+  | "awards"
+  | "template";
 
-type FormTab = (typeof FORM_TABS)[number];
+const DEFAULT_SECTION_VISIBILITY: Record<SectionKey, boolean> = {
+  personalInfo: true,
+  summary: true,
+  workExperience: true,
+  education: true,
+  skills: true,
+  certifications: true,
+  projects: true,
+  awards: true,
+  template: true,
+};
 
-const isFormTab = (value: string | null): value is FormTab =>
-  Boolean(value && FORM_TABS.includes(value as FormTab));
+const SECTION_LABELS: Record<SectionKey, string> = {
+  personalInfo: "Personal Info",
+  summary: "Summary",
+  workExperience: "Work Experience",
+  education: "Education",
+  skills: "Skills",
+  certifications: "Certifications",
+  projects: "Projects",
+  awards: "Awards",
+  template: "CV Template",
+};
+
+function SectionWrapper({
+  id,
+  title,
+  visible,
+  onToggle,
+  children,
+  controls,
+}: {
+  id: string;
+  title: string;
+  visible: boolean;
+  onToggle: (pressed: boolean) => void;
+  children: ReactNode;
+  controls?: ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      className="scroll-mt-24 space-y-3 border-border/70 pt-6 first:border-t-0 first:pt-0"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm font-medium text-muted-foreground">{title}</p>
+        <Toggle
+          variant="outline"
+          size="sm"
+          pressed={visible}
+          onPressedChange={onToggle}
+          aria-label={`Toggle ${title}`}
+        >
+          {visible ? "Visible" : "Hidden"}
+        </Toggle>
+      </div>
+      {controls}
+      {visible ? children : null}
+    </section>
+  );
+}
 
 export default function CVForm() {
   const params = useParams();
   const id = params.id as string;
-
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const urlTab = searchParams.get("tab");
-  const initialTab = isFormTab(urlTab) ? urlTab : "personal-info";
-
-  const [activeTab, setActiveTab] = useState<FormTab>(initialTab);
-  const [isDirtyForm, setIsDirtyForm] = useState(false);
-  const [pendingTab, setPendingTab] = useState<FormTab | null>(null);
-
-  // router
-  const router = useRouter();
-
-  const syncTabToUrl = useCallback(
-    (nextTab: FormTab) => {
-      const nextParams = new URLSearchParams(searchParams.toString());
-      nextParams.set("tab", nextTab);
-      router.replace(`${pathname}?${nextParams.toString()}`, {
-        scroll: false,
-      });
-    },
-    [pathname, router, searchParams]
+  const [visibleSections, setVisibleSections] = useState(
+    DEFAULT_SECTION_VISIBILITY
   );
+  const [projectsSectionTitle, setProjectsSectionTitle] = useState("Projects");
 
-  useEffect(() => {
-    if (!isFormTab(urlTab)) {
-      syncTabToUrl("personal-info");
-      return;
-    }
-
-    if (pendingTab === null && urlTab !== activeTab) {
-      setActiveTab(urlTab);
-    }
-  }, [activeTab, pendingTab, syncTabToUrl, urlTab]);
-
-  const handleTabChange = (value: string) => {
-    if (!isFormTab(value)) return;
-
-    if (isDirtyForm) {
-      setPendingTab(value);
-    } else {
-      setActiveTab(value);
-      syncTabToUrl(value);
-    }
-  };
-
-  const confirmTabChange = () => {
-    if (pendingTab) {
-      setActiveTab(pendingTab);
-      syncTabToUrl(pendingTab);
-      setPendingTab(null);
-      setIsDirtyForm(false);
-    }
-  };
-
-  const cancelTabChange = () => {
-    setPendingTab(null);
+  const toggleSection = (key: SectionKey, pressed: boolean) => {
+    setVisibleSections((prev) => ({ ...prev, [key]: pressed }));
   };
 
   return (
@@ -157,106 +151,134 @@ export default function CVForm() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-4">
-        <div className="sticky top-[3.5rem] z-30 py-2 sm:top-[3.8rem] lg:top-[3.8rem]">
-          <div className="overflow-x-auto scrollbar-hide [touch-action:pan-x]">
-            <TabsList className="h-12 min-w-max py-1 sm:h-auto">
-              <TabsTrigger value="personal-info">
-                Personal Info<span className="text-destructive">*</span>
-              </TabsTrigger>
-              <TabsTrigger value="summary">
-                Summary<span className="text-destructive">*</span>
-              </TabsTrigger>
-              <TabsTrigger value="work-experience">
-                Work Experience<span className="text-destructive">*</span>
-              </TabsTrigger>
-              <TabsTrigger value="education">
-                Education<span className="text-destructive">*</span>
-              </TabsTrigger>
-              <TabsTrigger value="skills">
-                Skills<span className="text-destructive">*</span>
-              </TabsTrigger>
-              <TabsTrigger value="certifications">Certifications</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="awards">Awards</TabsTrigger>
-              <TabsTrigger value="cv-template">CV Template</TabsTrigger>
-            </TabsList>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <SectionWrapper
+            id="section-personal-info"
+            title={SECTION_LABELS.personalInfo}
+            visible={visibleSections.personalInfo}
+            onToggle={(pressed) => toggleSection("personalInfo", pressed)}
+          >
+            <Suspense fallback={<PersonalInfoFormSkeleton />}>
+              <PersonalInfoForm id={id} />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-summary"
+            title={SECTION_LABELS.summary}
+            visible={visibleSections.summary}
+            onToggle={(pressed) => toggleSection("summary", pressed)}
+          >
+            <Suspense fallback={<SummaryFormSkeleton />}>
+              <SummaryForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-work-experience"
+            title={SECTION_LABELS.workExperience}
+            visible={visibleSections.workExperience}
+            onToggle={(pressed) => toggleSection("workExperience", pressed)}
+          >
+            <Suspense fallback={<WorkExperienceFormSkeleton />}>
+              <WorkExperienceForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-education"
+            title={SECTION_LABELS.education}
+            visible={visibleSections.education}
+            onToggle={(pressed) => toggleSection("education", pressed)}
+          >
+            <Suspense fallback={<EducationFormSkeleton />}>
+              <EducationForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-skills"
+            title={SECTION_LABELS.skills}
+            visible={visibleSections.skills}
+            onToggle={(pressed) => toggleSection("skills", pressed)}
+          >
+            <Suspense fallback={<SkillsFormSkeleton />}>
+              <SkillsForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-certifications"
+            title={SECTION_LABELS.certifications}
+            visible={visibleSections.certifications}
+            onToggle={(pressed) => toggleSection("certifications", pressed)}
+          >
+            <Suspense fallback={<CertificationsFormSkeleton />}>
+              <CertificationsForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-projects"
+            title={projectsSectionTitle}
+            visible={visibleSections.projects}
+            onToggle={(pressed) => toggleSection("projects", pressed)}
+            controls={
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[10rem_1fr] sm:items-center">
+                <p className="text-xs font-medium text-muted-foreground uppercase">
+                  Section title
+                </p>
+                <Input
+                  value={projectsSectionTitle}
+                  onChange={(e) =>
+                    setProjectsSectionTitle(e.target.value || "Projects")
+                  }
+                  placeholder="Projects"
+                />
+              </div>
+            }
+          >
+            <Suspense fallback={<ProjectsFormSkeleton />}>
+              <ProjectsForm
+                setIsDirtyForm={noopDirtyHandler}
+                id={id}
+                sectionTitle={projectsSectionTitle}
+              />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-awards"
+            title={SECTION_LABELS.awards}
+            visible={visibleSections.awards}
+            onToggle={(pressed) => toggleSection("awards", pressed)}
+          >
+            <Suspense fallback={<AwardsFormSkeleton />}>
+              <AwardsForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            </Suspense>
+          </SectionWrapper>
+
+          <SectionWrapper
+            id="section-cv-template"
+            title={SECTION_LABELS.template}
+            visible={visibleSections.template}
+            onToggle={(pressed) => toggleSection("template", pressed)}
+          >
+            <Suspense fallback={<TemplateFormSkeleton />}>
+              <TemplateForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            </Suspense>
+          </SectionWrapper>
         </div>
 
-        <TabsContent value="personal-info">
-          <Suspense fallback={<PersonalInfoFormSkeleton />}>
-            <PersonalInfoForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="summary">
-          <Suspense fallback={<SummaryFormSkeleton />}>
-            <SummaryForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="work-experience">
-          <Suspense fallback={<WorkExperienceFormSkeleton />}>
-            <WorkExperienceForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="education">
-          <Suspense fallback={<EducationFormSkeleton />}>
-            <EducationForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="skills">
-          <Suspense fallback={<SkillsFormSkeleton />}>
-            <SkillsForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="certifications">
-          <Suspense fallback={<CertificationsFormSkeleton />}>
-            <CertificationsForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="projects">
-          <Suspense fallback={<ProjectsFormSkeleton />}>
-            <ProjectsForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="awards">
-          <Suspense fallback={<AwardsFormSkeleton />}>
-            <AwardsForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="cv-template">
-          <Suspense fallback={<TemplateFormSkeleton />}>
-            <TemplateForm setIsDirtyForm={setIsDirtyForm} id={id} />
-          </Suspense>
-        </TabsContent>
-      </Tabs>
-
-      {/* Unsaved Changes Warning Dialog */}
-      <AlertDialog
-        open={pendingTab !== null}
-        onOpenChange={(open) => !open && cancelTabChange()}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
-            <AlertDialogDescription>
-              You have unsaved changes in this section. If you leave now, your
-              changes will be lost. Are you sure you want to continue?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelTabChange}>
-              Stay & Save
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmTabChange}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Leave Without Saving
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <Suspense fallback={<CVPreviewSkeleton />}>
+              <CVPreview id={id} />
+            </Suspense>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

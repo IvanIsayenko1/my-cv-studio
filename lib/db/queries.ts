@@ -1,3 +1,7 @@
+import { normalizeSkillsFromRow } from "@/lib/utils/skills-transform";
+import { parseProfessionalLinksFromStorage } from "@/lib/utils/personal-links-transform";
+import { parseEducationMeta } from "@/lib/utils/education-grade-transform";
+
 import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
 
@@ -124,6 +128,10 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     phone: p.phone || "",
     city: p.city || "",
     country: p.country || "",
+    professionalLinks: parseProfessionalLinksFromStorage({
+      linkedIn: p.linkedin || "",
+      portfolio: p.portfolio || "",
+    }),
     linkedIn: p.linkedin || "",
     portfolio: p.portfolio || "",
     photo: p.photo || "",
@@ -132,20 +140,14 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
   const professionalSummary =
     (summary.rows[0] as any)?.professional_summary || "";
 
-  const s = (skillsRow.rows[0] || {}) as any;
-  const skills: CV["skills"] = {
-    coreCompetencies: s.coreCompetencies ? JSON.parse(s.coreCompetencies) : [],
-    toolsAndTechnologies: s.toolsAndTechnologies
-      ? JSON.parse(s.toolsAndTechnologies)
-      : [],
-    systemsAndMethodologies: s.systemsAndMethodologies
-      ? JSON.parse(s.systemsAndMethodologies)
-      : [],
-    collaborationAndDelivery: s.collaborationAndDelivery
-      ? JSON.parse(s.collaborationAndDelivery)
-      : [],
-    languages: s.languages ? JSON.parse(s.languages) : [],
+  const s = (skillsRow.rows[0] || {}) as {
+    coreCompetencies?: string | null;
+    toolsAndTechnologies?: string | null;
+    systemsAndMethodologies?: string | null;
+    collaborationAndDelivery?: string | null;
+    languages?: string | null;
   };
+  const skills: CV["skills"] = normalizeSkillsFromRow(s).skills;
 
   const achievementsByWorkId = new Map<string, string[]>();
   (achievementRows.rows as any[]).forEach((row) => {
@@ -174,7 +176,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
         startDate: row.start_date,
         endDate: row.end_date || "Present",
         achievements: achievementsByWorkId.get(id) || [],
-        technologies: technologiesByWorkId.get(id) || [],
+        toolsAndMethods: technologiesByWorkId.get(id) || [],
         sortOrder: idx,
       };
     }
@@ -182,13 +184,15 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
 
   const education: CV["education"] = (educationRows.rows as any[]).map(
     (row) => ({
+      ...parseEducationMeta({
+        gpa: row.gpa != null ? Number(row.gpa) : null,
+        honors: row.honors || "",
+      }),
       degree: row.degree,
       fieldOfStudy: row.field_of_study,
       institution: row.institution,
       location: row.location,
       graduationDate: row.graduation_date,
-      gpa: row.gpa != null ? Number(row.gpa) : undefined,
-      honors: row.honors || undefined,
     })
   );
 

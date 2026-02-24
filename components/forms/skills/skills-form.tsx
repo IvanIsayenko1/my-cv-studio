@@ -54,7 +54,20 @@ interface SkillsFormProps {
   id: string;
 }
 
+const createEmptyCategory = () => ({
+  name: "",
+  items: [""],
+});
+
+const createEmptyLanguage = () => ({
+  language: "",
+  proficiency: "",
+});
+
 export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
+  const [removeCategoryIndex, setRemoveCategoryIndex] = useState<number | null>(
+    null
+  );
   const [removeLanguageIndex, setRemoveLanguageIndex] = useState<number | null>(
     null
   );
@@ -67,22 +80,23 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
     resolver: zodResolver(skillsSchema),
     defaultValues: {
       skills: {
-        coreCompetencies: [],
-        toolsAndTechnologies: [],
-        systemsAndMethodologies: [],
-        collaborationAndDelivery: [],
-        languages: [
-          {
-            language: undefined,
-            proficiency: undefined,
-          },
-        ],
+        categories: [createEmptyCategory()],
+        languages: [createEmptyLanguage()],
       },
     },
   });
 
   const { control, reset, formState, handleSubmit } = form;
   const { isDirty } = formState;
+
+  const {
+    fields: categoryFields,
+    append: appendCategory,
+    remove: removeCategory,
+  } = useFieldArray({
+    control,
+    name: "skills.categories",
+  });
 
   const {
     fields: languageFields,
@@ -98,35 +112,14 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
 
     reset({
       skills: {
-        coreCompetencies:
-          data.skills?.coreCompetencies?.length &&
-          data.skills.coreCompetencies.length > 0
-            ? data.skills.coreCompetencies
-            : [""],
-        toolsAndTechnologies:
-          data.skills?.toolsAndTechnologies?.length &&
-          data.skills.toolsAndTechnologies.length > 0
-            ? data.skills.toolsAndTechnologies
-            : [""],
-        systemsAndMethodologies:
-          data.skills?.systemsAndMethodologies?.length &&
-          data.skills.systemsAndMethodologies.length > 0
-            ? data.skills.systemsAndMethodologies
-            : [""],
-        collaborationAndDelivery:
-          data.skills?.collaborationAndDelivery?.length &&
-          data.skills.collaborationAndDelivery.length > 0
-            ? data.skills.collaborationAndDelivery
-            : [""],
+        categories:
+          data.skills?.categories?.length && data.skills.categories.length > 0
+            ? data.skills.categories
+            : [createEmptyCategory()],
         languages:
           data.skills?.languages?.length && data.skills.languages.length > 0
             ? data.skills.languages
-            : [
-                {
-                  language: "",
-                  proficiency: "",
-                },
-              ],
+            : [createEmptyLanguage()],
       },
     });
 
@@ -146,138 +139,122 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
     });
   };
 
+  const watchedCategories = useWatch({
+    control,
+    name: "skills.categories",
+  });
   const watchedLanguages = useWatch({
     control,
     name: "skills.languages",
   });
-  const lastLang = watchedLanguages?.[watchedLanguages.length - 1];
-  const requiredFilledForLastLanguage =
-    !!lastLang && lastLang.language?.trim() && lastLang.proficiency?.trim();
+
+  const lastCategory = watchedCategories?.[watchedCategories.length - 1];
+  const canAddCategory =
+    !lastCategory ||
+    (!!lastCategory.name?.trim() &&
+      (lastCategory.items ?? []).some((item) => item.trim()));
+
+  const lastLanguage = watchedLanguages?.[watchedLanguages.length - 1];
+  const canAddLanguage =
+    !lastLanguage ||
+    (!!lastLanguage.language?.trim() && !!lastLanguage.proficiency?.trim());
 
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardHeader className="px-5 sm:px-6">
           <CardTitle>Skills</CardTitle>
-          <CardDescription>Add your key skills and languages.</CardDescription>
+          <CardDescription>
+            Add custom skill categories that match your profession.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-5 sm:px-6">
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              <div className="space-y-4 border rounded-lg p-4 pb-6">
-                <div className="font-medium text-sm text-muted-foreground mb-2">
-                  Skills overview
+              {categoryFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="space-y-4 rounded-lg border p-4 pb-6"
+                >
+                  <div className="mb-2 flex items-start justify-between">
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Category {index + 1}
+                    </div>
+                    {categoryFields.length > 1 && (
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => setRemoveCategoryIndex(index)}
+                        aria-label="Remove category"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  <FormField
+                    control={control}
+                    name={`skills.categories.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Category name{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Clinical Skills, Sales Skills, Laboratory Skills"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={control}
+                    name={`skills.categories.${index}.items`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Items <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            rows={4}
+                            placeholder="Use one line per item"
+                            value={field.value?.join("\n") ?? ""}
+                            onChange={(e) =>
+                              field.onChange(e.target.value.split("\n"))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
+              ))}
 
-                {/* Core competencies */}
-                <FormField
-                  control={control}
-                  name="skills.coreCompetencies"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Core competencies{" "}
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          rows={4}
-                          placeholder="Use one line per core competency"
-                          value={field.value?.join("\n") ?? ""}
-                          onChange={(e) =>
-                            field.onChange(e.target.value.split("\n"))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!canAddCategory}
+                onClick={() => appendCategory(createEmptyCategory())}
+              >
+                Add another category
+              </Button>
 
-                {/* Tools and technologies */}
-                <FormField
-                  control={control}
-                  name="skills.toolsAndTechnologies"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Tools and technologies{" "}
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          rows={4}
-                          placeholder="Use one line per tool and technology"
-                          value={field.value?.join("\n") ?? ""}
-                          onChange={(e) =>
-                            field.onChange(e.target.value.split("\n"))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Systems and methodologies */}
-                <FormField
-                  control={control}
-                  name="skills.systemsAndMethodologies"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Systems and methodologies{" "}
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          rows={4}
-                          placeholder="Use one line per system and methodology"
-                          value={field.value?.join("\n") ?? ""}
-                          onChange={(e) =>
-                            field.onChange(e.target.value.split("\n"))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Collaboration and delivery */}
-                <FormField
-                  control={control}
-                  name="skills.collaborationAndDelivery"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Collaboration and delivery{" "}
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          rows={4}
-                          placeholder="Use one line per collaboration and delivery"
-                          value={field.value?.join("\n") ?? ""}
-                          onChange={(e) =>
-                            field.onChange(e.target.value.split("\n"))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* LANGUAGES as repeatable cards, like Education entries */}
               {languageFields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="space-y-4 border rounded-lg p-4 pb-6"
+                  className="space-y-4 rounded-lg border p-4 pb-6"
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="font-medium text-sm text-muted-foreground">
+                  <div className="mb-2 flex items-start justify-between">
+                    <div className="text-sm font-medium text-muted-foreground">
                       Language {index + 1}
                     </div>
                     {languageFields.length > 1 && (
@@ -285,7 +262,7 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
                         type="button"
                         size="icon"
                         variant="ghost"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                         onClick={() => setRemoveLanguageIndex(index)}
                         aria-label="Remove language"
                       >
@@ -294,7 +271,7 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <FormField
                       control={control}
                       name={`skills.languages.${index}.language`}
@@ -356,13 +333,8 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                disabled={!requiredFilledForLastLanguage}
-                onClick={() =>
-                  appendLanguage({
-                    language: "",
-                    proficiency: "",
-                  })
-                }
+                disabled={!canAddLanguage}
+                onClick={() => appendLanguage(createEmptyLanguage())}
               >
                 Add another language
               </Button>
@@ -381,7 +353,38 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
         </CardContent>
       </Card>
 
-      {/* Remove language confirmation dialog */}
+      <AlertDialog
+        open={removeCategoryIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setRemoveCategoryIndex(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this category?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This category will be permanently removed from your CV.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setRemoveCategoryIndex(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (removeCategoryIndex !== null) {
+                  removeCategory(removeCategoryIndex);
+                  setRemoveCategoryIndex(null);
+                }
+              }}
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog
         open={removeLanguageIndex !== null}
         onOpenChange={(open) => {
@@ -392,8 +395,7 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Remove this language?</AlertDialogTitle>
             <AlertDialogDescription>
-              This language entry will be permanently removed from your CV. You
-              can add it again later if needed.
+              This language entry will be permanently removed from your CV.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

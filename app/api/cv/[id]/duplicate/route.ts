@@ -5,6 +5,9 @@ import { randomUUID } from "crypto";
 
 import { db } from "@/lib/db/client";
 import { getCompleteCV } from "@/lib/db/queries";
+import { serializeProfessionalLinksForStorage } from "@/lib/utils/personal-links-transform";
+import { serializeSkillsForStorage } from "@/lib/utils/skills-transform";
+import { serializeEducationMeta } from "@/lib/utils/education-grade-transform";
 
 export async function POST(
   req: NextRequest,
@@ -49,6 +52,11 @@ export async function POST(
     projects,
     awards,
   } = existingCV;
+  const personalLinksStorage = serializeProfessionalLinksForStorage({
+    professionalLinks: personalInfo.professionalLinks ?? [],
+    linkedIn: personalInfo.linkedIn ?? "",
+    portfolio: personalInfo.portfolio ?? "",
+  });
 
   // cv
   await db.execute({
@@ -96,8 +104,8 @@ export async function POST(
       personalInfo.phone,
       personalInfo.city,
       personalInfo.country,
-      personalInfo.linkedIn ?? null,
-      personalInfo.portfolio ?? null,
+      personalLinksStorage.linkedIn,
+      personalLinksStorage.portfolio,
       personalInfo.photo ?? null,
     ]
   );
@@ -154,7 +162,7 @@ export async function POST(
       );
     }
 
-    for (const name of w.technologies ?? []) {
+    for (const name of w.toolsAndMethods ?? []) {
       await db.execute(
         `
         INSERT INTO cv_work_experience_technology (
@@ -170,6 +178,11 @@ export async function POST(
 
   // education
   for (const ed of education) {
+    const educationMeta = serializeEducationMeta({
+      grade: ed.grade,
+      gradingScale: ed.gradingScale,
+      honors: ed.honors,
+    });
     await db.execute(
       `
       INSERT INTO cv_education (
@@ -192,13 +205,14 @@ export async function POST(
         ed.institution,
         ed.location,
         ed.graduationDate,
-        ed.gpa ?? null,
-        ed.honors ?? null,
+        educationMeta.gpa,
+        educationMeta.honors,
       ]
     );
   }
 
   // skills
+  const serializedSkills = serializeSkillsForStorage(skills);
   await db.execute(
     `
     INSERT INTO cv_skills (cv_id, coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages)
@@ -212,11 +226,11 @@ export async function POST(
     `,
     [
       newRandomId,
-      JSON.stringify(skills.coreCompetencies),
-      JSON.stringify(skills.toolsAndTechnologies),
-      JSON.stringify(skills.systemsAndMethodologies),
-      JSON.stringify(skills.collaborationAndDelivery),
-      JSON.stringify(skills.languages),
+      serializedSkills.coreCompetencies,
+      serializedSkills.toolsAndTechnologies,
+      serializedSkills.systemsAndMethodologies,
+      serializedSkills.collaborationAndDelivery,
+      serializedSkills.languages,
     ]
   );
 

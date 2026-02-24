@@ -89,29 +89,11 @@ export function generateATSCleanColoredCV(cv: CV): Promise<Buffer> {
     if (cv.skills) {
       addAccentSection(doc, "Skills");
 
-      if (cv.skills.coreCompetencies?.length) {
-        skillGroup(doc, "Technical", cv.skills.coreCompetencies);
-      }
-
-      if (cv.skills.toolsAndTechnologies?.length) {
-        skillGroup(doc, "Tools & Practices", cv.skills.toolsAndTechnologies);
-      }
-
-      if (cv.skills.systemsAndMethodologies?.length) {
-        skillGroup(
-          doc,
-          "Systems & Methodologies",
-          cv.skills.systemsAndMethodologies
-        );
-      }
-
-      if (cv.skills.collaborationAndDelivery?.length) {
-        skillGroup(
-          doc,
-          "Collaboration & Delivery",
-          cv.skills.collaborationAndDelivery
-        );
-      }
+      (cv.skills.categories ?? []).forEach((category) => {
+        if (category.items?.length) {
+          skillGroup(doc, category.name, category.items);
+        }
+      });
 
       if (cv.skills.languages?.length) {
         const langs = cv.skills.languages
@@ -161,12 +143,12 @@ export function generateATSCleanColoredCV(cv: CV): Promise<Buffer> {
             .text(`- ${a}`);
         });
 
-        if (job.technologies?.length) {
+        if (job.toolsAndMethods?.length) {
           doc
             .moveDown(0.2)
             .fontSize(FONTS.small)
             .fillColor(COLORS.secondary)
-            .text(`Technologies: ${job.technologies.join(", ")}`);
+            .text(`Tools & Methods: ${job.toolsAndMethods.join(", ")}`);
         }
 
         doc.moveDown(0.8);
@@ -193,12 +175,18 @@ export function generateATSCleanColoredCV(cv: CV): Promise<Buffer> {
           .fillColor(COLORS.secondary)
           .text(`${edu.institution} | ${formatATSDate(edu.graduationDate)}`);
 
-        if (edu.gpa || edu.honors) {
+        if (edu.grade || edu.gradingScale || edu.honors) {
           doc
             .fontSize(FONTS.small)
             .fillColor(COLORS.primary)
             .text(
-              [edu.gpa && `GPA: ${edu.gpa}`, edu.honors]
+              [
+                edu.grade &&
+                  `Grade: ${edu.grade}${
+                    edu.gradingScale ? ` (${edu.gradingScale})` : ""
+                  }`,
+                edu.honors,
+              ]
                 .filter(Boolean)
                 .join(" | ")
             );

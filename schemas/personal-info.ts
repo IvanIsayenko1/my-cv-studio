@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export const professionalLinkSchema = z.object({
+  label: z
+    .string()
+    .min(1, "Link label is required")
+    .max(40, "Link label must be less than 40 characters"),
+  url: z.string().url("Please enter a valid URL"),
+});
+
 export const personalInfoSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
@@ -20,6 +28,8 @@ export const personalInfoSchema = z.object({
     ),
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
+  professionalLinks: z.array(professionalLinkSchema).default([]),
+  photo: z.string().optional(),
   linkedIn: z
     .string()
     .url("Please enter a valid LinkedIn URL")
@@ -32,4 +42,5 @@ export const personalInfoSchema = z.object({
     .or(z.literal("")),
 });
 
-export type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>;
+export type PersonalInfoFormValues = z.input<typeof personalInfoSchema>;
+export type PersonalInfoParsedValues = z.output<typeof personalInfoSchema>;

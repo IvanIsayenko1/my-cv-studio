@@ -19,6 +19,7 @@ export interface CV {
     phone: string;
     city: string;
     country: string;
+    professionalLinks?: Array<{ label: string; url: string }>;
     linkedIn?: string;
     portfolio?: string;
     photo?: string; // URL
@@ -37,11 +38,16 @@ export interface CV {
       | "Part-time"
       | "Contract"
       | "Freelance"
-      | "Internship";
+      | "Internship"
+      | "Temporary"
+      | "Seasonal"
+      | "Apprenticeship"
+      | "Volunteer"
+      | "Self-employed";
     startDate: string; // MM/YYYY
     endDate: string | "Present";
     achievements: string[];
-    technologies: string[];
+    toolsAndMethods: string[];
     sortOrder: number;
   }>;
 
@@ -52,16 +58,17 @@ export interface CV {
     institution: string;
     location: string;
     graduationDate: string;
-    gpa?: number;
+    grade?: string;
+    gradingScale?: string;
     honors?: string;
   }>;
 
   // Skills
   skills: {
-    coreCompetencies: string[];
-    toolsAndTechnologies: string[];
-    systemsAndMethodologies: string[];
-    collaborationAndDelivery: string[];
+    categories: Array<{
+      name: string;
+      items: string[];
+    }>;
     languages: Array<{ language: string; proficiency: string }>;
   };
 

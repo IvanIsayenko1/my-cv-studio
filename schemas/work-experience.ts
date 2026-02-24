@@ -12,6 +12,11 @@ export const workExperienceItemSchema = z.object({
     "Contract",
     "Freelance",
     "Internship",
+    "Temporary",
+    "Seasonal",
+    "Apprenticeship",
+    "Volunteer",
+    "Self-employed",
   ]),
   startDate: z
     .string()
@@ -29,7 +34,7 @@ export const workExperienceItemSchema = z.object({
   achievements: z.array(z.string()).catch([]),
 
   // OPTIONAL array — can be undefined — but defaults to []
-  technologies: z.array(z.string()).default([]).optional(),
+  toolsAndMethods: z.array(z.string()).default([]).optional(),
 });
 
 export const workExperienceSchema = z.object({

@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
 import { db } from "@/lib/db/client";
+import {
+  normalizeSkillsFromRow,
+  serializeSkillsForStorage,
+} from "@/lib/utils/skills-transform";
 
 import { skillsSchema } from "@/types/skills";
 
@@ -39,33 +43,23 @@ export async function GET(
   );
 
   if (result.rows.length === 0) {
-    // Let the form fall back to its defaultValues
     return NextResponse.json({
       skills: {
-        coreCompetencies: [],
-        toolsAndTechnologies: [],
-        systemsAndMethodologies: [],
-        collaborationAndDelivery: [],
+        categories: [{ name: "Core Skills", items: [""] }],
         languages: [],
       },
     });
   }
 
-  const row = result.rows[0] as any;
+  const row = result.rows[0] as {
+    coreCompetencies?: string | null;
+    toolsAndTechnologies?: string | null;
+    systemsAndMethodologies?: string | null;
+    collaborationAndDelivery?: string | null;
+    languages?: string | null;
+  };
 
-  return NextResponse.json({
-    skills: {
-      coreCompetencies: JSON.parse(row.coreCompetencies as string),
-      toolsAndTechnologies: JSON.parse(row.toolsAndTechnologies as string),
-      systemsAndMethodologies: JSON.parse(
-        row.systemsAndMethodologies as string
-      ),
-      collaborationAndDelivery: JSON.parse(
-        row.collaborationAndDelivery as string
-      ),
-      languages: JSON.parse(row.languages as string),
-    },
-  });
+  return NextResponse.json(normalizeSkillsFromRow(row));
 }
 
 export async function POST(
@@ -102,6 +96,7 @@ export async function POST(
   }
 
   const { skills } = parsed.data;
+  const serialized = serializeSkillsForStorage(skills);
 
   // Upsert into cv_skills
   await db.execute(
@@ -117,11 +112,11 @@ export async function POST(
     `,
     [
       cvId,
-      JSON.stringify(skills.coreCompetencies),
-      JSON.stringify(skills.toolsAndTechnologies),
-      JSON.stringify(skills.systemsAndMethodologies),
-      JSON.stringify(skills.collaborationAndDelivery),
-      JSON.stringify(skills.languages),
+      serialized.coreCompetencies,
+      serialized.toolsAndTechnologies,
+      serialized.systemsAndMethodologies,
+      serialized.collaborationAndDelivery,
+      serialized.languages,
     ]
   );
 

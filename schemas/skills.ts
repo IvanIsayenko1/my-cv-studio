@@ -1,22 +1,26 @@
 import { z } from "zod";
 
-const nonEmptyArray = (label: string) =>
-  z.array(z.string().min(1)).min(1, `Add at least one ${label}`);
-
 export const languageItemSchema = z.object({
   language: z.string().min(1, "Language is required"),
   proficiency: z.string().min(1, "Proficiency is required"),
 });
 
+export const skillCategorySchema = z.object({
+  name: z
+    .string()
+    .min(1, "Category name is required")
+    .max(64, "Category name must be less than 64 characters"),
+  items: z
+    .array(z.string().min(1))
+    .min(1, "Add at least one item to this category"),
+});
+
 export const skillsSchema = z.object({
   skills: z.object({
-    coreCompetencies: z
-      .array(z.string().min(1))
-      .min(1, "Add at least one core competency"),
-    toolsAndTechnologies: nonEmptyArray("tool and/or technology"),
-    systemsAndMethodologies: nonEmptyArray("system and/or methodology"),
-    collaborationAndDelivery: nonEmptyArray("collaboration and/or delivery"),
-    languages: z.array(languageItemSchema).min(1, "Add at least one language"),
+    categories: z
+      .array(skillCategorySchema)
+      .min(1, "Add at least one category"),
+    languages: z.array(languageItemSchema),
   }),
 });
 
