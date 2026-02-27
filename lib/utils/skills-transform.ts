@@ -1,78 +1,63 @@
 import { SkillsFormValues } from "@/types/skills";
 
-type LegacySkillsRow = {
-  coreCompetencies?: string | null;
-  toolsAndTechnologies?: string | null;
-  systemsAndMethodologies?: string | null;
-  collaborationAndDelivery?: string | null;
+type SkillsRow = {
+  categorySkills?: string | null;
   languages?: string | null;
 };
 
-type SkillCategory = SkillsFormValues["skills"]["categories"][number];
+type SkillCategory = SkillsFormValues["categories"][number];
 
 function safeParseJSON(value: string | null | undefined): unknown {
-  if (!value) return null;
+  if (!value) return undefined;
   try {
     return JSON.parse(value);
   } catch {
-    return null;
+    return undefined;
   }
 }
 
-const toCleanStringArray = (value: unknown): string[] =>
-  Array.isArray(value)
-    ? value
-        .filter((item): item is string => typeof item === "string")
-        .map((item) => item.trim())
-        .filter(Boolean)
-    : [];
+const toCategoryItemText = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value.trim();
+  }
 
-const toCategoriesFromLegacy = (row: LegacySkillsRow): SkillCategory[] => {
-  const groups: SkillCategory[] = [
-    {
-      name: "Core Competencies",
-      items: toCleanStringArray(safeParseJSON(row.coreCompetencies)),
-    },
-    {
-      name: "Tools & Technologies",
-      items: toCleanStringArray(safeParseJSON(row.toolsAndTechnologies)),
-    },
-    {
-      name: "Systems & Methodologies",
-      items: toCleanStringArray(safeParseJSON(row.systemsAndMethodologies)),
-    },
-    {
-      name: "Collaboration & Delivery",
-      items: toCleanStringArray(safeParseJSON(row.collaborationAndDelivery)),
-    },
-  ];
+  if (Array.isArray(value)) {
+    const lines = value
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean);
 
-  return groups.filter((group) => group.items.length > 0);
+    return lines.join("\n");
+  }
+
+  return "";
 };
 
-const toCategoriesFromStoredCore = (coreValue: unknown): SkillCategory[] => {
-  if (!Array.isArray(coreValue)) return [];
+const toCategory = (value: unknown): SkillCategory | null => {
+  if (!value || typeof value !== "object") return null;
 
-  const first = coreValue[0];
-  if (!first || typeof first !== "object") return [];
+  const category = value as { name?: unknown; items?: unknown };
+  const name = typeof category.name === "string" ? category.name.trim() : "";
+  const items = toCategoryItemText(category.items);
 
-  return coreValue
-    .map((item) => {
-      const category = item as { name?: unknown; items?: unknown };
-      const name =
-        typeof category.name === "string" ? category.name.trim() : "";
-      const items = toCleanStringArray(category.items);
-      return { name, items };
-    })
-    .filter((category) => category.name && category.items.length > 0);
+  if (!name || !items) return null;
+
+  return { name, items };
 };
 
-export function normalizeSkillsFromRow(row: LegacySkillsRow): SkillsFormValues {
-  const parsedCore = safeParseJSON(row.coreCompetencies);
-  const categories =
-    toCategoriesFromStoredCore(parsedCore).length > 0
-      ? toCategoriesFromStoredCore(parsedCore)
-      : toCategoriesFromLegacy(row);
+const parseCategoriesFromCategorySkillsColumn = (
+  value: string | null | undefined
+): SkillCategory[] => {
+  const parsed = safeParseJSON(value);
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed
+    .map((item) => toCategory(item))
+    .filter((item): item is SkillCategory => item !== null);
+};
+
+export function normalizeSkillsFromRow(row: SkillsRow): SkillsFormValues {
+  const categories = parseCategoriesFromCategorySkillsColumn(row.categorySkills);
 
   const parsedLanguages = safeParseJSON(row.languages);
   const languages = Array.isArray(parsedLanguages)
@@ -96,29 +81,22 @@ export function normalizeSkillsFromRow(row: LegacySkillsRow): SkillsFormValues {
     : [];
 
   return {
-    skills: {
-      categories:
-        categories.length > 0
-          ? categories
-          : [{ name: "Core Skills", items: [""] }],
-      languages,
-    },
+    categories:
+      categories.length > 0 ? categories : [{ name: "Core Skills", items: "" }],
+    languages,
   };
 }
 
-export function serializeSkillsForStorage(value: SkillsFormValues["skills"]): {
-  coreCompetencies: string;
-  toolsAndTechnologies: string;
-  systemsAndMethodologies: string;
-  collaborationAndDelivery: string;
+export function serializeSkillsForStorage(value: SkillsFormValues): {
+  categorySkills: string;
   languages: string;
 } {
   const categories = (value.categories ?? [])
     .map((category) => ({
       name: category.name.trim(),
-      items: (category.items ?? []).map((item) => item.trim()).filter(Boolean),
+      items: category.items.trim(),
     }))
-    .filter((category) => category.name && category.items.length > 0);
+    .filter((category) => category.name && category.items);
 
   const languages = (value.languages ?? [])
     .map((language) => ({
@@ -128,10 +106,7 @@ export function serializeSkillsForStorage(value: SkillsFormValues["skills"]): {
     .filter((language) => language.language && language.proficiency);
 
   return {
-    coreCompetencies: JSON.stringify(categories),
-    toolsAndTechnologies: JSON.stringify([]),
-    systemsAndMethodologies: JSON.stringify([]),
-    collaborationAndDelivery: JSON.stringify([]),
+    categorySkills: JSON.stringify(categories),
     languages: JSON.stringify(languages),
   };
 }

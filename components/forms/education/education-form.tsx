@@ -17,14 +17,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import StatusBedge from "@/components/status-bedge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -73,6 +68,7 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
 
   const { control, reset, formState, handleSubmit } = form;
   const { isDirty } = formState;
+  const isComplete = form.formState.isValid;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -138,17 +134,20 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
     last.institution?.trim() &&
     last.location?.trim() &&
     last.graduationDate?.trim();
-
   return (
     <>
-      <Card>
-        <CardHeader className="px-5 sm:px-6">
-          <CardTitle>Education</CardTitle>
-          <CardDescription>
-            Add your degrees and relevant academic qualifications.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-5 sm:px-6">
+      <SectionWrapper
+        id="education"
+        title="Education"
+        description="Add your degrees and relevant academic qualifications."
+        status={
+          <StatusBedge
+            isReady={isComplete}
+            readyText="Complete"
+            notReadyText="Incomplete"
+          />
+        }
+      >
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -350,8 +349,7 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
               </div>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+      </SectionWrapper>
 
       {/* Remove education confirmation dialog */}
       <AlertDialog

@@ -7,6 +7,7 @@ import Image from "next/image";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -79,14 +80,11 @@ export function TemplateForm({ id, setIsDirtyForm }: TemplateFormProps) {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="space-y-1 px-5 sm:px-6">
-        <CardTitle className="text-base sm:text-lg">Template</CardTitle>
-        <CardDescription className="text-xs sm:text-sm">
-          Choose a template for your CV. You can change this anytime.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-5 sm:px-6">
+    <SectionWrapper
+      id="template"
+      title="Template"
+      description="Choose a template for your CV. You can change this anytime."
+    >
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -180,7 +178,6 @@ export function TemplateForm({ id, setIsDirtyForm }: TemplateFormProps) {
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+    </SectionWrapper>
   );
 }

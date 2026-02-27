@@ -16,14 +16,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -110,14 +104,11 @@ export function ProjectsForm({
 
   return (
     <>
-      <Card>
-        <CardHeader className="px-5 sm:px-6">
-          <CardTitle>{sectionTitle}</CardTitle>
-          <CardDescription>
-            Add notable projects that showcase your skills and impact.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-5 sm:px-6">
+      <SectionWrapper
+        id="projects"
+        title={sectionTitle}
+        description="Add notable projects that showcase your skills and impact."
+      >
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -288,8 +279,7 @@ export function ProjectsForm({
               </div>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+      </SectionWrapper>
 
       {/* Remove project confirmation dialog */}
       <AlertDialog

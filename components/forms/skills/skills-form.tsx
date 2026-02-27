@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import StatusBedge from "@/components/status-bedge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,13 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Form,
   FormControl,
   FormField,
@@ -34,6 +29,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
   SelectContent,
@@ -56,7 +52,7 @@ interface SkillsFormProps {
 
 const createEmptyCategory = () => ({
   name: "",
-  items: [""],
+  items: "",
 });
 
 const createEmptyLanguage = () => ({
@@ -79,15 +75,14 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
   const form = useForm<SkillsFormValues>({
     resolver: zodResolver(skillsSchema),
     defaultValues: {
-      skills: {
-        categories: [createEmptyCategory()],
-        languages: [createEmptyLanguage()],
-      },
+      categories: [createEmptyCategory()],
+      languages: [createEmptyLanguage()],
     },
   });
 
   const { control, reset, formState, handleSubmit } = form;
   const { isDirty } = formState;
+  const isComplete = form.formState.isValid;
 
   const {
     fields: categoryFields,
@@ -95,7 +90,7 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
     remove: removeCategory,
   } = useFieldArray({
     control,
-    name: "skills.categories",
+    name: "categories",
   });
 
   const {
@@ -104,23 +99,21 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
     remove: removeLanguage,
   } = useFieldArray({
     control,
-    name: "skills.languages",
+    name: "languages",
   });
 
   useEffect(() => {
     if (!data) return;
 
     reset({
-      skills: {
-        categories:
-          data.skills?.categories?.length && data.skills.categories.length > 0
-            ? data.skills.categories
-            : [createEmptyCategory()],
-        languages:
-          data.skills?.languages?.length && data.skills.languages.length > 0
-            ? data.skills.languages
-            : [createEmptyLanguage()],
-      },
+      categories:
+        data?.categories?.length && data.categories.length > 0
+          ? data.categories
+          : [createEmptyCategory()],
+      languages:
+        data?.languages?.length && data.languages.length > 0
+          ? data.languages
+          : [createEmptyLanguage()],
     });
 
     setIsDirtyForm(false);
@@ -141,217 +134,216 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
 
   const watchedCategories = useWatch({
     control,
-    name: "skills.categories",
+    name: "categories",
   });
   const watchedLanguages = useWatch({
     control,
-    name: "skills.languages",
+    name: "languages",
   });
 
   const lastCategory = watchedCategories?.[watchedCategories.length - 1];
   const canAddCategory =
     !lastCategory ||
-    (!!lastCategory.name?.trim() &&
-      (lastCategory.items ?? []).some((item) => item.trim()));
+    (!!lastCategory.name?.trim() && !!lastCategory.items?.trim());
 
   const lastLanguage = watchedLanguages?.[watchedLanguages.length - 1];
   const canAddLanguage =
     !lastLanguage ||
     (!!lastLanguage.language?.trim() && !!lastLanguage.proficiency?.trim());
-
   return (
     <>
-      <Card>
-        <CardHeader className="px-5 sm:px-6">
-          <CardTitle>Skills</CardTitle>
-          <CardDescription>
-            Add custom skill categories that match your profession.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-5 sm:px-6">
-          <Form {...form}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              {categoryFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="space-y-4 rounded-lg border p-4 pb-6"
-                >
-                  <div className="mb-2 flex items-start justify-between">
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Category {index + 1}
-                    </div>
-                    {categoryFields.length > 1 && (
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => setRemoveCategoryIndex(index)}
-                        aria-label="Remove category"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+      <SectionWrapper
+        id="skills"
+        title="Skills"
+        description="Add custom skill categories that match your profession."
+        status={
+          <StatusBedge
+            isReady={isComplete}
+            readyText="Complete"
+            notReadyText="Incomplete"
+          />
+        }
+      >
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {categoryFields.map((field, index) => (
+              <div
+                key={field.id}
+                className="space-y-4 rounded-lg border p-4 pb-6"
+              >
+                <div className="mb-2 flex items-start justify-between">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Category {index + 1}
                   </div>
+                  {categoryFields.length > 1 && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setRemoveCategoryIndex(index)}
+                      aria-label="Remove category"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
 
+                <FormField
+                  control={control}
+                  name={`categories.${index}.name`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Category name{" "}
+                        <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Clinical Skills, Sales Skills, Laboratory Skills"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={control}
+                  name={`categories.${index}.items`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Items <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RichTextEditor
+                          placeholder="Use one line per item"
+                          value={field.value}
+                          onChange={field.onChange}
+                          mode="list-only"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            ))}
+
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!canAddCategory}
+              onClick={() => appendCategory(createEmptyCategory())}
+            >
+              Add another category
+            </Button>
+
+            {languageFields.map((field, index) => (
+              <div
+                key={field.id}
+                className="space-y-4 rounded-lg border p-4 pb-6"
+              >
+                <div className="mb-2 flex items-start justify-between">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Language {index + 1}
+                  </div>
+                  {languageFields.length > 1 && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setRemoveLanguageIndex(index)}
+                      aria-label="Remove language"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <FormField
                     control={control}
-                    name={`skills.categories.${index}.name`}
+                    name={`languages.${index}.language`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Category name{" "}
+                          Language <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="English" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={control}
+                    name={`languages.${index}.proficiency`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Proficiency{" "}
                           <span className="text-destructive">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="e.g., Clinical Skills, Sales Skills, Laboratory Skills"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name={`skills.categories.${index}.items`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Items <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            rows={4}
-                            placeholder="Use one line per item"
-                            value={field.value?.join("\n") ?? ""}
-                            onChange={(e) =>
-                              field.onChange(e.target.value.split("\n"))
-                            }
-                          />
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Native">Native</SelectItem>
+                              <SelectItem value="Fluent">
+                                Fluent / C1–C2
+                              </SelectItem>
+                              <SelectItem value="Advanced">
+                                Advanced / B2
+                              </SelectItem>
+                              <SelectItem value="Intermediate">
+                                Intermediate / B1
+                              </SelectItem>
+                              <SelectItem value="Basic">
+                                Basic / A1–A2
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              ))}
-
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!canAddCategory}
-                onClick={() => appendCategory(createEmptyCategory())}
-              >
-                Add another category
-              </Button>
-
-              {languageFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="space-y-4 rounded-lg border p-4 pb-6"
-                >
-                  <div className="mb-2 flex items-start justify-between">
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Language {index + 1}
-                    </div>
-                    {languageFields.length > 1 && (
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => setRemoveLanguageIndex(index)}
-                        aria-label="Remove language"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`skills.languages.${index}.language`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Language <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="English" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={control}
-                      name={`skills.languages.${index}.proficiency`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Proficiency{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select level" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Native">Native</SelectItem>
-                                <SelectItem value="Fluent">
-                                  Fluent / C1–C2
-                                </SelectItem>
-                                <SelectItem value="Advanced">
-                                  Advanced / B2
-                                </SelectItem>
-                                <SelectItem value="Intermediate">
-                                  Intermediate / B1
-                                </SelectItem>
-                                <SelectItem value="Basic">
-                                  Basic / A1–A2
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              ))}
-
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!canAddLanguage}
-                onClick={() => appendLanguage(createEmptyLanguage())}
-              >
-                Add another language
-              </Button>
-
-              <div className="cv-form-actions">
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="cv-form-primary-action"
-                >
-                  {isPending ? "Saving..." : "Save"}
-                </Button>
               </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+            ))}
+
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!canAddLanguage}
+              onClick={() => appendLanguage(createEmptyLanguage())}
+            >
+              Add another language
+            </Button>
+
+            <div className="cv-form-actions">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="cv-form-primary-action"
+              >
+                {isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </SectionWrapper>
 
       <AlertDialog
         open={removeCategoryIndex !== null}

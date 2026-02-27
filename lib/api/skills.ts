@@ -1,6 +1,6 @@
 import { SkillsFormValues } from "@/types/skills";
 
-export async function fetchSkills(
+export async function getSkills(
   cvId: string
 ): Promise<SkillsFormValues | null> {
   const res = await fetch(`/api/cv/${cvId}/skills`);

@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import StatusBedge from "@/components/status-bedge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,13 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Form,
   FormControl,
   FormField,
@@ -34,6 +29,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
   SelectContent,
@@ -90,6 +86,7 @@ export function WorkExperienceForm({
 
   const { control, reset, formState, handleSubmit } = form;
   const { isDirty } = formState;
+  const isComplete = form.formState.isValid;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -147,308 +144,299 @@ export function WorkExperienceForm({
     last.location?.trim() &&
     last.startDate?.trim() &&
     last.endDate?.trim();
-
   return (
     <>
-      <Card>
-        <CardHeader className="px-5 sm:px-6">
-          <CardTitle>Work Experience</CardTitle>
-          <CardDescription>
-            Add your recent roles, focusing on achievements and impact.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-5 sm:px-6">
-          <Form {...form}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="space-y-4 border rounded-lg p-4 pb-6"
-                >
-                  {/* Top row with title and delete button */}
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="font-medium text-sm text-muted-foreground">
-                      Role {index + 1}
-                    </div>
-                    {fields.length > 1 && (
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => setRemoveIndex(index)}
-                        aria-label="Remove role"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+      <SectionWrapper
+        id="work-experience"
+        title="Work Experience"
+        description="Add your recent roles, focusing on achievements and impact."
+        status={
+          <StatusBedge
+            isReady={isComplete}
+            readyText="Complete"
+            notReadyText="Incomplete"
+          />
+        }
+      >
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {fields.map((field, index) => (
+              <div
+                key={field.id}
+                className="space-y-4 border rounded-lg p-4 pb-6"
+              >
+                {/* Top row with title and delete button */}
+                <div className="flex justify-between items-start mb-2">
+                  <div className="font-medium text-sm text-muted-foreground">
+                    Role {index + 1}
                   </div>
+                  {fields.length > 1 && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => setRemoveIndex(index)}
+                      aria-label="Remove role"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
 
-                  {/* Job title / company */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`workExperience.${index}.jobTitle`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Job Title{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Senior Frontend Developer"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`workExperience.${index}.company`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Company <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="Acme Inc." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Location / Employment Type */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`workExperience.${index}.location`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Location <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Remote / City, Country"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`workExperience.${index}.employmentType`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Employment Type{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Full-time">
-                                  Full-time
-                                </SelectItem>
-                                <SelectItem value="Part-time">
-                                  Part-time
-                                </SelectItem>
-                                <SelectItem value="Contract">
-                                  Contract
-                                </SelectItem>
-                                <SelectItem value="Freelance">
-                                  Freelance
-                                </SelectItem>
-                                <SelectItem value="Internship">
-                                  Internship
-                                </SelectItem>
-                                <SelectItem value="Temporary">
-                                  Temporary
-                                </SelectItem>
-                                <SelectItem value="Seasonal">
-                                  Seasonal
-                                </SelectItem>
-                                <SelectItem value="Apprenticeship">
-                                  Apprenticeship
-                                </SelectItem>
-                                <SelectItem value="Volunteer">
-                                  Volunteer
-                                </SelectItem>
-                                <SelectItem value="Self-employed">
-                                  Self-employed
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Dates */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`workExperience.${index}.startDate`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Start Date (MM/YYYY){" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="01/2022" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`workExperience.${index}.endDate`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            End Date (MM/YYYY or Present){" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="Present" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Achievements */}
+                {/* Job title / company */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <FormField
                     control={control}
-                    name={`workExperience.${index}.achievements`}
+                    name={`workExperience.${index}.jobTitle`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Key Achievements</FormLabel>
+                        <FormLabel>
+                          Job Title <span className="text-destructive">*</span>
+                        </FormLabel>
                         <FormControl>
-                          <Textarea
-                            rows={4}
-                            placeholder="Use one line per achievement"
-                            value={field.value?.join("\n") ?? ""}
-                            onChange={(e) =>
-                              field.onChange(e.target.value.split("\n"))
-                            }
+                          <Input
+                            placeholder="Senior Frontend Developer"
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  {/* Tools / Systems / Methods */}
                   <FormField
                     control={control}
-                    name={`workExperience.${index}.toolsAndMethods`}
+                    name={`workExperience.${index}.company`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tools / Systems / Methods</FormLabel>
+                        <FormLabel>
+                          Company <span className="text-destructive">*</span>
+                        </FormLabel>
                         <FormControl>
-                          <div className="space-y-2">
-                            <div className="flex flex-wrap gap-2">
-                              {field.value?.map((tech, i) => (
-                                <span
-                                  key={tech + i}
-                                  className="inline-flex min-h-9 items-center rounded-full border px-3 py-1.5 text-sm sm:min-h-7 sm:px-2 sm:py-1 sm:text-xs"
-                                >
-                                  {tech}
-                                  <button
-                                    type="button"
-                                    className="-mr-1 ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:h-5 sm:w-5"
-                                    aria-label={`Remove tool/method ${tech}`}
-                                    onClick={() =>
-                                      field.onChange(
-                                        (field.value ?? []).filter(
-                                          (_, idx) => idx !== i
-                                        )
-                                      )
-                                    }
-                                  >
-                                    ×
-                                  </button>
-                                </span>
-                              ))}
-                            </div>
-                            <Input
-                              placeholder="Type a tool, system, or method and press Enter"
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  e.preventDefault();
-                                  const input = (
-                                    e.target as HTMLInputElement
-                                  ).value.trim();
-                                  if (!input) return;
-                                  field.onChange([
-                                    ...(field.value ?? []),
-                                    input,
-                                  ]);
-                                  (e.target as HTMLInputElement).value = "";
-                                }
-                              }}
-                            />
-                          </div>
+                          <Input placeholder="Acme Inc." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              ))}
 
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!requiredFilledForLast}
-                onClick={() =>
-                  append({
-                    jobTitle: "",
-                    company: "",
-                    location: "",
-                    employmentType: "Full-time",
-                    startDate: "",
-                    endDate: "Present",
-                    achievements: [],
-                    toolsAndMethods: [],
-                  })
-                }
-              >
-                Add another role
-              </Button>
+                {/* Location / Employment Type */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormField
+                    control={control}
+                    name={`workExperience.${index}.location`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Location <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Remote / City, Country"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name={`workExperience.${index}.employmentType`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Employment Type{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Full-time">
+                                Full-time
+                              </SelectItem>
+                              <SelectItem value="Part-time">
+                                Part-time
+                              </SelectItem>
+                              <SelectItem value="Contract">Contract</SelectItem>
+                              <SelectItem value="Freelance">
+                                Freelance
+                              </SelectItem>
+                              <SelectItem value="Internship">
+                                Internship
+                              </SelectItem>
+                              <SelectItem value="Temporary">
+                                Temporary
+                              </SelectItem>
+                              <SelectItem value="Seasonal">Seasonal</SelectItem>
+                              <SelectItem value="Apprenticeship">
+                                Apprenticeship
+                              </SelectItem>
+                              <SelectItem value="Volunteer">
+                                Volunteer
+                              </SelectItem>
+                              <SelectItem value="Self-employed">
+                                Self-employed
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <div className="cv-form-actions">
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="cv-form-primary-action"
-                >
-                  {isPending ? "Saving..." : "Save"}
-                </Button>
+                {/* Dates */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormField
+                    control={control}
+                    name={`workExperience.${index}.startDate`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Start Date (MM/YYYY){" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="01/2022" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name={`workExperience.${index}.endDate`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          End Date (MM/YYYY or Present){" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Present" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Achievements */}
+                <FormField
+                  control={control}
+                  name={`workExperience.${index}.achievements`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Key Achievements</FormLabel>
+                      <FormControl>
+                        <RichTextEditor
+                          value={field.value?.join("\n") ?? ""}
+                          onChange={(e) => field.onChange(e.split("\n"))}
+                          placeholder="Use one line per achievement"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Tools / Systems / Methods */}
+                <FormField
+                  control={control}
+                  name={`workExperience.${index}.toolsAndMethods`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tools / Systems / Methods</FormLabel>
+                      <FormControl>
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap gap-2">
+                            {field.value?.map((tech, i) => (
+                              <span
+                                key={tech + i}
+                                className="inline-flex min-h-9 items-center rounded-full border px-3 py-1.5 text-sm sm:min-h-7 sm:px-2 sm:py-1 sm:text-xs"
+                              >
+                                {tech}
+                                <button
+                                  type="button"
+                                  className="-mr-1 ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:h-5 sm:w-5"
+                                  aria-label={`Remove tool/method ${tech}`}
+                                  onClick={() =>
+                                    field.onChange(
+                                      (field.value ?? []).filter(
+                                        (_, idx) => idx !== i
+                                      )
+                                    )
+                                  }
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                          <Input
+                            placeholder="Type a tool, system, or method and press Enter"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                const input = (
+                                  e.target as HTMLInputElement
+                                ).value.trim();
+                                if (!input) return;
+                                field.onChange([...(field.value ?? []), input]);
+                                (e.target as HTMLInputElement).value = "";
+                              }
+                            }}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+            ))}
+
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!requiredFilledForLast}
+              onClick={() =>
+                append({
+                  jobTitle: "",
+                  company: "",
+                  location: "",
+                  employmentType: "Full-time",
+                  startDate: "",
+                  endDate: "Present",
+                  achievements: [],
+                  toolsAndMethods: [],
+                })
+              }
+            >
+              Add another role
+            </Button>
+
+            <div className="cv-form-actions">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="cv-form-primary-action"
+              >
+                {isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </SectionWrapper>
 
       {/* Remove role confirmation dialog */}
       <AlertDialog

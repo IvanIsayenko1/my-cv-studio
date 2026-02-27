@@ -1,6 +1,7 @@
 // @ts-ignore
 import PDFDocument from "pdfkit";
 
+import { categoryItemsToList } from "@/lib/utils/skill-items";
 import { CV } from "@/types/cv";
 
 const COLORS = {
@@ -167,7 +168,7 @@ export function generateModernTwoColumnCV(cv: CV): Promise<Buffer> {
       };
 
       (cv.skills.categories ?? []).forEach((category) => {
-        renderSkillRow(category.name, category.items);
+        renderSkillRow(category.name, categoryItemsToList(category.items));
       });
 
       if (cv.skills.languages?.length) {

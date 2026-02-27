@@ -16,14 +16,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -113,14 +107,11 @@ export function CertificationsForm({
 
   return (
     <>
-      <Card>
-        <CardHeader className="px-5 sm:px-6">
-          <CardTitle>Certifications</CardTitle>
-          <CardDescription>
-            List your relevant certifications and credentials.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-5 sm:px-6">
+      <SectionWrapper
+        id="certifications"
+        title="Certifications"
+        description="List your relevant certifications and credentials."
+      >
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -269,8 +260,7 @@ export function CertificationsForm({
               </div>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+      </SectionWrapper>
 
       {/* Remove certification confirmation dialog */}
       <AlertDialog

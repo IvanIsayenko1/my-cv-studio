@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
 import { db } from "@/lib/db/client";
+import { ensureCvSkillsCategorySkillsColumn } from "@/lib/db/skills-schema";
 import {
   normalizeSkillsFromRow,
   serializeSkillsForStorage,
@@ -32,9 +33,11 @@ export async function GET(
     return NextResponse.json({ error: "CV not found" }, { status: 404 });
   }
 
+  await ensureCvSkillsCategorySkillsColumn();
+
   const result = await db.execute(
     `
-    SELECT coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages
+    SELECT categorySkills, languages
     FROM cv_skills
     WHERE cv_id = ?
     LIMIT 1
@@ -42,20 +45,8 @@ export async function GET(
     [cvId]
   );
 
-  if (result.rows.length === 0) {
-    return NextResponse.json({
-      skills: {
-        categories: [{ name: "Core Skills", items: [""] }],
-        languages: [],
-      },
-    });
-  }
-
   const row = result.rows[0] as {
-    coreCompetencies?: string | null;
-    toolsAndTechnologies?: string | null;
-    systemsAndMethodologies?: string | null;
-    collaborationAndDelivery?: string | null;
+    categorySkills?: string | null;
     languages?: string | null;
   };
 
@@ -95,27 +86,22 @@ export async function POST(
     );
   }
 
-  const { skills } = parsed.data;
-  const serialized = serializeSkillsForStorage(skills);
+  const serialized = serializeSkillsForStorage(parsed.data);
+
+  await ensureCvSkillsCategorySkillsColumn();
 
   // Upsert into cv_skills
   await db.execute(
     `
-    INSERT INTO cv_skills (cv_id, coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO cv_skills (cv_id, categorySkills, languages)
+    VALUES (?, ?, ?)
     ON CONFLICT(cv_id) DO UPDATE SET
-      coreCompetencies = excluded.coreCompetencies,
-      toolsAndTechnologies = excluded.toolsAndTechnologies,
-      systemsAndMethodologies = excluded.systemsAndMethodologies,
-      collaborationAndDelivery = excluded.collaborationAndDelivery,
+      categorySkills = excluded.categorySkills,
       languages = excluded.languages
     `,
     [
       cvId,
-      serialized.coreCompetencies,
-      serialized.toolsAndTechnologies,
-      serialized.systemsAndMethodologies,
-      serialized.collaborationAndDelivery,
+      serialized.categorySkills,
       serialized.languages,
     ]
   );

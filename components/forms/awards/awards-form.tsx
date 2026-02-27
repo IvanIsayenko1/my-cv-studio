@@ -16,14 +16,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -102,14 +96,11 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
 
   return (
     <>
-      <Card>
-        <CardHeader className="px-5 sm:px-6">
-          <CardTitle>Awards</CardTitle>
-          <CardDescription>
-            Add notable awards or recognitions relevant to your career.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-5 sm:px-6">
+      <SectionWrapper
+        id="awards"
+        title="Awards"
+        description="Add notable awards or recognitions relevant to your career."
+      >
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {fields.map((field, index) => (
@@ -246,8 +237,7 @@ export function AwardsForm({ setIsDirtyForm, id }: AwardsFormProps) {
               </div>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+      </SectionWrapper>
 
       {/* Remove award confirmation dialog */}
       <AlertDialog

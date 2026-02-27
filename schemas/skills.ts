@@ -10,18 +10,12 @@ export const skillCategorySchema = z.object({
     .string()
     .min(1, "Category name is required")
     .max(64, "Category name must be less than 64 characters"),
-  items: z
-    .array(z.string().min(1))
-    .min(1, "Add at least one item to this category"),
+  items: z.string().min(5, "Add at least one item to this category"),
 });
 
 export const skillsSchema = z.object({
-  skills: z.object({
-    categories: z
-      .array(skillCategorySchema)
-      .min(1, "Add at least one category"),
-    languages: z.array(languageItemSchema),
-  }),
+  categories: z.array(skillCategorySchema).min(1, "Add at least one category"),
+  languages: z.array(languageItemSchema),
 });
 
 export type SkillsFormValues = z.infer<typeof skillsSchema>;

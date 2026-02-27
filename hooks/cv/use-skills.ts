@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { fetchSkills, postSkills } from "@/lib/api/skills";
+import { getSkills, postSkills } from "@/lib/api/skills";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
 import { SkillsFormValues } from "@/types/skills";
@@ -22,28 +22,22 @@ export function useSaveSkills(id: string) {
     mutationKey: [QUERY_KEYS.SKILLS, id],
     mutationFn: (values: SkillsFormValues) => {
       const cleaned: SkillsFormValues = {
-        skills: {
-          categories: values.skills.categories
-            ? values.skills.categories
-                .map((category) => ({
-                  name: category.name.trim(),
-                  items: (category.items ?? [])
-                    .map((item) => item.trim())
-                    .filter(Boolean),
-                }))
-                .filter(
-                  (category) => category.name && category.items.length > 0
-                )
-            : [],
-          languages: values.skills.languages
-            ? values.skills.languages
-                .map((l) => ({
-                  language: l.language.trim(),
-                  proficiency: l.proficiency,
-                }))
-                .filter((l) => l.language && l.proficiency)
-            : [],
-        },
+        categories: values.categories
+          ? values.categories
+              .map((category) => ({
+                name: category.name.trim(),
+                items: category.items.trim(),
+              }))
+              .filter((category) => category.name && category.items.length > 0)
+          : [],
+        languages: values.languages
+          ? values.languages
+              .map((l) => ({
+                language: l.language.trim(),
+                proficiency: l.proficiency,
+              }))
+              .filter((l) => l.language && l.proficiency)
+          : [],
       };
       return postSkills(id, cleaned);
     },
@@ -65,6 +59,6 @@ export function useSaveSkills(id: string) {
 export function useSkills(id: string) {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.SKILLS, id],
-    queryFn: () => fetchSkills(id),
+    queryFn: () => getSkills(id),
   });
 }

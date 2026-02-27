@@ -1,6 +1,7 @@
 // @ts-ignore
 import PDFDocument from "pdfkit";
 
+import { categoryItemsToList } from "@/lib/utils/skill-items";
 import { CV } from "@/types/cv";
 
 const COLORS = {
@@ -90,8 +91,9 @@ export function generateATSCleanColoredCV(cv: CV): Promise<Buffer> {
       addAccentSection(doc, "Skills");
 
       (cv.skills.categories ?? []).forEach((category) => {
-        if (category.items?.length) {
-          skillGroup(doc, category.name, category.items);
+        const skillItems = categoryItemsToList(category.items);
+        if (skillItems.length) {
+          skillGroup(doc, category.name, skillItems);
         }
       });
 

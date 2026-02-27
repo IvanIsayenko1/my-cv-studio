@@ -67,7 +67,7 @@ export interface CV {
   skills: {
     categories: Array<{
       name: string;
-      items: string[];
+      items: string;
     }>;
     languages: Array<{ language: string; proficiency: string }>;
   };

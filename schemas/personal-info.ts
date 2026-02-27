@@ -30,16 +30,6 @@ export const personalInfoSchema = z.object({
   country: z.string().min(1, "Country is required"),
   professionalLinks: z.array(professionalLinkSchema).default([]),
   photo: z.string().optional(),
-  linkedIn: z
-    .string()
-    .url("Please enter a valid LinkedIn URL")
-    .optional()
-    .or(z.literal("")),
-  portfolio: z
-    .string()
-    .url("Please enter a valid portfolio URL")
-    .optional()
-    .or(z.literal("")),
 });
 
 export type PersonalInfoFormValues = z.input<typeof personalInfoSchema>;

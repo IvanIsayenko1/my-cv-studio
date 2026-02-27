@@ -1,6 +1,7 @@
 import { normalizeSkillsFromRow } from "@/lib/utils/skills-transform";
 import { parseProfessionalLinksFromStorage } from "@/lib/utils/personal-links-transform";
 import { parseEducationMeta } from "@/lib/utils/education-grade-transform";
+import { ensureCvSkillsCategorySkillsColumn } from "@/lib/db/skills-schema";
 
 import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
@@ -8,6 +9,8 @@ import { TemplateId } from "@/types/template";
 import { db } from "./client";
 
 export async function getCompleteCV(cvId: string): Promise<CV | null> {
+  await ensureCvSkillsCategorySkillsColumn();
+
   const cvMeta = await db.execute(
     "SELECT id, user_id, title, created_at, updated_at FROM cvs WHERE id = ? LIMIT 1",
     [cvId]
@@ -36,7 +39,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
       [cvId]
     ),
     db.execute(
-      "SELECT coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages FROM cv_skills WHERE cv_id = ? LIMIT 1",
+      "SELECT categorySkills, languages FROM cv_skills WHERE cv_id = ? LIMIT 1",
       [cvId]
     ),
 
@@ -141,13 +144,10 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     (summary.rows[0] as any)?.professional_summary || "";
 
   const s = (skillsRow.rows[0] || {}) as {
-    coreCompetencies?: string | null;
-    toolsAndTechnologies?: string | null;
-    systemsAndMethodologies?: string | null;
-    collaborationAndDelivery?: string | null;
+    categorySkills?: string | null;
     languages?: string | null;
   };
-  const skills: CV["skills"] = normalizeSkillsFromRow(s).skills;
+  const skills: CV["skills"] = normalizeSkillsFromRow(s);
 
   const achievementsByWorkId = new Map<string, string[]>();
   (achievementRows.rows as any[]).forEach((row) => {

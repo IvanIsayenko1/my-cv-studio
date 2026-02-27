@@ -6,14 +6,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 
+import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import StatusBedge from "@/components/status-bedge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -23,7 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 import { useSaveSummary, useSummary } from "@/hooks/cv/use-summary";
 
@@ -47,6 +42,7 @@ export function SummaryForm({ setIsDirtyForm, id }: SummaryFormProps) {
       professionalSummary: "",
     },
   });
+  const isComplete = form.formState.isValid;
 
   useEffect(() => {
     if (data?.professionalSummary) {
@@ -73,54 +69,55 @@ export function SummaryForm({ setIsDirtyForm, id }: SummaryFormProps) {
   };
 
   return (
-    <Card>
-      <CardHeader className="px-5 sm:px-6">
-        <CardTitle>Professional Summary</CardTitle>
-        <CardDescription>
-          Write a concise, 3–5 sentence summary that highlights your key skills,
-          experience, and target role.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-5 sm:px-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="professionalSummary"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Summary
-                    <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      rows={6}
-                      placeholder="Experienced frontend developer with 5+ years..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Focus on achievements, core skills, and what you’re looking
-                    for next.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <SectionWrapper
+      id="summary"
+      title="Professional Summary"
+      description="Write a concise, 3–5 sentence summary that highlights your key skills, experience, and target role."
+      status={
+        <StatusBedge
+          isReady={isComplete}
+          readyText="Complete"
+          notReadyText="Incomplete"
+        />
+      }
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="professionalSummary"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Summary
+                  <span className="text-destructive">*</span>
+                </FormLabel>
+                <FormControl>
+                  <RichTextEditor
+                    {...field}
+                    placeholder="Experienced frontend developer with 5+ years..."
+                  />
+                </FormControl>
+                <FormDescription>
+                  Focus on achievements, core skills, and what you’re looking
+                  for next.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="cv-form-actions">
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="cv-form-primary-action"
-              >
-                {isPending ? "Saving..." : "Save"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+          <div className="cv-form-actions">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="cv-form-primary-action"
+            >
+              {isPending ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </SectionWrapper>
   );
 }

@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
 
 import { db } from "@/lib/db/client";
+import { ensureCvSkillsCategorySkillsColumn } from "@/lib/db/skills-schema";
 import { getCompleteCV } from "@/lib/db/queries";
 import { serializeProfessionalLinksForStorage } from "@/lib/utils/personal-links-transform";
 import { serializeSkillsForStorage } from "@/lib/utils/skills-transform";
@@ -213,23 +214,18 @@ export async function POST(
 
   // skills
   const serializedSkills = serializeSkillsForStorage(skills);
+  await ensureCvSkillsCategorySkillsColumn();
   await db.execute(
     `
-    INSERT INTO cv_skills (cv_id, coreCompetencies, toolsAndTechnologies, systemsAndMethodologies, collaborationAndDelivery, languages)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO cv_skills (cv_id, categorySkills, languages)
+    VALUES (?, ?, ?)
     ON CONFLICT(cv_id) DO UPDATE SET
-      coreCompetencies = excluded.coreCompetencies,
-      toolsAndTechnologies = excluded.toolsAndTechnologies,
-      systemsAndMethodologies = excluded.systemsAndMethodologies,
-      collaborationAndDelivery = excluded.collaborationAndDelivery,
+      categorySkills = excluded.categorySkills,
       languages = excluded.languages
     `,
     [
       newRandomId,
-      serializedSkills.coreCompetencies,
-      serializedSkills.toolsAndTechnologies,
-      serializedSkills.systemsAndMethodologies,
-      serializedSkills.collaborationAndDelivery,
+      serializedSkills.categorySkills,
       serializedSkills.languages,
     ]
   );

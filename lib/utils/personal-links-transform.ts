@@ -1,6 +1,9 @@
-import { PersonalInfoFormValues } from "@/types/personal-info";
-
 type Link = { label: string; url: string };
+type PersonalLinksInput = {
+  professionalLinks?: Array<{ label?: string; url?: string }>;
+  linkedIn?: string | null;
+  portfolio?: string | null;
+};
 
 const V2_PREFIX = "__LINKS_V2__";
 
@@ -62,19 +65,26 @@ export function parseProfessionalLinksFromStorage({
 }
 
 export function serializeProfessionalLinksForStorage(
-  values: Pick<PersonalInfoFormValues, "professionalLinks" | "linkedIn" | "portfolio">
+  values: PersonalLinksInput
 ): { linkedIn: string | null; portfolio: string | null } {
   const normalized = (values.professionalLinks ?? [])
-    .map((link) => ({
-      label: link.label.trim(),
-      url: link.url.trim(),
-    }))
+    .map((link) => {
+      const label = typeof link.label === "string" ? link.label.trim() : "";
+      const url = typeof link.url === "string" ? link.url.trim() : "";
+      return { label, url };
+    })
     .filter((link) => link.label && isValidURL(link.url));
 
   if (normalized.length === 0) {
     return {
-      linkedIn: values.linkedIn?.trim() || null,
-      portfolio: values.portfolio?.trim() || null,
+      linkedIn:
+        typeof values.linkedIn === "string"
+          ? values.linkedIn.trim() || null
+          : null,
+      portfolio:
+        typeof values.portfolio === "string"
+          ? values.portfolio.trim() || null
+          : null,
     };
   }
 
@@ -87,4 +97,3 @@ export function serializeProfessionalLinksForStorage(
     portfolio: `${V2_PREFIX}${JSON.stringify(normalized)}`,
   };
 }
-
