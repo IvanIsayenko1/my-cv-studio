@@ -6,17 +6,8 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import { RemoveCertificationDialog } from "@/components/dialogs/remove-certification-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,6 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MonthYearPicker } from "@/components/ui/month-year-picker";
+import { Separator } from "@/components/ui/separator";
 
 import {
   useCertifications,
@@ -39,14 +32,10 @@ import {
 } from "@/types/certifications";
 
 interface CertificationsFormProps {
-  setIsDirtyForm: (isDirty: boolean) => void;
   id: string;
 }
 
-export function CertificationsForm({
-  setIsDirtyForm,
-  id,
-}: CertificationsFormProps) {
+export function CertificationsForm({ id }: CertificationsFormProps) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
   const { data } = useCertifications(id);
@@ -60,7 +49,6 @@ export function CertificationsForm({
   });
 
   const { control, reset, formState, handleSubmit } = form;
-  const { isDirty } = formState;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -76,20 +64,10 @@ export function CertificationsForm({
           ? data.certifications
           : [],
     });
-
-    setIsDirtyForm(false);
-  }, [data, reset, setIsDirtyForm]);
-
-  useEffect(() => {
-    setIsDirtyForm(isDirty);
-  }, [isDirty, setIsDirtyForm]);
+  }, [data, reset]);
 
   const onSubmit = (values: CertificationsFormValues) => {
-    mutate(values, {
-      onSuccess: () => {
-        setIsDirtyForm(false);
-      },
-    });
+    mutate(values);
   };
 
   const watchedCerts = useWatch({
@@ -112,129 +90,127 @@ export function CertificationsForm({
         title="Certifications"
         description="List your relevant certifications and credentials."
       >
-          <Form {...form}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="space-y-4 border rounded-lg p-4 pb-6"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="font-medium text-sm text-muted-foreground">
-                      Certification {index + 1}
-                    </div>
-                    {fields.length > 0 && (
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => setRemoveIndex(index)}
-                        aria-label="Remove certification"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-8 flex gap-8 flex-col"
+          >
+            {fields.map((field, index) => (
+              <div key={field.id} className="space-y-4 mb-0">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="font-medium text-sm text-muted-foreground">
+                    Certification {index + 1}
                   </div>
+                  {fields.length > 0 && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => setRemoveIndex(index)}
+                      aria-label="Remove certification"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
 
-                  {/* Name / Issuing organization */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`certifications.${index}.name`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Certification name{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="AWS Certified Solutions Architect"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`certifications.${index}.issuingOrg`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Issuing organization{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Amazon Web Services"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Issue date / Expiration date */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`certifications.${index}.issueDate`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Issue date (MM/YYYY){" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="05/2023" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`certifications.${index}.expirationDate`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Expiration date (optional)</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="05/2026 or leave blank"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Credential ID */}
+                {/* Name / Issuing organization */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <FormField
                     control={control}
-                    name={`certifications.${index}.credentialId`}
+                    name={`certifications.${index}.name`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Credential ID (optional)</FormLabel>
+                        <FormLabel>
+                          Certification name{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g. ABCD-1234" {...field} />
+                          <Input
+                            placeholder="AWS Certified Solutions Architect"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name={`certifications.${index}.issuingOrg`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Issuing organization{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Amazon Web Services" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              ))}
 
+                {/* Issue date / Expiration date */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormField
+                    control={control}
+                    name={`certifications.${index}.issueDate`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Issue date (MM/YYYY){" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <MonthYearPicker {...field} placeholder="MM/YYYY" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name={`certifications.${index}.expirationDate`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Expiration date (optional)</FormLabel>
+                        <FormControl>
+                          <MonthYearPicker {...field} placeholder="MM/YYYY" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Credential ID */}
+                <FormField
+                  control={control}
+                  name={`certifications.${index}.credentialId`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Credential ID (optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. ABCD-1234" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {index < fields.length - 1 && <Separator className="mt-8" />}
+              </div>
+            ))}
+
+            <div className="cv-form-actions">
               <Button
                 type="button"
                 variant="outline"
+                className="cv-form-primary-action"
                 disabled={!canAddCertification}
                 onClick={() =>
                   append({
@@ -248,53 +224,32 @@ export function CertificationsForm({
               >
                 {hasAny ? "Add another certification" : "Add certification"}
               </Button>
-
-              <div className="cv-form-actions">
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="cv-form-primary-action"
-                >
-                  {isPending ? "Saving..." : "Save"}
-                </Button>
-              </div>
-            </form>
-          </Form>
+              <Button
+                type="submit"
+                disabled={isPending || !form.formState.isValid}
+                className="cv-form-primary-action"
+              >
+                {isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </SectionWrapper>
 
       {/* Remove certification confirmation dialog */}
-      <AlertDialog
+      <RemoveCertificationDialog
         open={removeIndex !== null}
         onOpenChange={(open) => {
           if (!open) setRemoveIndex(null);
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove this certification?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This certification will be permanently removed from your CV. You
-              can add it again later if needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setRemoveIndex(null)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                if (removeIndex !== null) {
-                  remove(removeIndex);
-                  setRemoveIndex(null);
-                }
-              }}
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onCancel={() => setRemoveIndex(null)}
+        onRemove={() => {
+          if (removeIndex !== null) {
+            remove(removeIndex);
+            setRemoveIndex(null);
+          }
+        }}
+      />
     </>
   );
 }

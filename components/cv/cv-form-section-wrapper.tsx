@@ -35,7 +35,7 @@ export default function SectionWrapper({
       <Accordion type="multiple" defaultValue={[id]}>
         <AccordionItem value={id}>
           <Card>
-            <CardHeader className="px-5 sm:px-6">
+            <CardHeader className="px-4 sm:px-6">
               <CardTitle className="text-lg">
                 <AccordionTrigger>
                   <div className="flex flex-row gap-2 items-center">
@@ -48,7 +48,7 @@ export default function SectionWrapper({
               </CardTitle>
               {description && <CardDescription>{description}</CardDescription>}
             </CardHeader>
-            <CardContent className="px-5 sm:px-6">
+            <CardContent className="px-4 sm:px-6">
               <AccordionContent>{children} </AccordionContent>
             </CardContent>
           </Card>

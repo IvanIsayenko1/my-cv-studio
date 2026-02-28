@@ -8,17 +8,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import { RemoveSkillsDialog } from "@/components/dialogs/remove-skills-dialog";
 import StatusBedge from "@/components/status-bedge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -46,7 +37,6 @@ import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { SkillsFormValues, skillsSchema } from "@/types/skills";
 
 interface SkillsFormProps {
-  setIsDirtyForm: (isDirty: boolean) => void;
   id: string;
 }
 
@@ -60,7 +50,7 @@ const createEmptyLanguage = () => ({
   proficiency: "",
 });
 
-export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
+export function SkillsForm({ id }: SkillsFormProps) {
   const [removeCategoryIndex, setRemoveCategoryIndex] = useState<number | null>(
     null
   );
@@ -115,18 +105,11 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
           ? data.languages
           : [createEmptyLanguage()],
     });
-
-    setIsDirtyForm(false);
-  }, [data, reset, setIsDirtyForm]);
-
-  useEffect(() => {
-    setIsDirtyForm(isDirty);
-  }, [isDirty, setIsDirtyForm]);
+  }, [data, reset]);
 
   const onSubmit = (values: SkillsFormValues) => {
     mutate(values, {
       onSuccess: () => {
-        setIsDirtyForm(false);
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
       },
     });
@@ -345,69 +328,37 @@ export function SkillsForm({ setIsDirtyForm, id }: SkillsFormProps) {
         </Form>
       </SectionWrapper>
 
-      <AlertDialog
+      <RemoveSkillsDialog
         open={removeCategoryIndex !== null}
+        title="Remove this category?"
+        description="This category will be permanently removed from your CV."
         onOpenChange={(open) => {
           if (!open) setRemoveCategoryIndex(null);
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove this category?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This category will be permanently removed from your CV.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setRemoveCategoryIndex(null)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                if (removeCategoryIndex !== null) {
-                  removeCategory(removeCategoryIndex);
-                  setRemoveCategoryIndex(null);
-                }
-              }}
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onCancel={() => setRemoveCategoryIndex(null)}
+        onRemove={() => {
+          if (removeCategoryIndex !== null) {
+            removeCategory(removeCategoryIndex);
+            setRemoveCategoryIndex(null);
+          }
+        }}
+      />
 
-      <AlertDialog
+      <RemoveSkillsDialog
         open={removeLanguageIndex !== null}
+        title="Remove this language?"
+        description="This language entry will be permanently removed from your CV."
         onOpenChange={(open) => {
           if (!open) setRemoveLanguageIndex(null);
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove this language?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This language entry will be permanently removed from your CV.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setRemoveLanguageIndex(null)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                if (removeLanguageIndex !== null) {
-                  removeLanguage(removeLanguageIndex);
-                  setRemoveLanguageIndex(null);
-                }
-              }}
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onCancel={() => setRemoveLanguageIndex(null)}
+        onRemove={() => {
+          if (removeLanguageIndex !== null) {
+            removeLanguage(removeLanguageIndex);
+            setRemoveLanguageIndex(null);
+          }
+        }}
+      />
     </>
   );
 }

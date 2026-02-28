@@ -296,20 +296,21 @@ export function RichTextEditor({
         className
       )}
     >
-      <div className="flex flex-wrap items-center gap-1 border-b border-input bg-muted/40 p-2">
+      <div className="flex items-center gap-1 overflow-x-auto border-b border-input bg-muted/40 p-1.5 sm:flex-wrap sm:p-2">
         {toolbarButtons.map((button) => {
           const Icon = button.icon;
           return (
             <Button
               key={button.key}
               type="button"
-              size="icon-sm"
+              size="icon"
               variant={button.active ? "secondary" : "ghost"}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => runCommand(button.onClick)}
               disabled={disabled || button.disabled}
               aria-label={button.label}
               title={button.label}
+              className="h-10 w-10 shrink-0 sm:h-8 sm:w-8"
             >
               <Icon className="size-4" />
             </Button>
@@ -336,7 +337,7 @@ export function RichTextEditor({
         }}
         className={cn(
           minHeightClassName,
-          "prose prose-sm dark:prose-invert max-w-none px-3 py-2 text-sm outline-none",
+          "prose prose-sm dark:prose-invert max-w-none px-3 py-2 text-base leading-6 outline-none sm:text-sm sm:leading-5",
           "[&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1",
           "empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]",
           disabled && "cursor-not-allowed opacity-60"

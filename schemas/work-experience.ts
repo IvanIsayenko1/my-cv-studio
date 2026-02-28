@@ -31,7 +31,7 @@ export const workExperienceItemSchema = z.object({
     ),
 
   // REQUIRED array, never undefined
-  achievements: z.array(z.string()).catch([]),
+  achievements: z.string().default("").optional(),
 
   // OPTIONAL array — can be undefined — but defaults to []
   toolsAndMethods: z.array(z.string()).default([]).optional(),

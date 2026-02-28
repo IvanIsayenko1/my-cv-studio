@@ -1,4 +1,3 @@
-// app/api/cv/[id]/work-experience/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@clerk/nextjs/server";
@@ -25,7 +24,7 @@ const workExperienceItemSchema = z.object({
   ]),
   startDate: z.string(),
   endDate: z.string(),
-  achievements: z.array(z.string()).default([]),
+  achievements: z.union([z.string(), z.string()]).default(""),
   toolsAndMethods: z.array(z.string()).default([]),
 });
 
@@ -134,7 +133,7 @@ export async function GET(
       | "Self-employed",
     startDate: row.start_date as string,
     endDate: row.end_date as string,
-    achievements: achievementsByRole.get(row.id as string) ?? [],
+    achievements: (achievementsByRole.get(row.id as string) ?? []).join("\n"),
     toolsAndMethods: toolsAndMethodsByRole.get(row.id as string) ?? [],
   }));
 
@@ -205,18 +204,16 @@ export async function POST(
       ]
     );
 
-    for (const text of w.achievements ?? []) {
-      await db.execute(
-        `
+    await db.execute(
+      `
         INSERT INTO cv_work_experience_achievement (
           id,
           work_experience_id,
           text
         ) VALUES (?, ?, ?)
         `,
-        [randomUUID(), workId, text]
-      );
-    }
+      [randomUUID(), workId, w.achievements]
+    );
 
     for (const name of w.toolsAndMethods ?? []) {
       await db.execute(

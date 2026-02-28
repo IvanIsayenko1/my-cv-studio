@@ -27,11 +27,10 @@ import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { SummaryFormValues, summarySchema } from "@/types/summary";
 
 interface SummaryFormProps {
-  setIsDirtyForm: (isDirty: boolean) => void;
   id: string;
 }
 
-export function SummaryForm({ setIsDirtyForm, id }: SummaryFormProps) {
+export function SummaryForm({ id }: SummaryFormProps) {
   const { data } = useSummary(id);
   const { mutate, isPending } = useSaveSummary(id);
   const queryClient = useQueryClient();
@@ -49,20 +48,12 @@ export function SummaryForm({ setIsDirtyForm, id }: SummaryFormProps) {
       form.reset({
         professionalSummary: data.professionalSummary ?? "",
       });
-      setIsDirtyForm(false);
     }
-  }, [data, form, setIsDirtyForm]);
-
-  const { isDirty } = form.formState;
-
-  useEffect(() => {
-    setIsDirtyForm(isDirty);
-  }, [isDirty, setIsDirtyForm]);
+  }, [data, form]);
 
   const onSubmit = (values: SummaryFormValues) => {
     mutate(values, {
       onSuccess: () => {
-        setIsDirtyForm(false);
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
       },
     });

@@ -37,8 +37,6 @@ import CVFormTitle from "./cv-form-title";
 import CVPreview from "./cv-preview";
 import CVPreviewSkeleton from "./cv-preview-skeleton";
 
-const noopDirtyHandler = () => {};
-
 export default function CVForm() {
   const params = useParams();
   const id = params.id as string;
@@ -76,35 +74,35 @@ export default function CVForm() {
           </Suspense>
 
           <Suspense fallback={<SummaryFormSkeleton />}>
-            <SummaryForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <SummaryForm id={id} />
           </Suspense>
 
           <Suspense fallback={<WorkExperienceFormSkeleton />}>
-            <WorkExperienceForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <WorkExperienceForm id={id} />
           </Suspense>
 
           <Suspense fallback={<EducationFormSkeleton />}>
-            <EducationForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <EducationForm id={id} />
           </Suspense>
 
           <Suspense fallback={<SkillsFormSkeleton />}>
-            <SkillsForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <SkillsForm id={id} />
           </Suspense>
 
           <Suspense fallback={<CertificationsFormSkeleton />}>
-            <CertificationsForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <CertificationsForm id={id} />
           </Suspense>
 
           <Suspense fallback={<ProjectsFormSkeleton />}>
-            <ProjectsForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <ProjectsForm id={id} />
           </Suspense>
 
           <Suspense fallback={<AwardsFormSkeleton />}>
-            <AwardsForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <AwardsForm id={id} />
           </Suspense>
 
           <Suspense fallback={<TemplateFormSkeleton />}>
-            <TemplateForm setIsDirtyForm={noopDirtyHandler} id={id} />
+            <TemplateForm id={id} />
           </Suspense>
         </div>
 

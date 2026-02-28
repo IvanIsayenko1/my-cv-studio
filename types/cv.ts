@@ -46,7 +46,7 @@ export interface CV {
       | "Self-employed";
     startDate: string; // MM/YYYY
     endDate: string | "Present";
-    achievements: string[];
+    achievements: string;
     toolsAndMethods: string[];
     sortOrder: number;
   }>;

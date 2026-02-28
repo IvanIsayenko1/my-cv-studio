@@ -11,9 +11,3 @@ export enum TemplateName {
   "ats-friendly-clean-colored" = "ATS Friendly Clean Colored",
   "modern-timeline" = "Modern Timeline",
 }
-
-export enum TemplateDescription {
-  "ats-friendly-clean" = "A basic template that is optimized for ATS (Applicant Tracking System) compatibility.",
-  "ats-friendly-clean-colored" = "A colored template that is optimized for ATS (Applicant Tracking System) compatibility.",
-  "modern-timeline" = "A modern timeline template.",
-}

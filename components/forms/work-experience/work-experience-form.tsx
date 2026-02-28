@@ -8,17 +8,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import { RemoveWorkExperienceDialog } from "@/components/dialogs/remove-work-experience-dialog";
 import StatusBedge from "@/components/status-bedge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -29,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Select,
@@ -37,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 
 import {
   useSaveWorkExperience,
@@ -52,14 +44,10 @@ import {
 } from "@/types/work-experience";
 
 interface WorkExperienceFormProps {
-  setIsDirtyForm: (isDirty: boolean) => void;
-  id: string; // cvId
+  id: string;
 }
 
-export function WorkExperienceForm({
-  setIsDirtyForm,
-  id,
-}: WorkExperienceFormProps) {
+export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
   const { data } = useWorkExperience(id);
@@ -77,7 +65,7 @@ export function WorkExperienceForm({
           employmentType: "Full-time",
           startDate: "",
           endDate: "Present",
-          achievements: [],
+          achievements: "",
           toolsAndMethods: [],
         },
       ],
@@ -85,7 +73,6 @@ export function WorkExperienceForm({
   });
 
   const { control, reset, formState, handleSubmit } = form;
-  const { isDirty } = formState;
   const isComplete = form.formState.isValid;
 
   const { fields, append, remove } = useFieldArray({
@@ -108,23 +95,17 @@ export function WorkExperienceForm({
                 employmentType: "Full-time",
                 startDate: "",
                 endDate: "Present",
-                achievements: [],
+                achievements: "",
                 toolsAndMethods: [],
               },
             ],
     });
-
-    setIsDirtyForm(false);
-  }, [data, reset, setIsDirtyForm]);
-
-  useEffect(() => {
-    setIsDirtyForm(isDirty);
-  }, [isDirty, setIsDirtyForm]);
+  }, [data, reset]);
 
   const onSubmit = (values: WorkExperienceFormValues) => {
+    debugger;
     mutate(values, {
       onSuccess: () => {
-        setIsDirtyForm(false);
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
       },
     });
@@ -159,12 +140,12 @@ export function WorkExperienceForm({
         }
       >
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-8 flex gap-8 flex-col"
+          >
             {fields.map((field, index) => (
-              <div
-                key={field.id}
-                className="space-y-4 border rounded-lg p-4 pb-6"
-              >
+              <div key={field.id} className="space-y-4 mb-0">
                 {/* Top row with title and delete button */}
                 <div className="flex justify-between items-start mb-2">
                   <div className="font-medium text-sm text-muted-foreground">
@@ -306,7 +287,7 @@ export function WorkExperienceForm({
                           <span className="text-destructive">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="01/2022" {...field} />
+                          <MonthYearPicker {...field} placeholder="MM/YYYY" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -322,7 +303,11 @@ export function WorkExperienceForm({
                           <span className="text-destructive">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="Present" {...field} />
+                          <MonthYearPicker
+                            {...field}
+                            placeholder="MM/YYYY"
+                            includePresentOption={true}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -339,9 +324,9 @@ export function WorkExperienceForm({
                       <FormLabel>Key Achievements</FormLabel>
                       <FormControl>
                         <RichTextEditor
-                          value={field.value?.join("\n") ?? ""}
-                          onChange={(e) => field.onChange(e.split("\n"))}
-                          placeholder="Use one line per achievement"
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          placeholder="Describe your key achievements and responsibilities in this role..."
                         />
                       </FormControl>
                       <FormMessage />
@@ -402,33 +387,35 @@ export function WorkExperienceForm({
                     </FormItem>
                   )}
                 />
+
+                {index < fields.length - 1 && <Separator className="mt-8" />}
               </div>
             ))}
 
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!requiredFilledForLast}
-              onClick={() =>
-                append({
-                  jobTitle: "",
-                  company: "",
-                  location: "",
-                  employmentType: "Full-time",
-                  startDate: "",
-                  endDate: "Present",
-                  achievements: [],
-                  toolsAndMethods: [],
-                })
-              }
-            >
-              Add another role
-            </Button>
-
             <div className="cv-form-actions">
               <Button
+                type="button"
+                variant="outline"
+                className="cv-form-primary-action"
+                disabled={!requiredFilledForLast}
+                onClick={() =>
+                  append({
+                    jobTitle: "",
+                    company: "",
+                    location: "",
+                    employmentType: "Full-time",
+                    startDate: "",
+                    endDate: "Present",
+                    achievements: "",
+                    toolsAndMethods: [],
+                  })
+                }
+              >
+                Add another role
+              </Button>
+              <Button
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || !form.formState.isValid}
                 className="cv-form-primary-action"
               >
                 {isPending ? "Saving..." : "Save"}
@@ -439,38 +426,19 @@ export function WorkExperienceForm({
       </SectionWrapper>
 
       {/* Remove role confirmation dialog */}
-      <AlertDialog
+      <RemoveWorkExperienceDialog
         open={removeIndex !== null}
         onOpenChange={(open) => {
           if (!open) setRemoveIndex(null);
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove this role?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This work experience entry will be permanently removed from your
-              CV. You can add it again later if needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setRemoveIndex(null)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                if (removeIndex !== null) {
-                  remove(removeIndex);
-                  setRemoveIndex(null);
-                }
-              }}
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onCancel={() => setRemoveIndex(null)}
+        onRemove={() => {
+          if (removeIndex !== null) {
+            remove(removeIndex);
+            setRemoveIndex(null);
+          }
+        }}
+      />
     </>
   );
 }

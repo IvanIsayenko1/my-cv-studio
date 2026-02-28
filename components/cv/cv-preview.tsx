@@ -14,6 +14,7 @@ import { useProjects } from "@/hooks/cv/use-projects";
 import { useSkills } from "@/hooks/cv/use-skills";
 import { useSummary } from "@/hooks/cv/use-summary";
 import { useWorkExperience } from "@/hooks/cv/use-work-experience";
+
 import { categoryItemsToList } from "@/lib/utils/skill-items";
 
 function PreviewSection({
@@ -39,6 +40,7 @@ function sanitizeRichTextHtml(html: string): string {
 
   const allowedTags = new Set([
     "p",
+    "div",
     "br",
     "strong",
     "b",
@@ -169,16 +171,16 @@ export default function CVPreview({ id }: { id: string }) {
                   <p className="text-xs text-muted-foreground">
                     {item.startDate} - {item.endDate} · {item.location}
                   </p>
-                  {(item.achievements ?? [])
-                    .slice(0, 2)
-                    .map((achievement, aidx) => (
-                      <p
-                        key={`${item.company}-achievement-${aidx}`}
-                        className="text-sm leading-relaxed"
-                      >
-                        • {achievement}
-                      </p>
-                    ))}
+                  {item.achievements ? (
+                    <PreviewSection title="Summary">
+                      <div
+                        className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeRichTextHtml(item.achievements),
+                        }}
+                      />
+                    </PreviewSection>
+                  ) : null}
                 </article>
               ))}
             </div>

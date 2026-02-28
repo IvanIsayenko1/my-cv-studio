@@ -7,17 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import { RemoveEducationDialog } from "@/components/dialogs/remove-education-dialog";
 import StatusBedge from "@/components/status-bedge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MonthYearPicker } from "@/components/ui/month-year-picker";
+import { Separator } from "@/components/ui/separator";
 
 import { useEducation, useSaveEducation } from "@/hooks/cv/use-education";
 
@@ -37,11 +30,10 @@ import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { EducationFormValues, educationSchema } from "@/types/education";
 
 interface EducationFormProps {
-  setIsDirtyForm: (isDirty: boolean) => void;
   id: string;
 }
 
-export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
+export function EducationForm({ id }: EducationFormProps) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
   const { data } = useEducation(id);
@@ -67,7 +59,6 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
   });
 
   const { control, reset, formState, handleSubmit } = form;
-  const { isDirty } = formState;
   const isComplete = form.formState.isValid;
 
   const { fields, append, remove } = useFieldArray({
@@ -105,18 +96,11 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
               },
             ],
     });
-
-    setIsDirtyForm(false);
-  }, [data, reset, setIsDirtyForm]);
-
-  useEffect(() => {
-    setIsDirtyForm(isDirty);
-  }, [isDirty, setIsDirtyForm]);
+  }, [data, reset]);
 
   const onSubmit = (values: EducationFormValues) => {
     mutate(values, {
       onSuccess: () => {
-        setIsDirtyForm(false);
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
       },
     });
@@ -148,166 +132,44 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
           />
         }
       >
-          <Form {...form}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="space-y-4 border rounded-lg p-4 pb-6"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="font-medium text-sm text-muted-foreground">
-                      Education {index + 1}
-                    </div>
-                    {fields.length > 1 && (
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => setRemoveIndex(index)}
-                        aria-label="Remove education"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-8 flex gap-8 flex-col"
+          >
+            {fields.map((field, index) => (
+              <div key={field.id} className="space-y-4 mb-0">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="font-medium text-sm text-muted-foreground">
+                    Education {index + 1}
                   </div>
+                  {fields.length > 1 && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => setRemoveIndex(index)}
+                      aria-label="Remove education"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
 
-                  {/* Degree / Field of Study */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`education.${index}.degree`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Degree <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="BSc Computer Science"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`education.${index}.fieldOfStudy`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Field of Study{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="Computer Science" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Institution / Location */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <FormField
-                      control={control}
-                      name={`education.${index}.institution`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Institution{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="University of Example"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`education.${index}.location`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Location <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="City, Country" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Graduation date / Grade / Scale */}
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                    <FormField
-                      control={control}
-                      name={`education.${index}.graduationDate`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Graduation Date{" "}
-                            <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="06/2024" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`education.${index}.grade`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Grade (optional)</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g., 3.8 or A"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={control}
-                      name={`education.${index}.gradingScale`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Grading Scale (optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g., 4.0 scale" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Honors */}
+                {/* Degree / Field of Study */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <FormField
                     control={control}
-                    name={`education.${index}.honors`}
+                    name={`education.${index}.degree`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Honors / Awards (optional)</FormLabel>
+                        <FormLabel>
+                          Degree <span className="text-destructive">*</span>
+                        </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Summa Cum Laude, Dean's List"
+                            placeholder="BSc Computer Science"
                             {...field}
                           />
                         </FormControl>
@@ -315,13 +177,135 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={control}
+                    name={`education.${index}.fieldOfStudy`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Field of Study{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Computer Science" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              ))}
 
+                {/* Institution / Location */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormField
+                    control={control}
+                    name={`education.${index}.institution`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Institution{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="University of Example"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name={`education.${index}.location`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Location <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="City, Country" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Graduation date / Grade / Scale */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <FormField
+                    control={control}
+                    name={`education.${index}.graduationDate`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Graduation Date{" "}
+                          <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <MonthYearPicker {...field} placeholder="MM/YYYY" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name={`education.${index}.grade`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Grade (optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., 3.8 or A" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name={`education.${index}.gradingScale`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Grading Scale (optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., 4.0 scale" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Honors */}
+                <FormField
+                  control={control}
+                  name={`education.${index}.honors`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Honors / Awards (optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Summa Cum Laude, Dean's List"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {index < fields.length - 1 && <Separator className="mt-8" />}
+              </div>
+            ))}
+
+            <div className="cv-form-actions">
               <Button
                 type="button"
                 variant="outline"
                 disabled={!requiredFilledForLast}
+                className="cv-form-primary-action"
                 onClick={() =>
                   append({
                     degree: "",
@@ -337,53 +321,32 @@ export function EducationForm({ setIsDirtyForm, id }: EducationFormProps) {
               >
                 Add another education
               </Button>
-
-              <div className="cv-form-actions">
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="cv-form-primary-action"
-                >
-                  {isPending ? "Saving..." : "Save"}
-                </Button>
-              </div>
-            </form>
-          </Form>
+              <Button
+                type="submit"
+                disabled={isPending || !form.formState.isValid}
+                className="cv-form-primary-action"
+              >
+                {isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </SectionWrapper>
 
       {/* Remove education confirmation dialog */}
-      <AlertDialog
+      <RemoveEducationDialog
         open={removeIndex !== null}
         onOpenChange={(open) => {
           if (!open) setRemoveIndex(null);
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove this education?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This education entry will be permanently removed from your CV. You
-              can add it again later if needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setRemoveIndex(null)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => {
-                if (removeIndex !== null) {
-                  remove(removeIndex);
-                  setRemoveIndex(null);
-                }
-              }}
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onCancel={() => setRemoveIndex(null)}
+        onRemove={() => {
+          if (removeIndex !== null) {
+            remove(removeIndex);
+            setRemoveIndex(null);
+          }
+        }}
+      />
     </>
   );
 }
