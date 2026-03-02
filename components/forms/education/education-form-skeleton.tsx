@@ -7,50 +7,59 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function EducationFormSkeleton() {
+export function EducationFormSkeleton({
+  collapsed = false,
+}: {
+  collapsed?: boolean;
+}) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          <Skeleton className="h-6 w-40" />
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 my-4">
+          <Skeleton className="h-6 w-28" />
+          <Skeleton className="h-6 w-24 rounded-full" />
         </CardTitle>
         <CardDescription>
-          <Skeleton className="h-4 w-64 mt-2" />
+          <Skeleton className="mt-2 h-4 w-72 max-w-full" />
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {[0, 1].map((i) => (
-          <div key={i} className="space-y-4 border rounded-lg p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-32" />
+      {!collapsed ? (
+        <CardContent className="space-y-8 px-4 sm:px-6">
+          {[0, 1].map((i) => (
+            <div key={i} className="space-y-4">
+              <div className="flex justify-between items-start mb-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-8 w-8 rounded-md" />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
               </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-32" />
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
               </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+
+              <Skeleton className="h-10 w-full" />
+
+              {i === 0 ? <Skeleton className="mt-8 h-px w-full" /> : null}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-10 w-1/2" />
-            </div>
+          ))}
+
+          <div className="cv-form-actions">
+            <Skeleton className="h-10 w-48" />
+            <Skeleton className="h-10 w-24" />
           </div>
-        ))}
-        <div className="flex justify-end">
-          <Skeleton className="h-9 w-24" />
-        </div>
-      </CardContent>
+        </CardContent>
+      ) : null}
     </Card>
   );
 }

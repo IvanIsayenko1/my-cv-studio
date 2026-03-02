@@ -7,20 +7,30 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function TemplateFormSkeleton() {
+export default function TemplateFormSkeleton({
+  collapsed = false,
+}: {
+  collapsed?: boolean;
+}) {
   return (
     <Card className="w-full">
-      <CardHeader className="space-y-1">
+      <CardHeader className="space-y-1 px-4 sm:px-6">
         <CardTitle className="text-base sm:text-lg">
-          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-6 w-32" />
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          <Skeleton className="h-4 w-64 mt-2" />
+          <Skeleton className="mt-2 h-4 w-80 max-w-full" />
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2 sm:px-6">
-        <Skeleton className="h-64 w-full" />
-      </CardContent>
+      {!collapsed ? (
+        <CardContent className="space-y-6 px-4 sm:px-6">
+          <Skeleton className="h-64 w-full" />
+
+          <div className="cv-form-actions">
+            <Skeleton className="h-10 w-24" />
+          </div>
+        </CardContent>
+      ) : null}
     </Card>
   );
 }

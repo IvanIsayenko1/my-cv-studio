@@ -12,7 +12,7 @@ import { SkillsFormValues } from "@/types/skills";
 
 /**
  * Mutation hook to save skills.
- * Cleans the input data by filtering out empty skills in technical, hard, soft, and languages categories.
+ * Cleans the input data by filtering out empty skills.
  * @param id The ID of the CV/resume to update.
  */
 export function useSaveSkills(id: string) {
@@ -29,14 +29,6 @@ export function useSaveSkills(id: string) {
                 items: category.items.trim(),
               }))
               .filter((category) => category.name && category.items.length > 0)
-          : [],
-        languages: values.languages
-          ? values.languages
-              .map((l) => ({
-                language: l.language.trim(),
-                proficiency: l.proficiency,
-              }))
-              .filter((l) => l.language && l.proficiency)
           : [],
       };
       return postSkills(id, cleaned);

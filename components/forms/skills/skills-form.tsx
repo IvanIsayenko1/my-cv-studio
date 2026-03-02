@@ -21,14 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 
 import { useSaveSkills, useSkills } from "@/hooks/cv/use-skills";
 
@@ -45,16 +38,8 @@ const createEmptyCategory = () => ({
   items: "",
 });
 
-const createEmptyLanguage = () => ({
-  language: "",
-  proficiency: "",
-});
-
 export function SkillsForm({ id }: SkillsFormProps) {
   const [removeCategoryIndex, setRemoveCategoryIndex] = useState<number | null>(
-    null
-  );
-  const [removeLanguageIndex, setRemoveLanguageIndex] = useState<number | null>(
     null
   );
 
@@ -66,13 +51,11 @@ export function SkillsForm({ id }: SkillsFormProps) {
     resolver: zodResolver(skillsSchema),
     defaultValues: {
       categories: [createEmptyCategory()],
-      languages: [createEmptyLanguage()],
     },
   });
 
   const { control, reset, formState, handleSubmit } = form;
-  const { isDirty } = formState;
-  const isComplete = form.formState.isValid;
+  const isComplete = formState.isValid;
 
   const {
     fields: categoryFields,
@@ -83,15 +66,6 @@ export function SkillsForm({ id }: SkillsFormProps) {
     name: "categories",
   });
 
-  const {
-    fields: languageFields,
-    append: appendLanguage,
-    remove: removeLanguage,
-  } = useFieldArray({
-    control,
-    name: "languages",
-  });
-
   useEffect(() => {
     if (!data) return;
 
@@ -100,10 +74,6 @@ export function SkillsForm({ id }: SkillsFormProps) {
         data?.categories?.length && data.categories.length > 0
           ? data.categories
           : [createEmptyCategory()],
-      languages:
-        data?.languages?.length && data.languages.length > 0
-          ? data.languages
-          : [createEmptyLanguage()],
     });
   }, [data, reset]);
 
@@ -119,20 +89,12 @@ export function SkillsForm({ id }: SkillsFormProps) {
     control,
     name: "categories",
   });
-  const watchedLanguages = useWatch({
-    control,
-    name: "languages",
-  });
 
   const lastCategory = watchedCategories?.[watchedCategories.length - 1];
   const canAddCategory =
     !lastCategory ||
     (!!lastCategory.name?.trim() && !!lastCategory.items?.trim());
 
-  const lastLanguage = watchedLanguages?.[watchedLanguages.length - 1];
-  const canAddLanguage =
-    !lastLanguage ||
-    (!!lastLanguage.language?.trim() && !!lastLanguage.proficiency?.trim());
   return (
     <>
       <SectionWrapper
@@ -148,12 +110,12 @@ export function SkillsForm({ id }: SkillsFormProps) {
         }
       >
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-8 flex gap-8 flex-col"
+          >
             {categoryFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="space-y-4 rounded-lg border p-4 pb-6"
-              >
+              <div key={field.id} className="space-y-4 mb-0">
                 <div className="mb-2 flex items-start justify-between">
                   <div className="text-sm font-medium text-muted-foreground">
                     Category {index + 1}
@@ -212,113 +174,26 @@ export function SkillsForm({ id }: SkillsFormProps) {
                     </FormItem>
                   )}
                 />
+
+                {index < categoryFields.length - 1 && (
+                  <Separator className="mt-8" />
+                )}
               </div>
             ))}
-
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!canAddCategory}
-              onClick={() => appendCategory(createEmptyCategory())}
-            >
-              Add another category
-            </Button>
-
-            {languageFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="space-y-4 rounded-lg border p-4 pb-6"
-              >
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    Language {index + 1}
-                  </div>
-                  {languageFields.length > 1 && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setRemoveLanguageIndex(index)}
-                      aria-label="Remove language"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`languages.${index}.language`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Language <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="English" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name={`languages.${index}.proficiency`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Proficiency{" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select level" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Native">Native</SelectItem>
-                              <SelectItem value="Fluent">
-                                Fluent / C1–C2
-                              </SelectItem>
-                              <SelectItem value="Advanced">
-                                Advanced / B2
-                              </SelectItem>
-                              <SelectItem value="Intermediate">
-                                Intermediate / B1
-                              </SelectItem>
-                              <SelectItem value="Basic">
-                                Basic / A1–A2
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            ))}
-
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!canAddLanguage}
-              onClick={() => appendLanguage(createEmptyLanguage())}
-            >
-              Add another language
-            </Button>
 
             <div className="cv-form-actions">
               <Button
+                type="button"
+                variant="outline"
+                disabled={!canAddCategory}
+                className="cv-form-primary-action"
+                onClick={() => appendCategory(createEmptyCategory())}
+              >
+                Add another category
+              </Button>
+              <Button
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || !form.formState.isValid}
                 className="cv-form-primary-action"
               >
                 {isPending ? "Saving..." : "Save"}
@@ -340,22 +215,6 @@ export function SkillsForm({ id }: SkillsFormProps) {
           if (removeCategoryIndex !== null) {
             removeCategory(removeCategoryIndex);
             setRemoveCategoryIndex(null);
-          }
-        }}
-      />
-
-      <RemoveSkillsDialog
-        open={removeLanguageIndex !== null}
-        title="Remove this language?"
-        description="This language entry will be permanently removed from your CV."
-        onOpenChange={(open) => {
-          if (!open) setRemoveLanguageIndex(null);
-        }}
-        onCancel={() => setRemoveLanguageIndex(null)}
-        onRemove={() => {
-          if (removeLanguageIndex !== null) {
-            removeLanguage(removeLanguageIndex);
-            setRemoveLanguageIndex(null);
           }
         }}
       />

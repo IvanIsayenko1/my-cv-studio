@@ -69,8 +69,13 @@ export interface CV {
       name: string;
       items: string;
     }>;
-    languages: Array<{ language: string; proficiency: string }>;
   };
+
+  // Languages
+  languages: Array<{
+    language: string;
+    proficiency: string;
+  }>;
 
   // Certifications
   certifications: Array<{

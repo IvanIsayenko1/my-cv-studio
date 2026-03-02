@@ -9,7 +9,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -51,6 +57,7 @@ export function TemplateForm({ id }: TemplateFormProps) {
     },
   });
   const { control, handleSubmit, reset, formState } = form;
+  const { isDirty } = formState;
 
   useEffect(() => {
     if (!data) return;
@@ -78,60 +85,37 @@ export function TemplateForm({ id }: TemplateFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <div className="flex flex-col items-center gap-4">
-                    <Carousel className="w-full sm:w-5/6">
-                      <CarouselContent className="-ml-1">
-                        {Object.values(TemplateId).map((tpl, index) => (
-                          <CarouselItem
-                            key={tpl}
-                            className="pl-1 basis-full sm:basis-1/2 lg:basis-1/3"
-                          >
-                            <button
-                              type="button"
-                              onClick={() => field.onChange(tpl)}
-                              className="w-full p-1 focus:outline-none"
-                            >
-                              <Card
-                                className={cn(
-                                  "border-2 transition-colors pt-0",
-                                  field.value === tpl
-                                    ? "border-primary ring-2 ring-primary/40"
-                                    : "border-muted hover:border-primary/40"
-                                )}
-                              >
-                                <CardContent className="relative aspect-[3/4]">
-                                  <Image
-                                    src={`/cv-templates/${tpl}.webp`}
-                                    alt={tpl}
-                                    className="rounded-lg"
-                                    fill
-                                    sizes="(max-width: 640px) 100vw, 33vw"
-                                  />
-                                  {/* <span className="text-lg sm:text-2xl font-semibold">
-                                      {index + 1}
-                                    </span> */}
-                                </CardContent>
-                                <CardHeader className="space-y-1">
-                                  <CardTitle className="text-center text-sm font-medium">
-                                    {
-                                      TemplateName[
-                                        tpl as keyof typeof TemplateName
-                                      ]
-                                    }
-                                  </CardTitle>
-                                </CardHeader>
-                              </Card>
-                            </button>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      {/* Hide arrows on mobile, show from sm+ */}
-                      <CarouselPrevious
-                        className="hidden sm:flex"
-                        type="button"
-                      />
-                      <CarouselNext className="hidden sm:flex" type="button" />
-                    </Carousel>
+                  <div className="grid w-full gap-2 p-2 sm:gap-4 sm:p-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2">
+                    {Object.values(TemplateId).map((tpl, index) => (
+                      <div>
+                        <Card
+                          key={index}
+                          className={cn(
+                            "cursor-pointer border-2 py-2",
+                            field.value === tpl
+                              ? "border-primary"
+                              : "border-transparent hover:border-gray-300"
+                          )}
+                          onClick={() => field.onChange(tpl)}
+                        >
+                          <CardHeader className="px-2">
+                            <CardTitle>{TemplateName[tpl]}</CardTitle>
+                            <CardDescription>
+                              {`Template ${index + 1}`}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="px-2">
+                            <Image
+                              src={`/cv-templates/${tpl}.webp`}
+                              alt={`Preview of ${TemplateName[tpl]} template`}
+                              width={400}
+                              height={500}
+                              className="w-full h-auto object-cover rounded-md"
+                            />
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ))}
                   </div>
                 </FormControl>
                 <FormMessage />

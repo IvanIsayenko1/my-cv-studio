@@ -1,7 +1,7 @@
-import { normalizeSkillsFromRow } from "@/lib/utils/skills-transform";
-import { parseProfessionalLinksFromStorage } from "@/lib/utils/personal-links-transform";
 import { parseEducationMeta } from "@/lib/utils/education-grade-transform";
-import { ensureCvSkillsCategorySkillsColumn } from "@/lib/db/skills-schema";
+import { normalizeLanguagesFromRow } from "@/lib/utils/languages-transform";
+import { parseProfessionalLinksFromStorage } from "@/lib/utils/personal-links-transform";
+import { normalizeSkillsFromRow } from "@/lib/utils/skills-transform";
 
 import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
@@ -9,8 +9,6 @@ import { TemplateId } from "@/types/template";
 import { db } from "./client";
 
 export async function getCompleteCV(cvId: string): Promise<CV | null> {
-  await ensureCvSkillsCategorySkillsColumn();
-
   const cvMeta = await db.execute(
     "SELECT id, user_id, title, created_at, updated_at FROM cvs WHERE id = ? LIMIT 1",
     [cvId]
@@ -22,6 +20,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     personal,
     summary,
     skillsRow,
+    languagesRow,
     workExpRows,
     educationRows,
     certificationRows,
@@ -38,10 +37,12 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
       "SELECT professional_summary FROM cv_summary WHERE cv_id = ? LIMIT 1",
       [cvId]
     ),
-    db.execute(
-      "SELECT categorySkills, languages FROM cv_skills WHERE cv_id = ? LIMIT 1",
-      [cvId]
-    ),
+    db.execute("SELECT categorySkills FROM cv_skills WHERE cv_id = ? LIMIT 1", [
+      cvId,
+    ]),
+    db.execute("SELECT languages FROM cv_languages WHERE cv_id = ? LIMIT 1", [
+      cvId,
+    ]),
 
     // Work Experience - Proper MM/YYYY sorting
     db.execute(
@@ -145,9 +146,17 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
 
   const s = (skillsRow.rows[0] || {}) as {
     categorySkills?: string | null;
-    languages?: string | null;
   };
   const skills: CV["skills"] = normalizeSkillsFromRow(s);
+  const l = (languagesRow.rows[0] || {}) as {
+    languages?: string | null;
+  };
+  const languages: CV["languages"] = normalizeLanguagesFromRow(l).languages.map(
+    (item) => ({
+      language: item.language,
+      proficiency: item.proficiency,
+    })
+  );
 
   const achievementsByWorkId = new Map<string, string[]>();
   (achievementRows.rows as any[]).forEach((row) => {
@@ -175,7 +184,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
           row.employment_type as CV["workExperience"][number]["employmentType"],
         startDate: row.start_date,
         endDate: row.end_date || "Present",
-        achievements: achievementsByWorkId.get(id) || [],
+        achievements: (achievementsByWorkId.get(id) ?? []).join("\n"),
         toolsAndMethods: technologiesByWorkId.get(id) || [],
         sortOrder: idx,
       };
@@ -237,6 +246,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     workExperience,
     education,
     skills,
+    languages,
     certifications,
     projects,
     awards,

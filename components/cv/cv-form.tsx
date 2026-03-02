@@ -27,6 +27,8 @@ import { WorkExperienceFormSkeleton } from "@/components/forms/work-experience/w
 
 import { ROUTES } from "@/config/routes";
 
+import { LanguagesForm } from "../forms/languages/languages-form";
+import { LanguagesFormSkeleton } from "../forms/languages/languages-form-skeleton";
 import { PersonalInfoFormSkeleton } from "../forms/personal-info/personal-info-form-skeleton";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
@@ -40,6 +42,9 @@ import CVPreviewSkeleton from "./cv-preview-skeleton";
 export default function CVForm() {
   const params = useParams();
   const id = params.id as string;
+  const collapsedSections = JSON.parse(
+    localStorage.getItem("cv-form-closed-sections") || "[]"
+  ) as string[];
 
   return (
     <div className="flex flex-col gap-6">
@@ -69,39 +74,103 @@ export default function CVForm() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Suspense fallback={<PersonalInfoFormSkeleton />}>
+          <Suspense
+            fallback={
+              <PersonalInfoFormSkeleton
+                collapsed={collapsedSections.includes("personal-info")}
+              />
+            }
+          >
             <PersonalInfoForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<SummaryFormSkeleton />}>
+          <Suspense
+            fallback={
+              <SummaryFormSkeleton
+                collapsed={collapsedSections.includes("summary")}
+              />
+            }
+          >
             <SummaryForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<WorkExperienceFormSkeleton />}>
+          <Suspense
+            fallback={
+              <WorkExperienceFormSkeleton
+                collapsed={collapsedSections.includes("work-experience")}
+              />
+            }
+          >
             <WorkExperienceForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<EducationFormSkeleton />}>
+          <Suspense
+            fallback={
+              <EducationFormSkeleton
+                collapsed={collapsedSections.includes("education")}
+              />
+            }
+          >
             <EducationForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<SkillsFormSkeleton />}>
+          <Suspense
+            fallback={
+              <SkillsFormSkeleton
+                collapsed={collapsedSections.includes("skills")}
+              />
+            }
+          >
             <SkillsForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<CertificationsFormSkeleton />}>
+          <Suspense
+            fallback={
+              <LanguagesFormSkeleton
+                collapsed={collapsedSections.includes("languages")}
+              />
+            }
+          >
+            <LanguagesForm id={id} />
+          </Suspense>
+
+          <Suspense
+            fallback={
+              <CertificationsFormSkeleton
+                collapsed={collapsedSections.includes("certifications")}
+              />
+            }
+          >
             <CertificationsForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<ProjectsFormSkeleton />}>
+          <Suspense
+            fallback={
+              <ProjectsFormSkeleton
+                collapsed={collapsedSections.includes("projects")}
+              />
+            }
+          >
             <ProjectsForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<AwardsFormSkeleton />}>
+          <Suspense
+            fallback={
+              <AwardsFormSkeleton
+                collapsed={collapsedSections.includes("awards")}
+              />
+            }
+          >
             <AwardsForm id={id} />
           </Suspense>
 
-          <Suspense fallback={<TemplateFormSkeleton />}>
+          <Suspense
+            fallback={
+              <TemplateFormSkeleton
+                collapsed={collapsedSections.includes("template")}
+              />
+            }
+          >
             <TemplateForm id={id} />
           </Suspense>
         </div>

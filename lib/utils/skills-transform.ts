@@ -2,7 +2,6 @@ import { SkillsFormValues } from "@/types/skills";
 
 type SkillsRow = {
   categorySkills?: string | null;
-  languages?: string | null;
 };
 
 type SkillCategory = SkillsFormValues["categories"][number];
@@ -57,39 +56,18 @@ const parseCategoriesFromCategorySkillsColumn = (
 };
 
 export function normalizeSkillsFromRow(row: SkillsRow): SkillsFormValues {
-  const categories = parseCategoriesFromCategorySkillsColumn(row.categorySkills);
-
-  const parsedLanguages = safeParseJSON(row.languages);
-  const languages = Array.isArray(parsedLanguages)
-    ? parsedLanguages
-        .map((item) => {
-          const language = item as {
-            language?: unknown;
-            proficiency?: unknown;
-          };
-          const name =
-            typeof language.language === "string"
-              ? language.language.trim()
-              : "";
-          const proficiency =
-            typeof language.proficiency === "string"
-              ? language.proficiency.trim()
-              : "";
-          return { language: name, proficiency };
-        })
-        .filter((item) => item.language && item.proficiency)
-    : [];
+  const categories = parseCategoriesFromCategorySkillsColumn(
+    row.categorySkills
+  );
 
   return {
     categories:
       categories.length > 0 ? categories : [{ name: "Core Skills", items: "" }],
-    languages,
   };
 }
 
 export function serializeSkillsForStorage(value: SkillsFormValues): {
   categorySkills: string;
-  languages: string;
 } {
   const categories = (value.categories ?? [])
     .map((category) => ({
@@ -98,15 +76,7 @@ export function serializeSkillsForStorage(value: SkillsFormValues): {
     }))
     .filter((category) => category.name && category.items);
 
-  const languages = (value.languages ?? [])
-    .map((language) => ({
-      language: language.language.trim(),
-      proficiency: language.proficiency.trim(),
-    }))
-    .filter((language) => language.language && language.proficiency);
-
   return {
     categorySkills: JSON.stringify(categories),
-    languages: JSON.stringify(languages),
   };
 }

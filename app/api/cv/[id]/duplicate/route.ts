@@ -4,11 +4,11 @@ import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
 
 import { db } from "@/lib/db/client";
-import { ensureCvSkillsCategorySkillsColumn } from "@/lib/db/skills-schema";
 import { getCompleteCV } from "@/lib/db/queries";
+import { serializeEducationMeta } from "@/lib/utils/education-grade-transform";
+import { serializeLanguagesForStorage } from "@/lib/utils/languages-transform";
 import { serializeProfessionalLinksForStorage } from "@/lib/utils/personal-links-transform";
 import { serializeSkillsForStorage } from "@/lib/utils/skills-transform";
-import { serializeEducationMeta } from "@/lib/utils/education-grade-transform";
 
 export async function POST(
   req: NextRequest,
@@ -47,6 +47,7 @@ export async function POST(
     personalInfo,
     professionalSummary,
     skills,
+    languages,
     workExperience,
     education,
     certifications,
@@ -214,7 +215,6 @@ export async function POST(
 
   // skills
   const serializedSkills = serializeSkillsForStorage(skills);
-  await ensureCvSkillsCategorySkillsColumn();
   await db.execute(
     `
     INSERT INTO cv_skills (cv_id, categorySkills, languages)
@@ -223,11 +223,19 @@ export async function POST(
       categorySkills = excluded.categorySkills,
       languages = excluded.languages
     `,
-    [
-      newRandomId,
-      serializedSkills.categorySkills,
-      serializedSkills.languages,
-    ]
+    [newRandomId, serializedSkills.categorySkills]
+  );
+
+  // languages
+  const serializedLanguages = serializeLanguagesForStorage({ languages });
+  await db.execute(
+    `
+    INSERT INTO cv_languages (cv_id, languages)
+    VALUES (?, ?)
+    ON CONFLICT(cv_id) DO UPDATE SET
+      languages = excluded.languages
+    `,
+    [newRandomId, serializedLanguages.languages]
   );
 
   // certifications

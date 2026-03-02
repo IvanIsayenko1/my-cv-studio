@@ -9,65 +9,51 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function SkillsFormSkeleton() {
+export function SkillsFormSkeleton({
+  collapsed = false,
+}: {
+  collapsed?: boolean;
+}) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          <Skeleton className="h-6 w-32" />
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 my-4">
+          <Skeleton className="h-6 w-24" />
+          <Skeleton className="h-6 w-24 rounded-full" />
         </CardTitle>
         <CardDescription>
-          <Skeleton className="h-4 w-64 mt-2" />
+          <Skeleton className="mt-2 h-4 w-80 max-w-full" />
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Skills overview block */}
-        <div className="space-y-4 border rounded-lg p-4 pb-6">
-          <Skeleton className="h-4 w-28" /> {/* "Skills overview" label */}
-          {/* Technical textarea */}
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" /> {/* label */}
-            <Skeleton className="h-20 w-full" /> {/* textarea */}
-          </div>
-          {/* Hard textarea */}
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-20 w-full" />
-          </div>
-          {/* Soft textarea */}
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-20 w-full" />
-          </div>
-        </div>
-
-        {/* One or two fake language cards */}
-        {[0, 1].map((i) => (
-          <div key={i} className="space-y-4 border rounded-lg p-4 pb-6">
-            <div className="flex justify-between items-start mb-2">
-              <Skeleton className="h-4 w-24" /> {/* "Language 1" */}
-              <Skeleton className="h-8 w-8 rounded-full" /> {/* delete icon */}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20" /> {/* Language label */}
-                <Skeleton className="h-10 w-full" /> {/* input */}
+      {!collapsed ? (
+        <CardContent className="space-y-8 px-4 sm:px-6">
+          {[0, 1].map((i) => (
+            <div key={i} className="space-y-4">
+              <div className="mb-2 flex items-start justify-between">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-8 w-8 rounded-md" />
               </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24" /> {/* Proficiency label */}
-                <Skeleton className="h-10 w-full" /> {/* select */}
-              </div>
-            </div>
-          </div>
-        ))}
 
-        {/* Add another language + Save buttons */}
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-9 w-40" /> {/* "Add another language" */}
-          <Skeleton className="h-9 w-24" /> {/* "Save" */}
-        </div>
-      </CardContent>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-32 w-full" />
+              </div>
+
+              {i === 0 ? <Skeleton className="mt-8 h-px w-full" /> : null}
+            </div>
+          ))}
+
+          <div className="cv-form-actions">
+            <Skeleton className="h-10 w-44" />
+            <Skeleton className="h-10 w-24" />
+          </div>
+        </CardContent>
+      ) : null}
     </Card>
   );
 }

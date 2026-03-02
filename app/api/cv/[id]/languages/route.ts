@@ -4,11 +4,11 @@ import { auth } from "@clerk/nextjs/server";
 
 import { db } from "@/lib/db/client";
 import {
-  normalizeSkillsFromRow,
-  serializeSkillsForStorage,
-} from "@/lib/utils/skills-transform";
+  normalizeLanguagesFromRow,
+  serializeLanguagesForStorage,
+} from "@/lib/utils/languages-transform";
 
-import { skillsSchema } from "@/types/skills";
+import { languagesSchema } from "@/schemas/languages";
 
 export async function GET(
   _req: NextRequest,
@@ -34,8 +34,8 @@ export async function GET(
 
   const result = await db.execute(
     `
-    SELECT categorySkills
-    FROM cv_skills
+    SELECT languages
+    FROM cv_languages
     WHERE cv_id = ?
     LIMIT 1
     `,
@@ -47,7 +47,7 @@ export async function GET(
     languages?: string | null;
   };
 
-  return NextResponse.json(normalizeSkillsFromRow(row));
+  return NextResponse.json(normalizeLanguagesFromRow(row));
 }
 
 export async function POST(
@@ -75,7 +75,7 @@ export async function POST(
   const body = await req.json();
 
   // Validate with Zod
-  const parsed = skillsSchema.safeParse(body);
+  const parsed = languagesSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Validation failed", details: parsed.error.flatten() },
@@ -83,17 +83,17 @@ export async function POST(
     );
   }
 
-  const serialized = serializeSkillsForStorage(parsed.data);
+  const serialized = serializeLanguagesForStorage(parsed.data);
 
-  // Upsert into cv_skills
+  // Upsert into cv_languages
   await db.execute(
     `
-    INSERT INTO cv_skills (cv_id, categorySkills)
+    INSERT INTO cv_languages (cv_id, languages)
     VALUES (?, ?)
     ON CONFLICT(cv_id) DO UPDATE SET
-      categorySkills = excluded.categorySkills
+      languages = excluded.languages
     `,
-    [cvId, serialized.categorySkills]
+    [cvId, serialized.languages]
   );
 
   return NextResponse.json({ success: true });

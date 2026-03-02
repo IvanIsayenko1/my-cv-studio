@@ -1,10 +1,5 @@
 import { z } from "zod";
 
-export const languageItemSchema = z.object({
-  language: z.string().min(1, "Language is required"),
-  proficiency: z.string().min(1, "Proficiency is required"),
-});
-
 export const skillCategorySchema = z.object({
   name: z
     .string()
@@ -15,7 +10,6 @@ export const skillCategorySchema = z.object({
 
 export const skillsSchema = z.object({
   categories: z.array(skillCategorySchema).min(1, "Add at least one category"),
-  languages: z.array(languageItemSchema),
 });
 
 export type SkillsFormValues = z.infer<typeof skillsSchema>;

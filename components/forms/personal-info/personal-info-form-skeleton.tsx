@@ -1,66 +1,103 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function PersonalInfoFormSkeleton() {
+export function PersonalInfoFormSkeleton({
+  collapsed = false,
+}: {
+  collapsed?: boolean;
+}) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          <Skeleton className="h-6 w-40" />
+      <CardHeader className="px-4 sm:px-6 gap-2">
+        <CardTitle className="flex items-center gap-2 ">
+          <Skeleton className="h-7 w-52" />
+          <Skeleton className="h-7 w-24 rounded-full" />
         </CardTitle>
+        <CardDescription>
+          <Skeleton className="h-4 w-96 max-w-full" />
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Name row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-full" />
+      {!collapsed ? (
+        <CardContent className="space-y-6 px-4 sm:px-6">
+          {/* Name row */}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
 
-        {/* Title */}
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-10 w-full" />
-        </div>
+          {/* Title */}
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-10 w-full" />
+          </div>
 
-        {/* Contact row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-full" />
+          {/* Contact row */}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
 
-        {/* Location row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-full" />
+          {/* Location row */}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
 
-        {/* Optional links */}
-        <div className="space-y-3 pt-4 border-t">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      </CardContent>
+          {/* Professional links */}
+          <div className="space-y-4 rounded-lg border border-border/70 bg-muted/20 p-4">
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-4 w-80 max-w-full" />
+
+            <div className="space-y-3 rounded-md border border-border/70 p-3">
+              <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_2fr_auto]">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="flex items-end">
+                  <Skeleton className="h-10 w-10 rounded-md" />
+                </div>
+              </div>
+            </div>
+
+            <Skeleton className="h-10 w-40" />
+          </div>
+
+          <div className="cv-form-actions">
+            <Skeleton className="h-10 w-24" />
+          </div>
+        </CardContent>
+      ) : null}
     </Card>
   );
 }

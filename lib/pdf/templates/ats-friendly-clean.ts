@@ -2,6 +2,7 @@
 import PDFDocument from "pdfkit";
 
 import { categoryItemsToList } from "@/lib/utils/skill-items";
+
 import { CV } from "@/types/cv";
 
 const COLORS = {
@@ -137,13 +138,13 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
         renderSkillCategory(category.name, categoryItemsToList(category.items));
       });
 
-      if (cv.skills.languages?.length) {
+      if (cv.languages?.length) {
         applyStyle(doc, TYPO.body);
         doc.fillColor(COLORS.primary).text("Languages");
 
         doc.y += RHYTHM.tightGap;
 
-        const langs = cv.skills.languages.map(
+        const langs = cv.languages.map(
           (l) => `${l.language} — ${l.proficiency}`
         );
 
@@ -175,7 +176,7 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
 
         doc.y += RHYTHM.tightGap;
 
-        renderBulletList(doc, job.achievements ?? []);
+        renderBulletList(doc, [job.achievements]);
 
         if (job.toolsAndMethods?.length) {
           applyStyle(doc, TYPO.small);

@@ -39,7 +39,7 @@ export function A4({
   };
 
   return (
-    <button className="w-full flex justify-center p-4 md:p-8" onClick={onClick}>
+    <button className="w-full flex justify-center" onClick={onClick}>
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}

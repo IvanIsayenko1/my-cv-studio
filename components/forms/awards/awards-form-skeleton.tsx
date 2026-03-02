@@ -7,36 +7,48 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function AwardsFormSkeleton() {
+export default function AwardsFormSkeleton({
+  collapsed = false,
+}: {
+  collapsed?: boolean;
+}) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          <Skeleton className="h-6 w-40" />
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 my-4">
+          <Skeleton className="h-6 w-24" />
         </CardTitle>
         <CardDescription>
-          <Skeleton className="h-4 w-64 mt-2" />
+          <Skeleton className="mt-2 h-4 w-80 max-w-full" />
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {[0, 1].map((i) => (
-          <div key={i} className="space-y-4 border rounded-lg p-4">
-            <div className="flex justify-between items-start mb-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-8 w-8 rounded-full" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {!collapsed ? (
+        <CardContent className="space-y-8 px-4 sm:px-6">
+          {[0, 1].map((i) => (
+            <div key={i} className="space-y-4">
+              <div className="flex justify-between items-start mb-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-8 w-8 rounded-md" />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+
               <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-32 w-full" />
+
+              {i === 0 ? <Skeleton className="mt-8 h-px w-full" /> : null}
             </div>
-            <Skeleton className="h-10 w-1/2" />
-            <Skeleton className="h-20 w-full" />
+          ))}
+
+          <div className="cv-form-actions">
+            <Skeleton className="h-10 w-36" />
+            <Skeleton className="h-10 w-24" />
           </div>
-        ))}
-        <div className="flex justify-end">
-          <Skeleton className="h-9 w-24" />
-        </div>
-      </CardContent>
+        </CardContent>
+      ) : null}
     </Card>
   );
 }

@@ -211,7 +211,11 @@ export function AwardsForm({ id }: AwardsFormProps) {
               </Button>
               <Button
                 type="submit"
-                disabled={isPending || !form.formState.isValid}
+                disabled={
+                  isPending ||
+                  !form.formState.isValid ||
+                  form.formState.isDirty === false
+                }
                 className="cv-form-primary-action"
               >
                 {isPending ? "Saving..." : "Save"}
