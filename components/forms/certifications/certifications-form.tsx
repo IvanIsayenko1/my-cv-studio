@@ -86,9 +86,10 @@ export function CertificationsForm({ id }: CertificationsFormProps) {
   return (
     <>
       <SectionWrapper
-        id="certifications"
+        sectionId="certifications"
         title="Certifications"
         description="List your relevant certifications and credentials."
+        cvId={id}
       >
         <Form {...form}>
           <form

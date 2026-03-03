@@ -14,12 +14,12 @@ export default function ProjectsFormSkeleton({
 }) {
   return (
     <Card>
-      <CardHeader className="px-4 sm:px-6">
-        <CardTitle className="flex items-center gap-2 my-4">
-          <Skeleton className="h-6 w-28" />
+      <CardHeader className="px-4 sm:px-6 gap-2">
+        <CardTitle className="flex items-center gap-2">
+          <Skeleton className="h-7 w-28" />
         </CardTitle>
         <CardDescription>
-          <Skeleton className="mt-2 h-4 w-80 max-w-full" />
+          <Skeleton className="h-4 w-96 max-w-full" />
         </CardDescription>
       </CardHeader>
       {!collapsed ? (

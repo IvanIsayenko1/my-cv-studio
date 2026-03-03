@@ -79,9 +79,10 @@ export function AwardsForm({ id }: AwardsFormProps) {
   return (
     <>
       <SectionWrapper
-        id="awards"
+        sectionId="awards"
         title="Awards"
         description="Add notable awards or recognitions relevant to your career."
+        cvId={id}
       >
         <Form {...form}>
           <form

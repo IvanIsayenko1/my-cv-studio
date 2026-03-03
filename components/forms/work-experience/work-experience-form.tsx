@@ -128,9 +128,10 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
   return (
     <>
       <SectionWrapper
-        id="work-experience"
+        sectionId="work-experience"
         title="Work Experience"
         description="Add your recent roles, focusing on achievements and impact."
+        cvId={id}
         status={
           <StatusBedge
             isReady={isComplete}

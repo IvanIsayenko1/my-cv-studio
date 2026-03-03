@@ -97,9 +97,10 @@ export function PersonalInfoForm({ id }: { id: string }) {
 
   return (
     <SectionWrapper
-      id="personal-info"
+      sectionId="personal-info"
       title="Personal Information"
       description="Enter your basic contact information. This will appear at the top of your CV"
+      cvId={id}
       status={
         <StatusBedge
           isReady={isComplete}

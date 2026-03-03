@@ -121,9 +121,10 @@ export function EducationForm({ id }: EducationFormProps) {
   return (
     <>
       <SectionWrapper
-        id="education"
+        sectionId="education"
         title="Education"
         description="Add your degrees and relevant academic qualifications."
+        cvId={id}
         status={
           <StatusBedge
             isReady={isComplete}

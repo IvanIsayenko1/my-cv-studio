@@ -61,9 +61,10 @@ export function SummaryForm({ id }: SummaryFormProps) {
 
   return (
     <SectionWrapper
-      id="summary"
+      sectionId="summary"
       title="Professional Summary"
       description="Write a concise, 3–5 sentence summary that highlights your key skills, experience, and target role."
+      cvId={id}
       status={
         <StatusBedge
           isReady={isComplete}

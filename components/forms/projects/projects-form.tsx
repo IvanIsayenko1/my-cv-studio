@@ -83,9 +83,10 @@ export function ProjectsForm({ id }: ProjectsFormProps) {
   return (
     <>
       <SectionWrapper
-        id="projects"
+        sectionId="projects"
         title="Projects"
         description="Add notable projects that showcase your skills and impact."
+        cvId={id}
       >
         <Form {...form}>
           <form

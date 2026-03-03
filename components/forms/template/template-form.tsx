@@ -70,9 +70,10 @@ export function TemplateForm({ id }: TemplateFormProps) {
 
   return (
     <SectionWrapper
-      id="template"
+      sectionId="template"
       title="Template"
       description="Choose a template for your CV. You can change this anytime."
+      cvId={id}
     >
       <Form {...form}>
         <form

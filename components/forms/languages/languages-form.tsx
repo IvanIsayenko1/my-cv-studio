@@ -105,9 +105,10 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
   return (
     <>
       <SectionWrapper
-        id="languages"
+        sectionId="languages"
         title="Languages"
         description="Add languages you speak and your proficiency level."
+        cvId={id}
         status={
           <StatusBedge
             isReady={isComplete}

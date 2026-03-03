@@ -3,22 +3,25 @@ import { ReactNode } from "react";
 import { CollapsibleCard } from "../ui/collapsible-card";
 
 export default function SectionWrapper({
-  id,
+  sectionId: id,
   title,
   status,
   children,
   description,
+  cvId,
 }: {
   status?: ReactNode;
-  id: string;
+  sectionId: string;
+  cvId: string;
   title: string;
   children: ReactNode;
   description?: string;
 }) {
+  const localStorageKey = `cv-form-closed-sections-${cvId}`;
   const getClosedSections = () => {
     if (typeof window === "undefined") return [];
     return JSON.parse(
-      localStorage.getItem("cv-form-closed-sections") || "[]"
+      localStorage.getItem(localStorageKey) || "[]"
     ) as string[];
   };
 
@@ -30,19 +33,13 @@ export default function SectionWrapper({
       const newClosedSections = closedSections.filter(
         (sectionId) => sectionId !== id
       );
-      localStorage.setItem(
-        "cv-form-closed-sections",
-        JSON.stringify(newClosedSections)
-      );
+      localStorage.setItem(localStorageKey, JSON.stringify(newClosedSections));
       return;
     }
 
     // Add the section ID to the closed sections list
     closedSections.push(id);
-    localStorage.setItem(
-      "cv-form-closed-sections",
-      JSON.stringify(closedSections)
-    );
+    localStorage.setItem(localStorageKey, JSON.stringify(closedSections));
   };
 
   return (

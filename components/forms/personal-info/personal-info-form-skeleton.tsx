@@ -17,7 +17,7 @@ export function PersonalInfoFormSkeleton({
   return (
     <Card>
       <CardHeader className="px-4 sm:px-6 gap-2">
-        <CardTitle className="flex items-center gap-2 ">
+        <CardTitle className="flex items-center gap-2">
           <Skeleton className="h-7 w-52" />
           <Skeleton className="h-7 w-24 rounded-full" />
         </CardTitle>

@@ -14,12 +14,12 @@ export default function TemplateFormSkeleton({
 }) {
   return (
     <Card className="w-full">
-      <CardHeader className="space-y-1 px-4 sm:px-6">
-        <CardTitle className="text-base sm:text-lg">
-          <Skeleton className="h-6 w-32" />
+      <CardHeader className="px-4 sm:px-6 gap-2">
+        <CardTitle className="flex items-center gap-2">
+          <Skeleton className="h-7 w-32" />
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          <Skeleton className="mt-2 h-4 w-80 max-w-full" />
+          <Skeleton className="h-4 w-96 max-w-full" />
         </CardDescription>
       </CardHeader>
       {!collapsed ? (

@@ -72,15 +72,15 @@ export default function CVDesktopActions({ id }: { id: string }) {
           <DropdownMenuContent align="end" className="w-40">
             <DropdownMenuGroup>
               <DropdownMenuItem
-                disabled={!isCVReady}
+                disabled={isDownloadPending || !isCVReady}
                 onClick={() => setIsOpenDuplicateDialog(true)}
               >
                 <Copy />
                 Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem
-                disabled={!isCVReady}
                 onClick={() => setIsOpenRenameDialog(true)}
+                disabled={isDownloadPending}
               >
                 <EditIcon />
                 Rename
@@ -91,6 +91,7 @@ export default function CVDesktopActions({ id }: { id: string }) {
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setIsOpenDeleteDialog(true)}
+                disabled={isDownloadPending}
               >
                 <Trash />
                 Delete

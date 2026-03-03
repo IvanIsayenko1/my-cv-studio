@@ -97,7 +97,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              disabled={!isCVReady || isDownloadPending}
+              disabled={isDownloadPending}
               onClick={(e) => {
                 e.stopPropagation();
                 setOpenedRename(true);
@@ -186,7 +186,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             size={"lg"}
             variant="ghost"
             className="font-normal h-14 flex flex-row justify-between"
-            disabled={!isCVReady || isDownloadPending}
+            disabled={isDownloadPending}
             onClick={() => {
               setOpenedMenu(false);
               setOpenedRename(true);
@@ -203,6 +203,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
               setOpenedMenu(false);
               setOpenendDelete(true);
             }}
+            disabled={isDownloadPending}
           >
             <span>Delete</span>
             <Trash />

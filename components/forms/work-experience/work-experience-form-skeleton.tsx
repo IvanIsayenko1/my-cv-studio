@@ -16,13 +16,13 @@ export function WorkExperienceFormSkeleton({
 }) {
   return (
     <Card>
-      <CardHeader className="px-4 sm:px-6">
-        <CardTitle className="flex items-center gap-2 my-4">
-          <Skeleton className="h-6 w-44" />
-          <Skeleton className="h-6 w-24 rounded-full" />
+      <CardHeader className="px-4 sm:px-6 gap-2">
+        <CardTitle className="flex items-center gap-2">
+          <Skeleton className="h-7 w-44" />
+          <Skeleton className="h-7 w-24 rounded-full" />
         </CardTitle>
         <CardDescription>
-          <Skeleton className="mt-2 h-4 w-80 max-w-full" />
+          <Skeleton className="h-4 w-96 max-w-full" />
         </CardDescription>
       </CardHeader>
       {!collapsed ? (

@@ -43,7 +43,7 @@ export default function CVForm() {
   const params = useParams();
   const id = params.id as string;
   const collapsedSections = JSON.parse(
-    localStorage.getItem("cv-form-closed-sections") || "[]"
+    localStorage.getItem(`cv-form-closed-sections-${id}`) || "[]"
   ) as string[];
 
   return (

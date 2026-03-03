@@ -98,9 +98,10 @@ export function SkillsForm({ id }: SkillsFormProps) {
   return (
     <>
       <SectionWrapper
-        id="skills"
+        sectionId="skills"
         title="Skills"
         description="Add custom skill categories that match your profession."
+        cvId={id}
         status={
           <StatusBedge
             isReady={isComplete}
