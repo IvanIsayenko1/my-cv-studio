@@ -1,5 +1,5 @@
 "use client";
-import { KeyboardEvent, MouseEvent, useRef } from "react";
+import { KeyboardEvent } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -14,29 +14,10 @@ export function A4({
   className,
   width = "100%",
   onClick,
+  style,
   ...props
 }: A4Props) {
   const widthValue = typeof width === "number" ? `${width}px` : width;
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
-
-    cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-  };
-
-  const handleMouseLeave = () => {
-    if (!cardRef.current) return;
-    cardRef.current.style.transform =
-      "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
-  };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!onClick) return;
@@ -49,25 +30,23 @@ export function A4({
   return (
     <div className="w-full flex justify-center">
       <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
         onClick={onClick}
         onKeyDown={handleKeyDown}
         role={onClick ? "button" : undefined}
         tabIndex={onClick ? 0 : undefined}
         className={cn(
-          "w-full max-w-[210mm] rounded-xl",
+          "group w-full max-w-[210mm] rounded-xl",
           "bg-card text-card-foreground border border-border",
-          "shadow-lg transition-all duration-200 ease-out",
-          onClick ? "cursor-pointer hover:shadow-2xl" : "hover:shadow-xl",
+          "shadow-lg transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "hover:-translate-y-1 hover:scale-[1.01] hover:shadow-2xl",
+          onClick ? "cursor-pointer" : "",
           className
         )}
         style={{
           width: widthValue,
           maxWidth: "210mm",
           aspectRatio: "210 / 297",
-          transformStyle: "preserve-3d",
+          ...style,
         }}
         {...props}
       >

@@ -1,3 +1,5 @@
+import { CSSProperties } from "react";
+
 import { ThemeSwitcher } from "@/components/layout/theme-switcher";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -10,7 +12,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Header />
 
       {/* Main Content */}
-      <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <main
+        className="load-stagger container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
+        style={{ "--stagger": 1 } as CSSProperties}
+      >
         {children}
       </main>
 

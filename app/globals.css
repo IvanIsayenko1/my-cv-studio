@@ -44,6 +44,11 @@
 }
 
 :root {
+  --motion-fast: 220ms;
+  --motion-medium: 560ms;
+  --motion-slow: 620ms;
+  --motion-ease-emphasis: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -127,6 +132,68 @@
     letter-spacing: 0;
   }
 
+  .load-stagger {
+    animation: rise-in var(--motion-slow) var(--motion-ease-emphasis) both;
+    animation-delay: calc(var(--stagger, 0) * 90ms + var(--base-delay, 0ms));
+  }
+
+  @supports (animation-timeline: view()) {
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(16px) scale(0.99);
+      animation: scroll-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 35%;
+    }
+  }
+
+  .card-hover-surprise {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-hover-surprise::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    pointer-events: none;
+    background: linear-gradient(
+      115deg,
+      transparent 15%,
+      color-mix(in oklab, var(--foreground) 10%, transparent) 45%,
+      transparent 70%
+    );
+    transform: translateX(-125%);
+    transition: transform var(--motion-medium) var(--motion-ease-smooth);
+  }
+
+  .card-hover-surprise:hover::before {
+    transform: translateX(125%);
+  }
+
+  .menu-fade-in {
+    animation: menu-fade-in var(--motion-fast) ease-out both;
+  }
+
+  .skeleton-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skeleton-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      color-mix(in oklab, var(--foreground) 8%, transparent) 50%,
+      transparent 75%
+    );
+    transform: translateX(-120%);
+    animation: shimmer-x calc(var(--motion-slow) * 2.4) ease-in-out infinite;
+  }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -142,5 +209,63 @@
 
   .cv-form-primary-action {
     @apply w-full sm:w-auto;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes scroll-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer-x {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes menu-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .load-stagger,
+  .scroll-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .card-hover-surprise::before {
+    transition: none;
+  }
+
+  .skeleton-sheen::after {
+    animation: none !important;
+  }
+
+  .menu-fade-in {
+    animation: none !important;
   }
 }

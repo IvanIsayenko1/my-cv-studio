@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 
 import { Plus } from "lucide-react";
 
@@ -14,9 +14,12 @@ export default function CVAdd() {
 
   return (
     <>
-      <A4>
+      <A4
+        className="load-stagger card-hover-surprise"
+        style={{ "--stagger": 0 } as CSSProperties}
+      >
         <Button
-          className="w-full h-full flex justify-center items-center"
+          className="w-full h-full flex justify-center items-center transition-transform duration-300 group-hover:scale-[1.02]"
           variant="ghost"
           onClick={() => setIsOpenDialog(true)}
         >
