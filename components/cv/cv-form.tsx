@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { CSSProperties, Suspense } from "react";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -45,10 +45,11 @@ export default function CVForm() {
   const collapsedSections = JSON.parse(
     localStorage.getItem(`cv-form-closed-sections-${id}`) || "[]"
   ) as string[];
+  const stagger = (value: number) => ({ "--stagger": value } as CSSProperties);
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start">
+      <div className="load-stagger flex items-start" style={stagger(0)}>
         <Button asChild variant="link" size="lg" className="!p-0">
           <Link href={ROUTES.MAKER} aria-label="Go Back">
             <ArrowLeftIcon aria-hidden="true" /> To the list
@@ -56,7 +57,10 @@ export default function CVForm() {
         </Button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+      <div
+        className="load-stagger flex flex-wrap items-center gap-3 sm:gap-4"
+        style={stagger(1)}
+      >
         <div className="min-w-0 flex-1">
           <Suspense fallback={<Skeleton className="h-9 w-32" />}>
             <CVFormTitle id={id} />
@@ -72,110 +76,133 @@ export default function CVForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div
+        className="load-stagger grid grid-cols-1 gap-4 lg:grid-cols-2"
+        style={stagger(2)}
+      >
         <div className="space-y-2">
-          <Suspense
-            fallback={
-              <PersonalInfoFormSkeleton
-                collapsed={collapsedSections.includes("personal-info")}
-              />
-            }
-          >
-            <PersonalInfoForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(3)}>
+            <Suspense
+              fallback={
+                <PersonalInfoFormSkeleton
+                  collapsed={collapsedSections.includes("personal-info")}
+                />
+              }
+            >
+              <PersonalInfoForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <SummaryFormSkeleton
-                collapsed={collapsedSections.includes("summary")}
-              />
-            }
-          >
-            <SummaryForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(4)}>
+            <Suspense
+              fallback={
+                <SummaryFormSkeleton
+                  collapsed={collapsedSections.includes("summary")}
+                />
+              }
+            >
+              <SummaryForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <WorkExperienceFormSkeleton
-                collapsed={collapsedSections.includes("work-experience")}
-              />
-            }
-          >
-            <WorkExperienceForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(5)}>
+            <Suspense
+              fallback={
+                <WorkExperienceFormSkeleton
+                  collapsed={collapsedSections.includes("work-experience")}
+                />
+              }
+            >
+              <WorkExperienceForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <EducationFormSkeleton
-                collapsed={collapsedSections.includes("education")}
-              />
-            }
-          >
-            <EducationForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(6)}>
+            <Suspense
+              fallback={
+                <EducationFormSkeleton
+                  collapsed={collapsedSections.includes("education")}
+                />
+              }
+            >
+              <EducationForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <SkillsFormSkeleton
-                collapsed={collapsedSections.includes("skills")}
-              />
-            }
-          >
-            <SkillsForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(7)}>
+            <Suspense
+              fallback={
+                <SkillsFormSkeleton
+                  collapsed={collapsedSections.includes("skills")}
+                />
+              }
+            >
+              <SkillsForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <LanguagesFormSkeleton
-                collapsed={collapsedSections.includes("languages")}
-              />
-            }
-          >
-            <LanguagesForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(8)}>
+            <Suspense
+              fallback={
+                <LanguagesFormSkeleton
+                  collapsed={collapsedSections.includes("languages")}
+                />
+              }
+            >
+              <LanguagesForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <CertificationsFormSkeleton
-                collapsed={collapsedSections.includes("certifications")}
-              />
-            }
-          >
-            <CertificationsForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(9)}>
+            <Suspense
+              fallback={
+                <CertificationsFormSkeleton
+                  collapsed={collapsedSections.includes("certifications")}
+                />
+              }
+            >
+              <CertificationsForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <ProjectsFormSkeleton
-                collapsed={collapsedSections.includes("projects")}
-              />
-            }
-          >
-            <ProjectsForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(10)}>
+            <Suspense
+              fallback={
+                <ProjectsFormSkeleton
+                  collapsed={collapsedSections.includes("projects")}
+                />
+              }
+            >
+              <ProjectsForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <AwardsFormSkeleton
-                collapsed={collapsedSections.includes("awards")}
-              />
-            }
-          >
-            <AwardsForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(11)}>
+            <Suspense
+              fallback={
+                <AwardsFormSkeleton
+                  collapsed={collapsedSections.includes("awards")}
+                />
+              }
+            >
+              <AwardsForm id={id} />
+            </Suspense>
+          </div>
 
-          <Suspense
-            fallback={
-              <TemplateFormSkeleton
-                collapsed={collapsedSections.includes("template")}
-              />
-            }
-          >
-            <TemplateForm id={id} />
-          </Suspense>
+          <div className="load-stagger" style={stagger(12)}>
+            <Suspense
+              fallback={
+                <TemplateFormSkeleton
+                  collapsed={collapsedSections.includes("template")}
+                />
+              }
+            >
+              <TemplateForm id={id} />
+            </Suspense>
+          </div>
         </div>
 
-        <aside className="hidden lg:block">
+        <aside className="load-stagger hidden lg:block" style={stagger(6)}>
           <div className="sticky top-24">
             <Suspense fallback={<CVPreviewSkeleton />}>
               <CVPreview id={id} />

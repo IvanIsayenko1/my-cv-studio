@@ -25,7 +25,7 @@ function PreviewSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-2">
+    <section className="scroll-reveal space-y-2">
       <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
         {title}
       </h3>
@@ -125,7 +125,7 @@ export default function CVPreview({ id }: { id: string }) {
     .join(", ");
 
   return (
-    <Card className="max-h-[calc(100vh-7.5rem)] overflow-y-auto py-4">
+    <Card className="card-hover-surprise max-h-[calc(100vh-7.5rem)] overflow-y-auto py-4">
       <CardHeader className="px-4 pb-3">
         <CardTitle className="text-base">Live Preview</CardTitle>
       </CardHeader>
