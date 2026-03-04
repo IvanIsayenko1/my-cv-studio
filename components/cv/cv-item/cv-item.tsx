@@ -41,21 +41,51 @@ export default function CVItem({
       <div className="flex h-full flex-col gap-2">
         <Link
           href={ROUTES.CV_DETAIL.replace(":id", cv.id)}
-          className="group/card flex h-full flex-col rounded-md border border-border/70 transition-colors duration-300 hover:border-foreground/25"
+          className="group/card flex h-full flex-col rounded-md border border-border/70 transition-colors duration-300 hover:border-foreground/25 overflow-hidden"
         >
-          <div className="flex h-full flex-col justify-between p-3 sm:p-4">
+          <div className="flex h-full flex-col p-4 sm:p-4">
             <div>
               <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-colors duration-300 group-hover/card:text-foreground/70">
                 CV
               </p>
-              <h4 className="mt-2 line-clamp-2 text-sm font-medium leading-tight transition-transform duration-300 group-hover/card:translate-x-0.5">
+              <h4 className="mt-2 line-clamp-3 text-xl font-semibold leading-tight tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5 sm:text-base sm:font-medium">
                 {cv.title}
               </h4>
             </div>
 
-            <div className="scroll-reveal space-y-1 text-xs text-muted-foreground">
+            <div className="scroll-reveal  space-y-1 text-sm text-muted-foreground sm:text-xs mt-4 sm:mt-3">
               <p>{createdLabel}</p>
               <p>{templateLabel}</p>
+            </div>
+
+            <div className="mt-4 space-y-2 opacity-35 sm:mt-3 sm:space-y-1.5 sm:opacity-30 ">
+              <div className="h-2 w-full bg-border/80" />
+              <div className="h-2 w-[92%] bg-border/90" />
+              <div className="h-2 w-[86%] bg-border/90" />
+              <div className="h-2 w-[94%] bg-border/90" />
+              <div className="h-2 w-[78%] bg-border/90" />
+              <div className="h-2 w-[90%] bg-border/90" />
+              <div className="h-2 w-[82%] bg-border/90" />
+              <div className="h-2 w-[88%] bg-border/90" />
+              <div className="h-2 w-[80%] bg-border/90" />
+              <div className="h-2 w-full bg-border/80" />
+              <div className="h-2 w-[92%] bg-border/90" />
+              <div className="h-2 w-[86%] bg-border/90" />
+              <div className="h-2 w-[94%] bg-border/90" />
+              <div className="h-2 w-[78%] bg-border/90" />
+              <div className="h-2 w-[90%] bg-border/90" />
+              <div className="h-2 w-[82%] bg-border/90" />
+              <div className="h-2 w-[88%] bg-border/90" />
+              <div className="h-2 w-[80%] bg-border/90" />{" "}
+              <div className="h-2 w-full bg-border/80" />
+              <div className="h-2 w-[92%] bg-border/90" />
+              <div className="h-2 w-[86%] bg-border/90" />
+              <div className="h-2 w-[94%] bg-border/90" />
+              <div className="h-2 w-[78%] bg-border/90" />
+              <div className="h-2 w-[90%] bg-border/90" />
+              <div className="h-2 w-[82%] bg-border/90" />
+              <div className="h-2 w-[88%] bg-border/90" />
+              <div className="h-2 w-[80%] bg-border/90" />
             </div>
           </div>
         </Link>
