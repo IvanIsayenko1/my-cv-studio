@@ -29,11 +29,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-      {/* sharp center line */}
-      {/* <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" /> */}
-
-      {/* soft glow under it */}
-      {/* <div className="pointer-events-none absolute inset-x-8 -bottom-1 h-3 bg-gradient-to-r from-transparent via-foreground/12 to-transparent blur-md" /> */}
     </header>
   );
 }

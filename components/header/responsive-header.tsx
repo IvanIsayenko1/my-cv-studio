@@ -2,6 +2,7 @@
 
 import HeaderDesktop from "./header-desktop";
 import HeaderMobile from "./header-mobile";
+import HeaderMobileMenu from "./header-mobile-menu";
 
 export default function ResponsiveHeader() {
   return (
@@ -10,7 +11,7 @@ export default function ResponsiveHeader() {
         <HeaderDesktop />
       </div>
       <div className="md:hidden">
-        <HeaderMobile />
+        <HeaderMobileMenu />
       </div>
     </>
   );
