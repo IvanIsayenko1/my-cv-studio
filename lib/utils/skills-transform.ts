@@ -57,7 +57,7 @@ const parseCategoriesFromCategorySkillsColumn = (
 
 export function normalizeSkillsFromRow(row: SkillsRow): SkillsFormValues {
   const categories = parseCategoriesFromCategorySkillsColumn(
-    row.categorySkills
+    row?.categorySkills ?? null
   );
 
   return {

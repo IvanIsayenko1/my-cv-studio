@@ -1,5 +1,5 @@
 "use client";
-import { MouseEvent, useRef } from "react";
+import { KeyboardEvent, MouseEvent, useRef } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -38,17 +38,29 @@ export function A4({
       "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!onClick) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <button className="w-full flex justify-center" onClick={onClick}>
+    <div className="w-full flex justify-center">
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role={onClick ? "button" : undefined}
+        tabIndex={onClick ? 0 : undefined}
         className={cn(
-          "w-full max-w-[210mm] rounded-xl cursor-pointer",
+          "w-full max-w-[210mm] rounded-xl",
           "bg-card text-card-foreground border border-border",
           "shadow-lg transition-all duration-200 ease-out",
-          "hover:shadow-2xl",
+          onClick ? "cursor-pointer hover:shadow-2xl" : "hover:shadow-xl",
           className
         )}
         style={{
@@ -61,6 +73,6 @@ export function A4({
       >
         <div className="w-full h-full p-3 overflow-auto">{children}</div>
       </div>
-    </button>
+    </div>
   );
 }

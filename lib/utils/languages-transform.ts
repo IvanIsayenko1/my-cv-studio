@@ -16,7 +16,7 @@ function safeParseJSON(value: string | null | undefined): unknown {
 export function normalizeLanguagesFromRow(
   row: LanguagesRow
 ): LanguagesFormValues {
-  const parsedLanguages = safeParseJSON(row.languages);
+  const parsedLanguages = safeParseJSON(row?.languages ?? null);
   const languages = Array.isArray(parsedLanguages)
     ? parsedLanguages
         .map((item) => {

@@ -7,7 +7,7 @@ export default function CVFormTitle({ id }: { id: string }) {
 
   return (
     <div className="min-w-0">
-      <h3 className="truncate text-xl font-semibold tracking-tight sm:text-2xl">
+      <h3 className="font-display truncate text-xl font-semibold tracking-tight sm:text-2xl">
         {cv?.title ?? "Untitled CV"}
       </h3>
     </div>

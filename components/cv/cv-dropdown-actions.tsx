@@ -54,84 +54,11 @@ export default function CVDropdownActions({ id }: { id: string }) {
   // Keep markup split by viewport to preserve native-feeling interactions:
   // dropdown menu on desktop, bottom drawer on mobile.
   const getMenu = () => {
-    if (isDesktop) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              aria-label="Open menu"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreVerticalIcon />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-52 py-2 space-y-1">
-            <DropdownMenuItem disabled={!isCVReady}>
-              <Share className="h-5 w-5" />
-              <span>Share</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={!isCVReady}
-              onClick={(e) => {
-                // Prevent parent card click/navigation handlers from firing.
-                e.stopPropagation();
-                setOpenendDuplicate(true);
-              }}
-            >
-              <span className="flex flex-row items-center gap-2">
-                <Copy className="h-5 w-5" />
-                <span>Duplicate</span>
-              </span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={!isCVReady || isDownloadPending}
-              onClick={(e) => {
-                // Keep action scoped to this menu item only.
-                e.stopPropagation();
-                downloadCV(id);
-              }}
-            >
-              <Download className="h-5 w-5" />
-              <span>Download</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              disabled={isDownloadPending}
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpenedRename(true);
-              }}
-            >
-              <EditIcon className="h-5 w-5" />
-              <span>Rename</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={(e) => {
-                // Avoid bubbling into parent interactive containers.
-                e.stopPropagation();
-                setOpenendDelete(true);
-              }}
-            >
-              <span className="flex flex-row items-center gap-2">
-                <Trash className="h-5 w-5" />
-                <span>Delete</span>
-              </span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
-
     return (
       <Drawer open={openedMenu} onOpenChange={setOpenedMenu}>
         <DrawerTrigger asChild>
           <Button
-            variant="outline"
+            variant={"outline"}
             aria-label="Open menu"
             size={"icon-lg"}
             data-cv-actions-trigger="true"

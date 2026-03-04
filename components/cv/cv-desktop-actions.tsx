@@ -50,7 +50,7 @@ export default function CVDesktopActions({ id }: { id: string }) {
 
   return (
     <>
-      <ButtonGroup className="hidden sm:flex">
+      <ButtonGroup>
         <Button variant="outline" disabled={!isCVReady}>
           <Share />
           Share
@@ -73,13 +73,20 @@ export default function CVDesktopActions({ id }: { id: string }) {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 disabled={isDownloadPending || !isCVReady}
-                onClick={() => setIsOpenDuplicateDialog(true)}
+                onClick={(e) => {
+                  setIsOpenDuplicateDialog(true);
+                  e.stopPropagation();
+                }}
               >
                 <Copy />
                 Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setIsOpenRenameDialog(true)}
+                onClick={(e) => {
+                  setIsOpenRenameDialog(true);
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
                 disabled={isDownloadPending}
               >
                 <EditIcon />

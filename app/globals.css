@@ -122,6 +122,11 @@
 }
 
 @layer utilities {
+  .font-display {
+    font-family: var(--font-geist-sans), "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: 0;
+  }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
