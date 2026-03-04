@@ -15,8 +15,8 @@ export function LanguagesFormSkeleton({
   collapsed?: boolean;
 }) {
   return (
-    <Card>
-      <CardHeader className="px-4 sm:px-6 gap-2">
+    <Card className="p-0 gap-0">
+      <CardHeader className="p-6 gap-2">
         <CardTitle className="flex items-center gap-2">
           <Skeleton className="h-7 w-28" />
           <Skeleton className="h-7 w-24 rounded-full" />
@@ -26,7 +26,7 @@ export function LanguagesFormSkeleton({
         </CardDescription>
       </CardHeader>
       {!collapsed ? (
-        <CardContent className="space-y-8 px-4 sm:px-6">
+        <CardContent className="space-y-8 pt-4">
           {[0, 1].map((i) => (
             <div key={i} className="space-y-4">
               <div className="mb-2 flex items-start justify-between">

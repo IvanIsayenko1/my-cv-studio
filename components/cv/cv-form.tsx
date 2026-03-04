@@ -34,10 +34,10 @@ import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import CVFormMenu from "./cv-form-menu/cv-form-menu";
 import CVFormMenuSkeleton from "./cv-form-menu/cv-form-menu-skeleton";
-import CVFormStatus from "./cv-form-status";
 import CVFormTitle from "./cv-form-title";
 import CVPreview from "./cv-preview";
 import CVPreviewSkeleton from "./cv-preview-skeleton";
+import CVStatus from "./cv-status";
 
 export default function CVForm() {
   const params = useParams();
@@ -45,14 +45,14 @@ export default function CVForm() {
   const collapsedSections = JSON.parse(
     localStorage.getItem(`cv-form-closed-sections-${id}`) || "[]"
   ) as string[];
-  const stagger = (value: number) => ({ "--stagger": value } as CSSProperties);
+  const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="load-stagger flex items-start" style={stagger(0)}>
         <Button asChild variant="link" size="lg" className="!p-0">
           <Link href={ROUTES.MAKER} aria-label="Go Back">
-            <ArrowLeftIcon aria-hidden="true" /> To the list
+            <ArrowLeftIcon aria-hidden="true" /> Back to CV Builder
           </Link>
         </Button>
       </div>
@@ -67,7 +67,7 @@ export default function CVForm() {
           </Suspense>
         </div>
         <Suspense fallback={<Skeleton className="h-6 w-16" />}>
-          <CVFormStatus id={id} />
+          <CVStatus id={id} />
         </Suspense>
         <div className="shrink-0">
           <Suspense fallback={<CVFormMenuSkeleton />}>

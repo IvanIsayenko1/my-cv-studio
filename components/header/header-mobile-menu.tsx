@@ -38,11 +38,11 @@ export default function HeaderMobileMenu() {
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <Dialog.Content
           className={cn(
-            "fixed inset-2 z-50 flex max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-2xl border bg-background shadow-2xl",
+            "fixed inset-0 z-50 flex h-[100dvh] w-screen flex-col overflow-hidden bg-background",
             "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-200"
           )}
         >
-          <div className="flex items-center justify-between border-b px-4 py-3">
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="space-y-0.5">
               <Dialog.Title className="text-base font-semibold">
                 Menu

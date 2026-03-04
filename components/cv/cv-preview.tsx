@@ -125,7 +125,7 @@ export default function CVPreview({ id }: { id: string }) {
     .join(", ");
 
   return (
-    <Card className="card-hover-surprise max-h-[calc(100vh-7.5rem)] overflow-y-auto py-4">
+    <Card className="max-h-[calc(100vh-7.5rem)] overflow-y-auto py-4">
       <CardHeader className="px-4 pb-3">
         <CardTitle className="text-base">Live Preview</CardTitle>
       </CardHeader>

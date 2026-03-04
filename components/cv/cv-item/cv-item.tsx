@@ -11,6 +11,7 @@ import { ROUTES } from "@/config/routes";
 
 import CVFormMenu from "../cv-form-menu/cv-form-menu";
 import CVFormMenuSkeleton from "../cv-form-menu/cv-form-menu-skeleton";
+import CVStatus from "../cv-status";
 
 export default function CVItem({
   cv,
@@ -35,7 +36,7 @@ export default function CVItem({
   return (
     <A4
       key={cv.id}
-      className="load-stagger card-hover-surprise"
+      className="load-stagger"
       style={{ "--stagger": index } as CSSProperties}
     >
       <div className="flex h-full flex-col gap-2">
@@ -45,12 +46,13 @@ export default function CVItem({
         >
           <div className="flex h-full flex-col p-4 sm:p-4">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-colors duration-300 group-hover/card:text-foreground/70">
-                CV
-              </p>
               <h4 className="mt-2 line-clamp-3 text-xl font-semibold leading-tight tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5 sm:text-base sm:font-medium">
                 {cv.title}
               </h4>
+            </div>
+
+            <div className="mt-2 flex items-center gap-2">
+              <CVStatus id={cv.id} />
             </div>
 
             <div className="scroll-reveal  space-y-1 text-sm text-muted-foreground sm:text-xs mt-4 sm:mt-3">

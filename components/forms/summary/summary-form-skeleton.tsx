@@ -15,8 +15,8 @@ export function SummaryFormSkeleton({
   collapsed?: boolean;
 }) {
   return (
-    <Card>
-      <CardHeader className="px-4 sm:px-6 gap-2">
+    <Card className="p-0 gap-0">
+      <CardHeader className="p-6 gap-2">
         <CardTitle className="flex items-center gap-2">
           <Skeleton className="h-7 w-52" />
           <Skeleton className="h-7 w-24 rounded-full" />
@@ -27,7 +27,7 @@ export function SummaryFormSkeleton({
         </CardDescription>
       </CardHeader>
       {!collapsed ? (
-        <CardContent className="space-y-6 px-4 sm:px-6">
+        <CardContent className="space-y-6 pt-4">
           <div className="space-y-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-40 w-full" />
