@@ -186,7 +186,6 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
         endDate: row.end_date || "Present",
         achievements: (achievementsByWorkId.get(id) ?? []).join("\n"),
         toolsAndMethods: technologiesByWorkId.get(id) || [],
-        sortOrder: idx,
       };
     }
   );

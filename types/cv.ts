@@ -46,9 +46,8 @@ export interface CV {
       | "Self-employed";
     startDate: string; // MM/YYYY
     endDate: string | "Present";
-    achievements: string;
-    toolsAndMethods: string[];
-    sortOrder: number;
+    achievements: string | undefined;
+    toolsAndMethods: string[] | undefined;
   }>;
 
   // Education

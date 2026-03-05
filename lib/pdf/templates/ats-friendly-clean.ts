@@ -176,7 +176,7 @@ export function generateATSCleanCV(cv: CV): Promise<Buffer> {
 
         doc.y += RHYTHM.tightGap;
 
-        renderBulletList(doc, [job.achievements]);
+        renderBulletList(doc, job.achievements ? [job.achievements] : []);
 
         if (job.toolsAndMethods?.length) {
           applyStyle(doc, TYPO.small);

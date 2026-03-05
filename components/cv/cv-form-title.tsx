@@ -1,9 +1,9 @@
 "use client";
 
-import { useCV } from "@/hooks/cv/use-cv";
+import { useCVData } from "@/hooks/cv/use-cv";
 
 export default function CVFormTitle({ id }: { id: string }) {
-  const { data: cv } = useCV(id);
+  const { data: cv } = useCVData(id);
 
   return (
     <div className="min-w-0">

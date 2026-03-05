@@ -1,11 +1,11 @@
 import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
 
-import { generateATSCleanCV } from "./templates/ats-friendly-clean";
+import { generateHTMLCVPDF } from "./html-generator";
 
 export async function generateCVPDF(cv: CV): Promise<Buffer> {
   if (cv.templateId === TemplateId.ATS_FRIENDLY_CLEAN) {
-    return generateATSCleanCV(cv);
+    return generateHTMLCVPDF(cv);
   }
   // if (cv.templateId === TemplateId.ATS_FRIENDLY_CLEAN_COLORED) {
   //   return generateATSCleanColoredCV(cv);
@@ -14,5 +14,5 @@ export async function generateCVPDF(cv: CV): Promise<Buffer> {
   //   return generateModernTwoColumnCV(cv);
   // }
 
-  return generateATSCleanCV(cv);
+  return generateHTMLCVPDF(cv);
 }

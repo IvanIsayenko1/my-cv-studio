@@ -133,7 +133,7 @@ export function useCreateCV(
  * Suspense query hook to fetch CV data.
  * @param id The ID of the CV/resume.
  */
-export function useCV(id: string) {
+export function useCVData(id: string) {
   return useSuspenseQuery<CV["cvData"] | null>({
     queryKey: [QUERY_KEYS.CV, id],
     queryFn: () => getCV(id),
@@ -143,7 +143,7 @@ export function useCV(id: string) {
 /**
  * Suspense query hook to fetch CV list.
  */
-export function useCVList() {
+export function useCVDataList() {
   return useSuspenseQuery<(CV["cvData"] & { templateId: string | null })[]>({
     queryKey: [QUERY_KEYS.CV_LIST],
     queryFn: () => getCVList(),
