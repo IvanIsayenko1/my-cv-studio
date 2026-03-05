@@ -5,7 +5,7 @@ export const QUERY_KEYS = {
   PERSONAL_INFO: "personal-info",
   AWARDS: "awards",
   CERTIFICATIONS: "certifications",
-  CV: "cv",
+  CV_DATA: "cv-data",
   EDUCATION: "education",
   SKILLS: "skills",
   WORK_EXPERIENCE: "work-experience",

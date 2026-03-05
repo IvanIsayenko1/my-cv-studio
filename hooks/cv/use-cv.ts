@@ -26,7 +26,7 @@ import { CV } from "@/types/cv";
  */
 export function useCVQueryData({ id }: { id: string }) {
   const queryClient = useQueryClient();
-  const cv = queryClient.getQueryData([QUERY_KEYS.CV, id]) as
+  const cv = queryClient.getQueryData([QUERY_KEYS.CV_DATA, id]) as
     | CV["cvData"]
     | null
     | undefined;
@@ -135,7 +135,7 @@ export function useCreateCV(
  */
 export function useCVData(id: string) {
   return useSuspenseQuery<CV["cvData"] | null>({
-    queryKey: [QUERY_KEYS.CV, id],
+    queryKey: [QUERY_KEYS.CV_DATA, id],
     queryFn: () => getCV(id),
   });
 }

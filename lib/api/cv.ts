@@ -56,11 +56,13 @@ export function useUpdateCVTitle() {
       return res.json();
     },
     onSuccess: (data, { id, title }) => {
-      queryClient.setQueryData([QUERY_KEYS.CV, id], (old: CV | undefined) =>
-        old ? { ...old, cvData: { ...old.cvData, title } } : old
+      queryClient.setQueryData(
+        [QUERY_KEYS.CV_DATA, id],
+        (old: CV | undefined) =>
+          old ? { ...old, cvData: { ...old.cvData, title } } : old
       );
 
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV, id] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_DATA, id] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_LIST] });
     },
   });

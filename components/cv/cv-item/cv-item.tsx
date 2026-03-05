@@ -78,7 +78,7 @@ export default function CVItem({
               <div className="h-2 w-[90%] bg-border/90" />
               <div className="h-2 w-[82%] bg-border/90" />
               <div className="h-2 w-[88%] bg-border/90" />
-              <div className="h-2 w-[80%] bg-border/90" />{" "}
+              <div className="h-2 w-[80%] bg-border/90" />
               <div className="h-2 w-full bg-border/80" />
               <div className="h-2 w-[92%] bg-border/90" />
               <div className="h-2 w-[86%] bg-border/90" />

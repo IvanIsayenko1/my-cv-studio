@@ -15,7 +15,7 @@ import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 
-import { useCVQueryData, useDownloadCV } from "@/hooks/cv/use-cv";
+import { useCVData, useCVQueryData, useDownloadCV } from "@/hooks/cv/use-cv";
 import { useStatus } from "@/hooks/cv/use-status";
 
 import RenameCVDialog from "../dialogs/rename-cv-dialog";
@@ -30,12 +30,12 @@ import {
 
 export default function CVDesktopActions({ id }: { id: string }) {
   // custom hooks
-  const cv = useCVQueryData({ id });
+  const { data: cvData } = useCVData(id);
   const { data } = useStatus(id);
   const isCVReady = data?.isReady;
 
   const { mutate: downloadCV, isPending: isDownloadPending } = useDownloadCV(
-    cv?.title || "cv.pdf"
+    cvData?.title || "cv.pdf"
   );
 
   // state of the dialog
@@ -126,7 +126,11 @@ export default function CVDesktopActions({ id }: { id: string }) {
         setIsOpenDialog={setIsOpenRenameDialog}
       />
 
-      <ShareCVDialog id={id} open={isOpenShareDialog} setOpen={setIsOpenShareDialog} />
+      <ShareCVDialog
+        id={id}
+        open={isOpenShareDialog}
+        setOpen={setIsOpenShareDialog}
+      />
     </>
   );
 }
