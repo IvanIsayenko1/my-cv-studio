@@ -7,6 +7,7 @@ import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
 
 import { db } from "./client";
+import { getActiveShareByToken } from "./share";
 
 export async function getCompleteCV(cvId: string): Promise<CV | null> {
   const cvMeta = await db.execute(
@@ -251,4 +252,13 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     awards,
     templateId,
   };
+}
+
+export async function getCompleteCVByShareToken(
+  token: string
+): Promise<CV | null> {
+  const share = await getActiveShareByToken(token);
+  if (!share) return null;
+
+  return getCompleteCV(share.cvId);
 }

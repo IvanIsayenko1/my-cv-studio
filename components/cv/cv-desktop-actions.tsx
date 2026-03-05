@@ -1,12 +1,9 @@
 import { useState } from "react";
 
-import { useRouter } from "next/navigation";
-
 import {
   Copy,
   Download,
   EditIcon,
-  MailCheckIcon,
   MoreHorizontalIcon,
   Share,
   Trash,
@@ -14,6 +11,7 @@ import {
 
 import DeleteCVDialog from "@/components/dialogs/delete-cv-dialog";
 import DuplicateCVDialog from "@/components/dialogs/duplicate-cv-dialog";
+import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 
@@ -31,9 +29,6 @@ import {
 } from "../ui/dropdown-menu";
 
 export default function CVDesktopActions({ id }: { id: string }) {
-  // router
-  const router = useRouter();
-
   // custom hooks
   const cv = useCVQueryData({ id });
   const { data } = useStatus(id);
@@ -47,11 +42,16 @@ export default function CVDesktopActions({ id }: { id: string }) {
   const [isOpenDuplicateDialog, setIsOpenDuplicateDialog] = useState(false);
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
   const [isOpenRenameDialog, setIsOpenRenameDialog] = useState(false);
+  const [isOpenShareDialog, setIsOpenShareDialog] = useState(false);
 
   return (
     <>
       <ButtonGroup>
-        <Button variant="outline" disabled={!isCVReady}>
+        <Button
+          variant="outline"
+          disabled={!isCVReady}
+          onClick={() => setIsOpenShareDialog(true)}
+        >
           <Share />
           Share
         </Button>
@@ -125,6 +125,8 @@ export default function CVDesktopActions({ id }: { id: string }) {
         isOpenDialog={isOpenRenameDialog}
         setIsOpenDialog={setIsOpenRenameDialog}
       />
+
+      <ShareCVDialog id={id} open={isOpenShareDialog} setOpen={setIsOpenShareDialog} />
     </>
   );
 }
