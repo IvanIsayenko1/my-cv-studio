@@ -243,7 +243,9 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
                 variant="outline"
                 disabled={!canAddLanguage}
                 className="cv-form-primary-action"
-                onClick={() => appendLanguage(createEmptyLanguage())}
+                onClick={() =>
+                  appendLanguage(createEmptyLanguage(), { shouldFocus: false })
+                }
               >
                 Add another language
               </Button>

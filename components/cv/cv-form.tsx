@@ -123,24 +123,24 @@ export default function CVForm() {
           <div className="load-stagger" style={stagger(6)}>
             <Suspense
               fallback={
-                <EducationFormSkeleton
-                  collapsed={collapsedSections.includes("education")}
-                />
-              }
-            >
-              <EducationForm id={id} />
-            </Suspense>
-          </div>
-
-          <div className="load-stagger" style={stagger(7)}>
-            <Suspense
-              fallback={
                 <SkillsFormSkeleton
                   collapsed={collapsedSections.includes("skills")}
                 />
               }
             >
               <SkillsForm id={id} />
+            </Suspense>
+          </div>
+
+          <div className="load-stagger" style={stagger(7)}>
+            <Suspense
+              fallback={
+                <EducationFormSkeleton
+                  collapsed={collapsedSections.includes("education")}
+                />
+              }
+            >
+              <EducationForm id={id} />
             </Suspense>
           </div>
 

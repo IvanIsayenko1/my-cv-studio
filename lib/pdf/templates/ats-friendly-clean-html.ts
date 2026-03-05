@@ -56,6 +56,18 @@ export function renderATSCleanPreviewHTML(cv: CV): string {
   const locationLine = [cv.personalInfo.city, cv.personalInfo.country]
     .filter(Boolean)
     .join(", ");
+  const linkItems =
+    cv.personalInfo.professionalLinks?.filter(
+      (item) => item?.label?.trim() && item?.url?.trim()
+    ) ??
+    [];
+  const linksLine = linkItems.length
+    ? linkItems
+        .map((item) => `${item.label.trim()}: ${item.url.trim()}`)
+        .join(" | ")
+    : [cv.personalInfo.linkedIn, cv.personalInfo.portfolio]
+        .filter(Boolean)
+        .join(" | ");
 
   const skillCategories = (cv.skills?.categories ?? [])
     .map((category) => ({
@@ -120,6 +132,23 @@ export function renderATSCleanPreviewHTML(cv: CV): string {
     `);
   }
 
+  if (skillCategories.length > 0) {
+    sections.push(`
+      <section class="preview-section">
+        <h3 class="section-title">Skills</h3>
+        
+        <div class="stack-sm">
+          ${skillCategories
+            .map(
+              (category) =>
+                `<p class="line-meta"><span class="line-label">${escapeHtml(category.name)}:</span> ${escapeHtml(category.items.join(", "))}</p>`
+            )
+            .join("")}
+        </div>
+      </section>
+    `);
+  }
+
   if (educationItems.length > 0) {
     sections.push(`
       <section class="preview-section">
@@ -143,23 +172,6 @@ export function renderATSCleanPreviewHTML(cv: CV): string {
                     }
                 </article>
               `
-            )
-            .join("")}
-        </div>
-      </section>
-    `);
-  }
-
-  if (skillCategories.length > 0) {
-    sections.push(`
-      <section class="preview-section">
-        <h3 class="section-title">Skills</h3>
-        
-        <div class="stack-sm">
-          ${skillCategories
-            .map(
-              (category) =>
-                `<p class="line-meta"><span class="line-label">${escapeHtml(category.name)}:</span> ${escapeHtml(category.items.join(", "))}</p>`
             )
             .join("")}
         </div>
@@ -465,6 +477,9 @@ export function renderATSCleanPreviewHTML(cv: CV): string {
               locationLine
                 ? `<p class="meta">${escapeHtml(locationLine)}</p>`
                 : ""
+            }
+            ${
+              linksLine ? `<p class="meta">${escapeHtml(linksLine)}</p>` : ""
             }
           </section>
 
