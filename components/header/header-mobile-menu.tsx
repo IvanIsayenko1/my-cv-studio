@@ -123,12 +123,16 @@ export default function HeaderMobileMenu() {
                 Account
               </p>
               {isLoaded && isSignedIn ? (
-                <p className="px-2 text-sm text-muted-foreground">
-                  Signed in as{" "}
-                  <span className="block max-w-[70vw] truncate text-foreground">
+                <div className="mx-2 rounded-md border border-border/70 bg-muted/40 p-3">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {[user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+                      user?.username ||
+                      "Account"}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
                     {user?.emailAddresses[0]?.emailAddress}
-                  </span>
-                </p>
+                  </p>
+                </div>
               ) : null}
               {isSignedIn ? (
                 <Button
