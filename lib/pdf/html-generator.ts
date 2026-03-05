@@ -8,10 +8,12 @@ async function launchBrowser() {
     const puppeteerCore = await import("puppeteer-core");
 
     return puppeteerCore.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
+      args: puppeteerCore.default.defaultArgs({
+        args: chromium.args,
+        headless: "shell",
+      }),
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: "shell",
     });
   }
 
