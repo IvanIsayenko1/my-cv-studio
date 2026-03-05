@@ -12,6 +12,7 @@ export const QUERY_KEYS = {
   STATUS: "status",
   CV_LIST: "cv-list",
   LANGUAGES: "languages",
+  SHARE: "share",
 } as const;
 
 export type QueryKeys = (typeof QUERY_KEYS)[keyof typeof QUERY_KEYS];

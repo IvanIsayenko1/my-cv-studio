@@ -11,6 +11,7 @@ import {
 
 import DeleteCVDialog from "@/components/dialogs/delete-cv-dialog";
 import DuplicateCVDialog from "@/components/dialogs/duplicate-cv-dialog";
+import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
 import {
   MobileOverlay,
@@ -39,6 +40,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
   const [openedDuplicate, setOpenendDuplicate] = useState(false);
   const [openedMenu, setOpenedMenu] = useState(false);
   const [openedRename, setOpenedRename] = useState(false);
+  const [openedShare, setOpenedShare] = useState(false);
 
   const getMenu = () => {
     return (
@@ -65,6 +67,10 @@ export default function CVDropdownActions({ id }: { id: string }) {
               variant="ghost"
               className="font-normal h-14 flex flex-row justify-between"
               disabled={!isCVReady}
+              onClick={() => {
+                setOpenedMenu(false);
+                setOpenedShare(true);
+              }}
             >
               <span>Share</span>
               <Share />
@@ -143,6 +149,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
         isOpenDialog={openedRename}
         setIsOpenDialog={setOpenedRename}
       />
+      <ShareCVDialog id={id} open={openedShare} setOpen={setOpenedShare} />
     </div>
   );
 }
