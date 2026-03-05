@@ -18,13 +18,14 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "../ui/drawer";
+  MobileOverlay,
+  MobileOverlayBody,
+  MobileOverlayClose,
+  MobileOverlayContent,
+  MobileOverlayFooter,
+  MobileOverlayHeader,
+  MobileOverlayTitle,
+} from "../ui/mobile-overlay";
 import {
   Form,
   FormControl,
@@ -121,46 +122,46 @@ export default function RenameCVDialog({
   }
 
   return (
-    <Drawer open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-      <DrawerContent
-        className="mb-4"
-        data-duplicate-cv-drawer-content="true"
-        onPointerDownOutside={() => setIsOpenDialog(false)}
-      >
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Rename CV</DrawerTitle>
-        </DrawerHeader>
-        <Form {...form}>
-          <form
-            id={formId}
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="m-4 space-y-4"
-          >
-            {formField}
-          </form>
-        </Form>
-        <DrawerFooter className="pt-2">
+    <MobileOverlay open={isOpenDialog} onOpenChange={setIsOpenDialog}>
+      <MobileOverlayContent onPointerDownOutside={() => setIsOpenDialog(false)}>
+        <MobileOverlayHeader>
+          <MobileOverlayTitle>Rename CV</MobileOverlayTitle>
+        </MobileOverlayHeader>
+        <MobileOverlayBody>
+          <Form {...form}>
+            <form
+              id={formId}
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
+              {formField}
+            </form>
+          </Form>
+        </MobileOverlayBody>
+        <MobileOverlayFooter className="space-y-2">
           <Button
             type="submit"
             form={formId}
             disabled={isUpdatePending}
             size={"lg"}
+            className="w-full"
           >
             {isUpdatePending && <Spinner />}
             {isUpdatePending ? "Updating..." : "Update"}
           </Button>
-          <DrawerClose asChild>
+          <MobileOverlayClose asChild>
             <Button
               variant="outline"
               disabled={isUpdatePending}
               onClick={(e) => e.stopPropagation()}
               size={"lg"}
+              className="w-full"
             >
               Cancel
             </Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          </MobileOverlayClose>
+        </MobileOverlayFooter>
+      </MobileOverlayContent>
+    </MobileOverlay>
   );
 }

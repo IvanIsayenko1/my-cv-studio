@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import { useRouter } from "next/navigation";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,14 +25,14 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "../ui/drawer";
+  MobileOverlay,
+  MobileOverlayClose,
+  MobileOverlayContent,
+  MobileOverlayDescription,
+  MobileOverlayFooter,
+  MobileOverlayHeader,
+  MobileOverlayTitle,
+} from "../ui/mobile-overlay";
 
 export default function DeleteCVDialog({
   id,
@@ -65,23 +63,6 @@ export default function DeleteCVDialog({
   const handleDelete = () => {
     deleteCV({ id });
   };
-
-  useEffect(() => {
-    if (isDesktop || !open) return;
-
-    const closeOnOutsideTouch = (event: Event) => {
-      const target = event.target as Element | null;
-      if (!target) return;
-      if (target.closest("[data-delete-cv-drawer-content='true']")) return;
-      setOpen(false);
-    };
-
-    document.addEventListener("touchstart", closeOnOutsideTouch, true);
-
-    return () => {
-      document.removeEventListener("touchstart", closeOnOutsideTouch, true);
-    };
-  }, [isDesktop, open, setOpen]);
 
   if (isDesktop) {
     return (
@@ -120,43 +101,41 @@ export default function DeleteCVDialog({
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent
-        className="mb-4"
-        data-delete-cv-drawer-content="true"
-        onPointerDownOutside={() => setOpen(false)}
-      >
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Delete CV</DrawerTitle>
-          <DrawerDescription>
+    <MobileOverlay open={open} onOpenChange={setOpen}>
+      <MobileOverlayContent onPointerDownOutside={() => setOpen(false)}>
+        <MobileOverlayHeader>
+          <MobileOverlayTitle>Delete CV</MobileOverlayTitle>
+          <MobileOverlayDescription>
             You are about to delete this CV. This action cannot be undone. Are
             you sure you want to continue?
-          </DrawerDescription>
-        </DrawerHeader>
+          </MobileOverlayDescription>
+        </MobileOverlayHeader>
 
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
+        <MobileOverlayFooter className="space-y-2">
+          <MobileOverlayClose asChild>
             <Button
               variant="outline"
               disabled={isDeletePending}
               onClick={(e) => e.stopPropagation()}
               size={"lg"}
+              className="w-full"
             >
               Keep the CV
             </Button>
-          </DrawerClose>
+          </MobileOverlayClose>
           <Button
             type="button"
             onClick={handleDelete}
             disabled={isDeletePending}
             variant="destructive"
             size={"lg"}
+            className="w-full"
           >
             {isDeletePending && <Spinner />}
             {isDeletePending ? "Deleting..." : "Delete"}
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </MobileOverlayFooter>
+      </MobileOverlayContent>
+    </MobileOverlay>
   );
 }

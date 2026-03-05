@@ -34,13 +34,14 @@ import { RESOLUTIONS } from "@/lib/constants/resolutions";
 import { CVNameFormValues, cvNameSchema } from "@/schemas/cv-name";
 
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "../ui/drawer";
+  MobileOverlay,
+  MobileOverlayBody,
+  MobileOverlayClose,
+  MobileOverlayContent,
+  MobileOverlayFooter,
+  MobileOverlayHeader,
+  MobileOverlayTitle,
+} from "../ui/mobile-overlay";
 
 export default function DuplicateCVDialog({
   id,
@@ -93,23 +94,6 @@ export default function DuplicateCVDialog({
     if (!open) return;
     clearErrors("name");
   }, [open, clearErrors]);
-
-  useEffect(() => {
-    if (isDesktop || !open) return;
-
-    const closeOnOutsideTouch = (event: Event) => {
-      const target = event.target as Element | null;
-      if (!target) return;
-      if (target.closest("[data-duplicate-cv-drawer-content='true']")) return;
-      setOpen(false);
-    };
-
-    document.addEventListener("touchstart", closeOnOutsideTouch, true);
-
-    return () => {
-      document.removeEventListener("touchstart", closeOnOutsideTouch, true);
-    };
-  }, [isDesktop, open, setOpen]);
 
   // Surface mutation error inline on the name field.
   useEffect(() => {
@@ -178,46 +162,46 @@ export default function DuplicateCVDialog({
 
   // Mobile presentation
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent
-        className="mb-4"
-        data-duplicate-cv-drawer-content="true"
-        onPointerDownOutside={() => setOpen(false)}
-      >
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Duplicate existing CV</DrawerTitle>
-        </DrawerHeader>
-        <Form {...form}>
-          <form
-            id={formId}
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="m-4 space-y-4"
-          >
-            {nameField}
-          </form>
-        </Form>
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
+    <MobileOverlay open={open} onOpenChange={setOpen}>
+      <MobileOverlayContent onPointerDownOutside={() => setOpen(false)}>
+        <MobileOverlayHeader>
+          <MobileOverlayTitle>Duplicate existing CV</MobileOverlayTitle>
+        </MobileOverlayHeader>
+        <MobileOverlayBody>
+          <Form {...form}>
+            <form
+              id={formId}
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
+              {nameField}
+            </form>
+          </Form>
+        </MobileOverlayBody>
+        <MobileOverlayFooter className="space-y-2">
+          <MobileOverlayClose asChild>
             <Button
               variant="outline"
               disabled={isDuplicatePending}
               onClick={(e) => e.stopPropagation()}
               size={"lg"}
+              className="w-full"
             >
               Cancel
             </Button>
-          </DrawerClose>
+          </MobileOverlayClose>
           <Button
             type="submit"
             form={formId}
             disabled={isDuplicatePending}
             size={"lg"}
+            className="w-full"
           >
             {isDuplicatePending && <Spinner />}
             {isDuplicatePending ? "Duplicating..." : "Duplicate"}
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </MobileOverlayFooter>
+      </MobileOverlayContent>
+    </MobileOverlay>
   );
 }
