@@ -1,14 +1,29 @@
-import puppeteer from "puppeteer";
-
 import { CV } from "@/types/cv";
 
 import { renderATSCleanPreviewHTML } from "./templates/ats-friendly-clean-html";
 
-export async function generateHTMLCVPDF(cv: CV): Promise<Buffer> {
-  const browser = await puppeteer.launch({
+async function launchBrowser() {
+  if (process.env.NODE_ENV === "production") {
+    const chromium = (await import("@sparticuz/chromium")).default;
+    const puppeteerCore = await import("puppeteer-core");
+
+    return puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+  }
+
+  const puppeteer = await import("puppeteer");
+  return puppeteer.default.launch({
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
+}
+
+export async function generateHTMLCVPDF(cv: CV): Promise<Buffer> {
+  const browser = await launchBrowser();
 
   try {
     const page = await browser.newPage();
