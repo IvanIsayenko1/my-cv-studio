@@ -49,19 +49,22 @@ export default function CVForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="load-stagger flex items-start" style={stagger(0)}>
-        <Button asChild variant="link" size="lg" className="!p-0">
-          <Link href={ROUTES.MAKER} aria-label="Go Back">
-            <ArrowLeftIcon aria-hidden="true" /> Back to CV Builder
-          </Link>
-        </Button>
-      </div>
-
       <div
         className="load-stagger flex flex-wrap items-center gap-3 sm:gap-4"
         style={stagger(1)}
       >
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 flex items-center gap-2 sm:gap-4 md:flex">
+          <Button
+            asChild
+            variant="outline"
+            size="icon-lg"
+            className="!p-0"
+            style={stagger(0)}
+          >
+            <Link href={ROUTES.MAKER} aria-label="Go Back">
+              <ArrowLeftIcon aria-hidden="true" />
+            </Link>
+          </Button>
           <Suspense fallback={<Skeleton className="h-9 w-32" />}>
             <CVFormTitle id={id} />
           </Suspense>
