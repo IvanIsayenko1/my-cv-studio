@@ -35,7 +35,7 @@ export default async function SharedCVPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="mx-auto w-full flex flex-row justify-between max-w-[210mm] overflow-auto rounded-lg  bg-background shadow-xl">
+      <section className="mx-auto w-full flex flex-row justify-between max-w-[210mm] overflow-auto rounded-lg">
         <div className="min-w-0">
           <h1 className="truncate text-base font-semibold">
             {cv.cvData.title}
@@ -58,7 +58,7 @@ export default async function SharedCVPage({
           <iframe
             title="Shared CV preview"
             srcDoc={htmlPreview}
-            className="h-[calc(100vh-15rem)] w-full bg-white p-8"
+            className="h-[calc(100vh-13rem)] w-full bg-white p-8"
           />
         </div>
       </section>
