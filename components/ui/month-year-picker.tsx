@@ -12,19 +12,19 @@ import { Button } from "./button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "./dialog";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "./drawer";
+  MobileOverlay,
+  MobileOverlayBody,
+  MobileOverlayClose,
+  MobileOverlayContent,
+  MobileOverlayFooter,
+  MobileOverlayHeader,
+  MobileOverlayTitle,
+} from "./mobile-overlay";
 import {
   Select,
   SelectContent,
@@ -232,26 +232,30 @@ export function MonthYearPicker({
     return (
       <>
         {trigger}
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>Pick month and year</DrawerTitle>
-            </DrawerHeader>
-            <div className="px-4 pb-2">{panel}</div>
-            <DrawerFooter>
-              <Button type="button" onClick={applySelection}>
+        <MobileOverlay open={open} onOpenChange={setOpen}>
+          <MobileOverlayContent>
+            <MobileOverlayHeader>
+              <MobileOverlayTitle>Pick month and year</MobileOverlayTitle>
+            </MobileOverlayHeader>
+            <MobileOverlayBody>{panel}</MobileOverlayBody>
+            <MobileOverlayFooter className="space-y-2">
+              <Button type="button" onClick={applySelection} size="lg" className="w-full">
                 Select
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
-                Close
-              </Button>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
+              <MobileOverlayClose asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={(e) => e.stopPropagation()}
+                  size="lg"
+                  className="w-full"
+                >
+                  Close
+                </Button>
+              </MobileOverlayClose>
+            </MobileOverlayFooter>
+          </MobileOverlayContent>
+        </MobileOverlay>
       </>
     );
   }

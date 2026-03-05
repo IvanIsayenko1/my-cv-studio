@@ -5,7 +5,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { Check, ChevronDown, Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveWorkExperienceDialog } from "@/components/dialogs/remove-work-experience-dialog";
@@ -20,6 +20,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  MobileOverlay,
+  MobileOverlayBody,
+  MobileOverlayClose,
+  MobileOverlayContent,
+  MobileOverlayFooter,
+  MobileOverlayHeader,
+  MobileOverlayTitle,
+} from "@/components/ui/mobile-overlay";
 import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
@@ -35,9 +44,12 @@ import {
   useSaveWorkExperience,
   useWorkExperience,
 } from "@/hooks/cv/use-work-experience";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
+import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
+import { EMPLOYMENT_TYPE_OPTIONS } from "@/types/emplyment-types";
 import {
   WorkExperienceFormValues,
   workExperienceSchema,
@@ -49,6 +61,10 @@ interface WorkExperienceFormProps {
 
 export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
+  const [employmentPickerIndex, setEmploymentPickerIndex] = useState<
+    number | null
+  >(null);
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const { data } = useWorkExperience(id);
   const { mutate, isPending } = useSaveWorkExperience(id);
@@ -233,42 +249,36 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
                           <span className="text-destructive">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Full-time">
-                                Full-time
-                              </SelectItem>
-                              <SelectItem value="Part-time">
-                                Part-time
-                              </SelectItem>
-                              <SelectItem value="Contract">Contract</SelectItem>
-                              <SelectItem value="Freelance">
-                                Freelance
-                              </SelectItem>
-                              <SelectItem value="Internship">
-                                Internship
-                              </SelectItem>
-                              <SelectItem value="Temporary">
-                                Temporary
-                              </SelectItem>
-                              <SelectItem value="Seasonal">Seasonal</SelectItem>
-                              <SelectItem value="Apprenticeship">
-                                Apprenticeship
-                              </SelectItem>
-                              <SelectItem value="Volunteer">
-                                Volunteer
-                              </SelectItem>
-                              <SelectItem value="Self-employed">
-                                Self-employed
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          {isDesktop ? (
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="h-11 w-full justify-between px-3"
+                              onClick={() => setEmploymentPickerIndex(index)}
+                              aria-label="Choose employment type"
+                            >
+                              <span className="truncate text-left">
+                                {field.value || "Select type"}
+                              </span>
+                              <ChevronDown className="size-4 opacity-70" />
+                            </Button>
+                          )}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -440,6 +450,62 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
           }
         }}
       />
+
+      <MobileOverlay
+        open={employmentPickerIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setEmploymentPickerIndex(null);
+        }}
+      >
+        <MobileOverlayContent>
+          <MobileOverlayHeader>
+            <MobileOverlayTitle>Select Employment Type</MobileOverlayTitle>
+          </MobileOverlayHeader>
+          <MobileOverlayBody className="max-h-[55vh] space-y-1">
+            {EMPLOYMENT_TYPE_OPTIONS.map((option) => {
+              const selected =
+                employmentPickerIndex !== null &&
+                form.getValues(
+                  `workExperience.${employmentPickerIndex}.employmentType`
+                ) === option;
+
+              return (
+                <Button
+                  key={option}
+                  type="button"
+                  variant={selected ? "secondary" : "ghost"}
+                  size="lg"
+                  className="h-12 w-full justify-between px-4 text-left"
+                  onClick={() => {
+                    if (employmentPickerIndex === null) return;
+                    form.setValue(
+                      `workExperience.${employmentPickerIndex}.employmentType`,
+                      option,
+                      { shouldDirty: true, shouldTouch: true }
+                    );
+                    setEmploymentPickerIndex(null);
+                  }}
+                >
+                  <span>{option}</span>
+                  {selected ? <Check className="size-4" /> : null}
+                </Button>
+              );
+            })}
+          </MobileOverlayBody>
+          <MobileOverlayFooter>
+            <MobileOverlayClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
+              >
+                Close
+              </Button>
+            </MobileOverlayClose>
+          </MobileOverlayFooter>
+        </MobileOverlayContent>
+      </MobileOverlay>
     </>
   );
 }

@@ -5,7 +5,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { Check, ChevronDown, Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveSkillsDialog } from "@/components/dialogs/remove-skills-dialog";
@@ -28,12 +28,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+  MobileOverlay,
+  MobileOverlayBody,
+  MobileOverlayClose,
+  MobileOverlayContent,
+  MobileOverlayFooter,
+  MobileOverlayHeader,
+  MobileOverlayTitle,
+} from "@/components/ui/mobile-overlay";
 
 import { useLanguages, useSaveLanguages } from "@/hooks/cv/use-languages";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
-
-import { SkillsFormValues, skillsSchema } from "@/types/skills";
+import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
 import { LanguagesFormValues, languagesSchema } from "@/schemas/languages";
 
@@ -46,10 +55,22 @@ const createEmptyLanguage = () => ({
   proficiency: "",
 });
 
+const PROFICIENCY_OPTIONS = [
+  { value: "Native", label: "Native" },
+  { value: "Fluent", label: "Fluent / C1–C2" },
+  { value: "Advanced", label: "Advanced / B2" },
+  { value: "Intermediate", label: "Intermediate / B1" },
+  { value: "Basic", label: "Basic / A1–A2" },
+] as const;
+
 export function LanguagesForm({ id }: LanguagesFormProps) {
   const [removeLanguageIndex, setRemoveLanguageIndex] = useState<number | null>(
     null
   );
+  const [proficiencyPickerIndex, setProficiencyPickerIndex] = useState<
+    number | null
+  >(null);
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const { data } = useLanguages(id);
   const { mutate, isPending } = useSaveLanguages(id);
@@ -169,29 +190,41 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
                           <span className="text-destructive">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select level" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Native">Native</SelectItem>
-                              <SelectItem value="Fluent">
-                                Fluent / C1–C2
-                              </SelectItem>
-                              <SelectItem value="Advanced">
-                                Advanced / B2
-                              </SelectItem>
-                              <SelectItem value="Intermediate">
-                                Intermediate / B1
-                              </SelectItem>
-                              <SelectItem value="Basic">
-                                Basic / A1–A2
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          {isDesktop ? (
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select level" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {PROFICIENCY_OPTIONS.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    value={option.value}
+                                  >
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="h-11 w-full justify-between px-3"
+                              onClick={() => setProficiencyPickerIndex(index)}
+                              aria-label="Choose language proficiency"
+                            >
+                              <span className="truncate text-left">
+                                {PROFICIENCY_OPTIONS.find(
+                                  (option) => option.value === field.value
+                                )?.label || "Select level"}
+                              </span>
+                              <ChevronDown className="size-4 opacity-70" />
+                            </Button>
+                          )}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -241,6 +274,61 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
           }
         }}
       />
+
+      <MobileOverlay
+        open={proficiencyPickerIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setProficiencyPickerIndex(null);
+        }}
+      >
+        <MobileOverlayContent>
+          <MobileOverlayHeader>
+            <MobileOverlayTitle>Select Proficiency</MobileOverlayTitle>
+          </MobileOverlayHeader>
+          <MobileOverlayBody className="max-h-[55vh] space-y-1">
+            {PROFICIENCY_OPTIONS.map((option) => {
+              const selected =
+                proficiencyPickerIndex !== null &&
+                form.getValues(
+                  `languages.${proficiencyPickerIndex}.proficiency`
+                ) === option.value;
+
+              return (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={selected ? "secondary" : "ghost"}
+                  size="lg"
+                  className="h-12 w-full justify-between px-4 text-left"
+                  onClick={() => {
+                    if (proficiencyPickerIndex === null) return;
+                    form.setValue(
+                      `languages.${proficiencyPickerIndex}.proficiency`,
+                      option.value,
+                      {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      }
+                    );
+                    setProficiencyPickerIndex(null);
+                  }}
+                >
+                  <span>{option.label}</span>
+                  {selected ? <Check className="size-4" /> : null}
+                </Button>
+              );
+            })}
+          </MobileOverlayBody>
+          <MobileOverlayFooter>
+            <MobileOverlayClose asChild>
+              <Button type="button" variant="outline" size="lg" className="w-full">
+                Close
+              </Button>
+            </MobileOverlayClose>
+          </MobileOverlayFooter>
+        </MobileOverlayContent>
+      </MobileOverlay>
     </>
   );
 }
