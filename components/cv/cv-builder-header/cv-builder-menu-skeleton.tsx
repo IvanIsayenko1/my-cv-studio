@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function CVFormMenuSkeleton() {
+export default function CVBuilderMenuSkeleton() {
   return (
     <div className="flex items-center gap-4">
       <Skeleton className="hidden h-9 w-[240px] md:block" />

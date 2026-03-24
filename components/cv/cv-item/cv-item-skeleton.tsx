@@ -1,7 +1,7 @@
 import { A4 } from "@/components/shared/a4";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import CVFormMenuSkeleton from "../cv-form-menu/cv-form-menu-skeleton";
+import CVBuilderMenuSkeleton from "../cv-builder-header/cv-builder-menu-skeleton";
 
 export default function CVItemSkeleton() {
   return (
@@ -34,7 +34,7 @@ export default function CVItemSkeleton() {
           </div>
         </div>
         <div className="flex justify-end sm:justify-center">
-          <CVFormMenuSkeleton />
+          <CVBuilderMenuSkeleton />
         </div>
       </div>
     </A4>

@@ -10,11 +10,5 @@ const CVList = dynamic(() => import("@/components/cv/cv-list"), {
 });
 
 export default function MakerPage() {
-  return (
-    <div className="flex w-full flex-col">
-      <section>
-        <CVList />
-      </section>
-    </div>
-  );
+  return <CVList />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAwards } from "@/hooks/cv/use-awards";
 import { useCertifications } from "@/hooks/cv/use-certifications";
@@ -19,6 +19,10 @@ import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
 
 export default function CVPreview({ id }: { id: string }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const [iframeHeight, setIframeHeight] = useState(620);
+
   const { data: cvData } = useCVData(id);
   const { data: personalInfo } = usePersonalInfo(id);
   const { data: summary } = useSummary(id);
@@ -111,18 +115,66 @@ export default function CVPreview({ id }: { id: string }) {
     return renderATSCleanPreviewHTML(fullCV);
   }, [fullCV]);
 
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe || !htmlPreview) return;
+
+    const updateHeight = () => {
+      const doc = iframe.contentDocument;
+      if (!doc) return;
+
+      const nextHeight = Math.max(
+        doc.documentElement.scrollHeight,
+        doc.body.scrollHeight,
+        620
+      );
+
+      setIframeHeight(nextHeight);
+    };
+
+    const connectObserver = () => {
+      const doc = iframe.contentDocument;
+      if (!doc || typeof ResizeObserver === "undefined") return;
+
+      resizeObserverRef.current?.disconnect();
+
+      const observer = new ResizeObserver(() => updateHeight());
+      observer.observe(doc.documentElement);
+      observer.observe(doc.body);
+      resizeObserverRef.current = observer;
+    };
+
+    const handleLoad = () => {
+      updateHeight();
+      connectObserver();
+    };
+
+    iframe.addEventListener("load", handleLoad);
+
+    // `srcDoc` can already be available by the time the effect runs.
+    handleLoad();
+
+    return () => {
+      iframe.removeEventListener("load", handleLoad);
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
+    };
+  }, [htmlPreview]);
+
   return htmlPreview ? (
-    <div className="rounded-xl border-border bg-muted/30">
-      <div className="mx-auto w-full max-w-[210mm] overflow-auto rounded-lg border border-border bg-background shadow-xl">
+    <div className="rounded-xl border-border ">
+      <div className="mx-auto w-full max-w-[210mm] rounded-xl border border-border bg-white p-8">
         <iframe
+          ref={iframeRef}
           title="CV PDF preview"
           srcDoc={htmlPreview}
-          className="h-[calc(100vh-7rem)]  min-h-[620px] w-full bg-white p-8"
+          style={{ height: `${iframeHeight}px` }}
+          className="w-full"
         />
       </div>
     </div>
   ) : (
-    <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground ">
+    <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
       CV preview is unavailable.
     </div>
   );

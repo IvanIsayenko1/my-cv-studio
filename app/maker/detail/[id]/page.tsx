@@ -1,7 +1,7 @@
 "use client";
 
-import CVForm from "@/components/cv/cv-form";
+import CVBuilder from "@/components/cv/cv-builder";
 
 export default function CVCreate() {
-  return <CVForm />;
+  return <CVBuilder />;
 }

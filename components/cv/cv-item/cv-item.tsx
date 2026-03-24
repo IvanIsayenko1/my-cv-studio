@@ -9,8 +9,8 @@ import { TemplateName } from "@/types/template";
 
 import { ROUTES } from "@/config/routes";
 
-import CVFormMenu from "../cv-form-menu/cv-form-menu";
-import CVFormMenuSkeleton from "../cv-form-menu/cv-form-menu-skeleton";
+import CVBuilderMenu from "../cv-builder-header/cv-builder-menu";
+import CVBuilderMenuSkeleton from "../cv-builder-header/cv-builder-menu-skeleton";
 import CVStatus from "../cv-status";
 
 export default function CVItem({
@@ -71,8 +71,8 @@ export default function CVItem({
         </Link>
 
         <div className="flex justify-end sm:justify-center">
-          <Suspense fallback={<CVFormMenuSkeleton />}>
-            <CVFormMenu id={cv.id} />
+          <Suspense fallback={<CVBuilderMenuSkeleton />}>
+            <CVBuilderMenu id={cv.id} />
           </Suspense>
         </div>
       </div>

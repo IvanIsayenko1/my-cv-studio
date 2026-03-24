@@ -2,7 +2,7 @@
 
 import { useCVData } from "@/hooks/cv/use-cv";
 
-export default function CVFormTitle({ id }: { id: string }) {
+export default function CVBuilderTitle({ id }: { id: string }) {
   const { data: cv } = useCVData(id);
 
   return (

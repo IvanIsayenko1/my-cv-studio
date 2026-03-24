@@ -24,6 +24,7 @@ export default function SectionWrapper({
       localStorage.getItem(localStorageKey) || "[]"
     ) as string[];
   };
+  let isThisSectionClosed = getClosedSections().includes(id);
 
   const onOpenChangeHandler = (isOpen: boolean) => {
     const closedSections = getClosedSections();
@@ -53,7 +54,7 @@ export default function SectionWrapper({
         </div>
       }
       description={description}
-      defaultOpen={!getClosedSections().includes(id)}
+      defaultOpen={!isThisSectionClosed}
       onOpenChange={onOpenChangeHandler}
     >
       <div className="pt-4">{children}</div>

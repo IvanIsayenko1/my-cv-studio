@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { ChevronDownIcon } from "lucide-react";
+import { is } from "zod/v4/locales";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -34,11 +35,7 @@ export function CollapsibleCard({
   const isControlled = open !== undefined;
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const isOpen = isControlled ? open : internalOpen;
-
-  const contentRef = React.useRef<HTMLDivElement>(null);
   const contentId = React.useId();
-  const [contentHeight, setContentHeight] = React.useState(0);
-  const [isInitialized, setIsInitialized] = React.useState(false);
 
   const setOpenState = React.useCallback(
     (nextOpen: boolean) => {
@@ -47,21 +44,6 @@ export function CollapsibleCard({
     },
     [isControlled, onOpenChange]
   );
-
-  React.useLayoutEffect(() => {
-    const node = contentRef.current;
-    if (!node) return;
-
-    const measure = () => setContentHeight(node.scrollHeight);
-    measure();
-    setIsInitialized(true);
-
-    if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => measure());
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, [children, isOpen]);
 
   return (
     <section
@@ -100,23 +82,10 @@ export function CollapsibleCard({
       <div
         id={contentId}
         aria-hidden={!isOpen}
-        style={{
-          maxHeight: isOpen
-            ? isInitialized
-              ? `${contentHeight}px`
-              : "none"
-            : "0px",
-        }}
-        className={cn(
-          "overflow-hidden",
-          isInitialized &&
-            "transition-[max-height] duration-300 ease-out motion-reduce:transition-none"
-        )}
+        hidden={!isOpen}
+        className="overflow-hidden"
       >
-        <div
-          ref={contentRef}
-          className={cn("px-4 pb-4 sm:px-6 sm:pb-6", contentClassName)}
-        >
+        <div className={cn("px-4 pb-4 sm:px-6 sm:pb-6", contentClassName)}>
           {children}
         </div>
       </div>
