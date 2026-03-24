@@ -14,7 +14,7 @@ export default function Header() {
       aria-label="Site header"
     >
       <div className="container mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-        <div className="flex items-center justify-between gap-4 sm:gap-6 h-14">
+        <div className="flex items-center justify-between gap-4 sm:gap-6 ">
           {/* Left: Branding/Title */}
           <div className="shrink-0">
             <Link href={ROUTES.HOME} aria-label="Go to mycvstudio home page">

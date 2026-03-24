@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 
+import { useCVQueryData } from "@/hooks/cv/use-cv";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { useUpdateCVTitle } from "@/lib/api/cv";
@@ -18,15 +19,6 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "../ui/mobile-overlay";
-import {
   Form,
   FormControl,
   FormField,
@@ -35,6 +27,15 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import {
+  MobileOverlay,
+  MobileOverlayBody,
+  MobileOverlayClose,
+  MobileOverlayContent,
+  MobileOverlayFooter,
+  MobileOverlayHeader,
+  MobileOverlayTitle,
+} from "../ui/mobile-overlay";
 import { Spinner } from "../ui/spinner";
 
 const FormSchema = z.object({
@@ -54,6 +55,7 @@ export default function RenameCVDialog({
   id: string;
 }) {
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
+  const cv = useCVQueryData({ id });
 
   const { mutate: updateTitle, isPending: isUpdatePending } =
     useUpdateCVTitle();
@@ -61,7 +63,7 @@ export default function RenameCVDialog({
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: "", // initial empty; will hydrate in useEffect
+      name: cv?.title || "",
     },
   });
 
