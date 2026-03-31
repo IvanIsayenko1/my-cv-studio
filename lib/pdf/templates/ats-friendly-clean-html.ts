@@ -1,87 +1,25 @@
-import { categoryItemsToList } from "@/lib/utils/skill-items";
-
 import { CV } from "@/types/cv";
 
-const ALLOWED_RICH_TEXT_TAGS = new Set([
-  "p",
-  "div",
-  "br",
-  "strong",
-  "b",
-  "em",
-  "i",
-  "ul",
-  "ol",
-  "li",
-]);
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function sanitizeRichTextHtml(html: string): string {
-  if (!html) return "";
-
-  return html.replace(
-    /<\/?([a-zA-Z0-9-]+)(\s[^>]*)?>/g,
-    (match: string, rawTagName: string, _attrs: string) => {
-      const tagName = rawTagName.toLowerCase();
-      if (!ALLOWED_RICH_TEXT_TAGS.has(tagName)) {
-        return "";
-      }
-
-      const isClosing = match.startsWith("</");
-      return isClosing ? `</${tagName}>` : `<${tagName}>`;
-    }
-  );
-}
-
-function renderRichTextBlock(html: string): string {
-  const sanitized = sanitizeRichTextHtml(html).trim();
-  return sanitized ? `<div class="rich-text">${sanitized}</div>` : "";
-}
+import {
+  escapeHtml,
+  getSharedTemplateData,
+  renderRichTextBlock,
+} from "./shared";
 
 export function renderATSCleanPreviewHTML(cv: CV): string {
-  const fullName = [cv.personalInfo.firstName, cv.personalInfo.lastName]
-    .filter(Boolean)
-    .join(" ");
-  const contactLine = [cv.personalInfo.email, cv.personalInfo.phone]
-    .filter(Boolean)
-    .join(" • ");
-  const locationLine = [cv.personalInfo.city, cv.personalInfo.country]
-    .filter(Boolean)
-    .join(", ");
-  const linkItems =
-    cv.personalInfo.professionalLinks?.filter(
-      (item) => item?.label?.trim() && item?.url?.trim()
-    ) ??
-    [];
-  const linksLine = linkItems.length
-    ? linkItems
-        .map((item) => `${item.label.trim()}: ${item.url.trim()}`)
-        .join(" | ")
-    : [cv.personalInfo.linkedIn, cv.personalInfo.portfolio]
-        .filter(Boolean)
-        .join(" | ");
-
-  const skillCategories = (cv.skills?.categories ?? [])
-    .map((category) => ({
-      name: category.name,
-      items: categoryItemsToList(category.items),
-    }))
-    .filter((category) => category.name && category.items.length > 0);
-
-  const workItems = cv.workExperience ?? [];
-  const educationItems = cv.education ?? [];
-  const projectItems = cv.projects ?? [];
-  const certificationItems = cv.certifications ?? [];
-  const awardItems = cv.awards ?? [];
-  const languageItems = cv.languages ?? [];
+  const {
+    awardItems,
+    certificationItems,
+    contactLine,
+    educationItems,
+    fullName,
+    languageItems,
+    linksLine,
+    locationLine,
+    projectItems,
+    skillCategories,
+    workItems,
+  } = getSharedTemplateData(cv);
 
   const sections: string[] = [];
 
@@ -478,9 +416,7 @@ export function renderATSCleanPreviewHTML(cv: CV): string {
                 ? `<p class="meta">${escapeHtml(locationLine)}</p>`
                 : ""
             }
-            ${
-              linksLine ? `<p class="meta">${escapeHtml(linksLine)}</p>` : ""
-            }
+            ${linksLine ? `<p class="meta">${escapeHtml(linksLine)}</p>` : ""}
           </section>
 
           <section class="content">

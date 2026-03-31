@@ -2,12 +2,25 @@ export { templateSchema, type TemplateFormValues } from "@/schemas/template";
 
 export enum TemplateId {
   ATS_FRIENDLY_CLEAN = "ats-friendly-clean",
-  // ATS_FRIENDLY_CLEAN_COLORED = "ats-friendly-clean-colored",
-  // MODERN_TIMELINE = "modern-timeline",
+  VISUAL_CLEAR = "visual-clear",
 }
 
 export enum TemplateName {
   "ats-friendly-clean" = "ATS Friendly Clean",
-  // "ats-friendly-clean-colored" = "ATS Friendly Clean Colored",
-  // "modern-timeline" = "Modern Timeline",
+  "visual-clear" = "Visual Clear",
 }
+
+export const TEMPLATE_OPTIONS = [
+  {
+    id: TemplateId.ATS_FRIENDLY_CLEAN,
+    name: TemplateName[TemplateId.ATS_FRIENDLY_CLEAN],
+    description: "Minimal ATS-oriented layout",
+    previewSrc: "/cv-templates/ats-friendly-clean.webp",
+  },
+  {
+    id: TemplateId.VISUAL_CLEAR,
+    name: TemplateName[TemplateId.VISUAL_CLEAR],
+    description: "Editorial layout inspired by the reference CV",
+    previewSrc: "/cv-templates/visual-clear.png",
+  },
+] as const;

@@ -1,6 +1,6 @@
 import { CV } from "@/types/cv";
 
-import { renderATSCleanPreviewHTML } from "./templates/ats-friendly-clean-html";
+import { renderPreviewHTML } from "./templates/render-preview-html";
 
 async function launchBrowser() {
   if (process.env.NODE_ENV === "production") {
@@ -29,7 +29,7 @@ export async function generateHTMLCVPDF(cv: CV): Promise<Buffer> {
 
   try {
     const page = await browser.newPage();
-    await page.setContent(renderATSCleanPreviewHTML(cv), {
+    await page.setContent(renderPreviewHTML(cv), {
       waitUntil: "domcontentloaded",
     });
 

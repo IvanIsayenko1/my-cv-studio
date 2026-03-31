@@ -4,7 +4,7 @@ import { CSSProperties, Suspense } from "react";
 
 import { useParams } from "next/navigation";
 
-import ContentPage from "../layout/content-page";
+import PageContent from "../layout/page-content";
 import CVBuilderForm from "./cv-builder-form";
 import CVBuilderHeader from "./cv-builder-header/cv-builder-header";
 import CVPreview from "./cv-preview";
@@ -16,7 +16,7 @@ export default function CVBuilder() {
   const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
 
   return (
-    <ContentPage className="flex h-full min-h-0 w-full flex-col gap-2">
+    <PageContent className="flex h-full min-h-0 w-full flex-col gap-2">
       {/* Title, navigations and form actions */}
       <CVBuilderHeader />
       <div className="grid h-full min-h-0 w-full grid-cols-1 gap-2 overflow-hidden lg:grid-cols-2">
@@ -35,6 +35,6 @@ export default function CVBuilder() {
           </div>
         </aside>
       </div>
-    </ContentPage>
+    </PageContent>
   );
 }

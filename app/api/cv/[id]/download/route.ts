@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
 import { getCompleteCV } from "@/lib/db/queries";
-import { generateCVPDF } from "@/lib/pdf/cv-generator";
+import { generateHTMLCVPDF } from "@/lib/pdf/html-generator";
 
 export const runtime = "nodejs";
 
@@ -27,7 +27,7 @@ export async function GET(
     }
 
     // Generate PDF
-    const pdfBuffer = await generateCVPDF(cv);
+    const pdfBuffer = await generateHTMLCVPDF(cv);
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,

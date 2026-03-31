@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils/cn";
 
-export default function ContentPage({
+export default function PageContent({
   children,
   className,
 }: {
@@ -8,12 +8,7 @@ export default function ContentPage({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        `container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8`,
-        className
-      )}
-    >
+    <div className={cn(`container mx-auto px-4 sm:px-6 lg:px-8`, className)}>
       {children}
     </div>
   );

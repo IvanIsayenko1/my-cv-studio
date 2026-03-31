@@ -11,9 +11,10 @@ import { usePersonalInfo } from "@/hooks/cv/use-personal-info";
 import { useProjects } from "@/hooks/cv/use-projects";
 import { useSkills } from "@/hooks/cv/use-skills";
 import { useSummary } from "@/hooks/cv/use-summary";
+import { useTemplate } from "@/hooks/cv/use-template";
 import { useWorkExperience } from "@/hooks/cv/use-work-experience";
 
-import { renderATSCleanPreviewHTML } from "@/lib/pdf/templates/ats-friendly-clean-html";
+import { renderPreviewHTML } from "@/lib/pdf/templates/render-preview-html";
 
 import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
@@ -24,6 +25,7 @@ export default function CVPreview({ id }: { id: string }) {
   const [iframeHeight, setIframeHeight] = useState(620);
 
   const { data: cvData } = useCVData(id);
+  const { data: template } = useTemplate(id);
   const { data: personalInfo } = usePersonalInfo(id);
   const { data: summary } = useSummary(id);
   const { data: workExperience } = useWorkExperience(id);
@@ -95,7 +97,7 @@ export default function CVPreview({ id }: { id: string }) {
         date: item.date,
         description: item.description,
       })),
-      templateId: TemplateId.ATS_FRIENDLY_CLEAN,
+      templateId: (template?.id as TemplateId) ?? TemplateId.ATS_FRIENDLY_CLEAN,
     };
   }, [
     awards,
@@ -107,12 +109,13 @@ export default function CVPreview({ id }: { id: string }) {
     projects,
     skills,
     summary,
+    template,
     workExperience,
   ]);
 
   const htmlPreview = useMemo(() => {
     if (!fullCV) return "";
-    return renderATSCleanPreviewHTML(fullCV);
+    return renderPreviewHTML(fullCV);
   }, [fullCV]);
 
   useEffect(() => {
@@ -162,8 +165,8 @@ export default function CVPreview({ id }: { id: string }) {
   }, [htmlPreview]);
 
   return htmlPreview ? (
-    <div className="rounded-xl border-border ">
-      <div className="mx-auto w-full max-w-[210mm] rounded-xl border border-border bg-white p-8">
+    <div className="border-border rounded-xl">
+      <div className="border-border mx-auto w-full max-w-[210mm] rounded-xl border bg-white p-8">
         <iframe
           ref={iframeRef}
           title="CV PDF preview"
@@ -174,7 +177,7 @@ export default function CVPreview({ id }: { id: string }) {
       </div>
     </div>
   ) : (
-    <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+    <div className="border-border text-muted-foreground rounded-lg border p-4 text-sm">
       CV preview is unavailable.
     </div>
   );

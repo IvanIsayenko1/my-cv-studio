@@ -17,13 +17,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
   Form,
   FormControl,
   FormField,
@@ -36,9 +29,9 @@ import { useSaveTemplate, useTemplate } from "@/hooks/cv/use-template";
 import { cn } from "@/lib/utils/cn";
 
 import {
+  TEMPLATE_OPTIONS,
   TemplateFormValues,
   TemplateId,
-  TemplateName,
   templateSchema,
 } from "@/types/template";
 
@@ -56,8 +49,7 @@ export function TemplateForm({ id }: TemplateFormProps) {
       id: TemplateId.ATS_FRIENDLY_CLEAN,
     },
   });
-  const { control, handleSubmit, reset, formState } = form;
-  const { isDirty } = formState;
+  const { control, handleSubmit, reset } = form;
 
   useEffect(() => {
     if (!data) return;
@@ -86,32 +78,31 @@ export function TemplateForm({ id }: TemplateFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <div className="grid w-full gap-2 p-2 sm:gap-4 sm:p-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2">
-                    {Object.values(TemplateId).map((tpl, index) => (
-                      <div>
+                  <div className="grid w-full grid-cols-1 gap-2 p-2 sm:grid-cols-1 sm:gap-4 sm:p-4 md:grid-cols-2">
+                    {TEMPLATE_OPTIONS.map((template) => (
+                      <div key={template.id}>
                         <Card
-                          key={index}
                           className={cn(
                             "cursor-pointer border-2 py-2",
-                            field.value === tpl
+                            field.value === template.id
                               ? "border-primary"
                               : "border-transparent hover:border-gray-300"
                           )}
-                          onClick={() => field.onChange(tpl)}
+                          onClick={() => field.onChange(template.id)}
                         >
                           <CardHeader className="px-2">
-                            <CardTitle>{TemplateName[tpl]}</CardTitle>
+                            <CardTitle>{template.name}</CardTitle>
                             <CardDescription>
-                              {`Template ${index + 1}`}
+                              {template.description}
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="px-2">
                             <Image
-                              src={`/cv-templates/${tpl}.webp`}
-                              alt={`Preview of ${TemplateName[tpl]} template`}
+                              src={template.previewSrc}
+                              alt={`Preview of ${template.name} template`}
                               width={400}
                               height={500}
-                              className="w-full h-auto object-cover rounded-md"
+                              className="h-auto w-full rounded-md object-cover"
                             />
                           </CardContent>
                         </Card>

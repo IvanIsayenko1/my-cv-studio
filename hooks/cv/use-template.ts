@@ -23,6 +23,7 @@ export function useSaveTemplate(id: string) {
     onSuccess: () => {
       toast.success("Template has been updated");
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.TEMPLATE, id] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_LIST] });
     },
     onError: (error) => {
       toast.error("Failed to update template");
