@@ -21,6 +21,6 @@ export const TEMPLATE_OPTIONS = [
     id: TemplateId.VISUAL_CLEAR,
     name: TemplateName[TemplateId.VISUAL_CLEAR],
     description: "Editorial layout inspired by the reference CV",
-    previewSrc: "/cv-templates/visual-clear.png",
+    previewSrc: "/cv-templates/visual-clear.webp",
   },
 ] as const;

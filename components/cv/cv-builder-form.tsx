@@ -35,11 +35,7 @@ export default function CVBuilderForm() {
   const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
 
   return (
-    // <div
-    //   className="load-stagger grid grid-cols-1 gap-4 lg:grid-cols-2"
-    //   style={stagger(2)}
-    // >
-    <div className="min-h-0 w-full flex-1 space-y-2 overflow-y-auto pb-4 no-scrollbar">
+    <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto pb-4">
       <div className="load-stagger" style={stagger(3)}>
         <Suspense
           fallback={
@@ -160,14 +156,5 @@ export default function CVBuilderForm() {
         </Suspense>
       </div>
     </div>
-
-    //   <aside className="load-stagger hidden lg:block" style={stagger(6)}>
-    //     <div className="sticky top-24">
-    //       <Suspense fallback={<CVPreviewSkeleton />}>
-    //         <CVPreview id={id} />
-    //       </Suspense>
-    //     </div>
-    //   </aside>
-    // </div>
   );
 }

@@ -28,11 +28,9 @@ export default function CVBuilder() {
           className="load-stagger no-scrollbar hidden min-h-0 overflow-y-auto pb-4 lg:block"
           style={stagger(6)}
         >
-          <div className="min-h-0">
-            <Suspense fallback={<CVPreviewSkeleton />}>
-              <CVPreview id={id} />
-            </Suspense>
-          </div>
+          <Suspense fallback={<CVPreviewSkeleton />}>
+            <CVPreview id={id} />
+          </Suspense>
         </aside>
       </div>
     </PageContent>
