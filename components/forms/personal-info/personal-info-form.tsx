@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
+import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import PersonalInfoAIAssistantDialog from "@/components/dialogs/personal-info-ai-assitant-dialog";
 import StatusBedge from "@/components/status-bedge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,8 +29,10 @@ import {
   useSavePersonalInfo,
 } from "@/hooks/cv/use-personal-info";
 
+import { PROFESSIONAL_INFORMATION_MODULE } from "@/lib/constants/ai-prompts";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
+import { CVPersonalInformationAIReview } from "@/types/ai";
 import {
   PersonalInfoFormValues,
   personalInfoSchema,
@@ -38,6 +42,10 @@ export function PersonalInfoForm({ id }: { id: string }) {
   const { data } = usePersonalInfo(id);
   const { mutate, isPending } = useSavePersonalInfo(id);
   const queryClient = useQueryClient();
+
+  const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
+  const [aiReview, setAIReview] =
+    useState<CVPersonalInformationAIReview | null>(null);
 
   const form = useForm<PersonalInfoFormValues>({
     resolver: zodResolver(personalInfoSchema),
@@ -266,8 +274,8 @@ export function PersonalInfoForm({ id }: { id: string }) {
           </div>
 
           {/* Optional Links */}
-          <div className="space-y-4 rounded-lg border border-border/70 bg-muted/20 p-4">
-            <h3 className="text-sm font-medium text-foreground">
+          <div className="border-border/70 bg-muted/20 space-y-4 rounded-lg border p-4">
+            <h3 className="text-foreground text-sm font-medium">
               Professional Links
             </h3>
             <FormDescription>
@@ -277,7 +285,7 @@ export function PersonalInfoForm({ id }: { id: string }) {
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="space-y-3 rounded-md border border-border/70 p-3"
+                className="border-border/70 space-y-3 rounded-md border p-3"
               >
                 <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_2fr_auto]">
                   <FormField
@@ -337,6 +345,14 @@ export function PersonalInfoForm({ id }: { id: string }) {
           </div>
 
           <div className="cv-form-actions">
+            <CVBuilderAIAssistant<CVPersonalInformationAIReview>
+              value={form.getValues()}
+              prompt={PROFESSIONAL_INFORMATION_MODULE}
+              handleResponse={(e) => {
+                setAIReview(e);
+                setIsOpenAIAssistantDialog(true);
+              }}
+            />
             <Button
               type="submit"
               disabled={isPending}
@@ -348,6 +364,14 @@ export function PersonalInfoForm({ id }: { id: string }) {
           </div>
         </form>
       </Form>
+
+      {/* AI Assistant Dialog */}
+      <PersonalInfoAIAssistantDialog
+        isOpenDialog={isOpenAIAssistantDialog}
+        setIsOpenDialog={setIsOpenAIAssistantDialog}
+        aiReview={aiReview}
+        formId={id}
+      />
     </SectionWrapper>
   );
 }
