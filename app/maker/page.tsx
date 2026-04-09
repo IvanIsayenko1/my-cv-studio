@@ -1,12 +1,14 @@
-import { Suspense } from "react";
+"use client";
 
-import CVList from "@/components/cv/cv-list";
+import dynamic from "next/dynamic";
+
 import MakerPageSeleton from "@/components/maker-page-skeleton";
 
+const CVList = dynamic(() => import("@/components/cv/cv-list"), {
+  ssr: false,
+  loading: () => <MakerPageSeleton />,
+});
+
 export default function MakerPage() {
-  return (
-    <Suspense fallback={<MakerPageSeleton />}>
-      <CVList />;
-    </Suspense>
-  );
+  return <CVList />;
 }
