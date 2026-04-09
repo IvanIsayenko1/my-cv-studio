@@ -7,8 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
+import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveSkillsDialog } from "@/components/dialogs/remove-skills-dialog";
+import SkillsAIAssistantDialog from "@/components/dialogs/skills-ai-assistant-dialog";
 import StatusBedge from "@/components/status-bedge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +27,10 @@ import { Separator } from "@/components/ui/separator";
 
 import { useSaveSkills, useSkills } from "@/hooks/cv/use-skills";
 
+import { SKILLS_MODULE } from "@/lib/constants/ai-prompts";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
+import { CVSkillsAIReview, cvSkillsAIReviewSchema } from "@/types/ai-skills-review";
 import { SkillsFormValues, skillsSchema } from "@/types/skills";
 
 interface SkillsFormProps {
@@ -42,6 +46,8 @@ export function SkillsForm({ id }: SkillsFormProps) {
   const [removeCategoryIndex, setRemoveCategoryIndex] = useState<number | null>(
     null
   );
+  const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
+  const [aiReview, setAIReview] = useState<CVSkillsAIReview | null>(null);
 
   const { data } = useSkills(id);
   const { mutate, isPending } = useSaveSkills(id);
@@ -192,6 +198,16 @@ export function SkillsForm({ id }: SkillsFormProps) {
               >
                 Add another category
               </Button>
+              <CVBuilderAIAssistant<CVSkillsAIReview>
+                value={form.getValues()}
+                prompt={SKILLS_MODULE}
+                responseSchema={cvSkillsAIReviewSchema}
+                handleResponse={(response) => {
+                  if (!response) return;
+                  setAIReview(response);
+                  setIsOpenAIAssistantDialog(true);
+                }}
+              />
               <Button
                 type="submit"
                 disabled={isPending || !form.formState.isValid}
@@ -217,6 +233,16 @@ export function SkillsForm({ id }: SkillsFormProps) {
             removeCategory(removeCategoryIndex);
             setRemoveCategoryIndex(null);
           }
+        }}
+      />
+
+      <SkillsAIAssistantDialog
+        isOpenDialog={isOpenAIAssistantDialog}
+        setIsOpenDialog={setIsOpenAIAssistantDialog}
+        aiReview={aiReview}
+        formId={id}
+        currentValues={{
+          categories: watchedCategories ?? [],
         }}
       />
     </>

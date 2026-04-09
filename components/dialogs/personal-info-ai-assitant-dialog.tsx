@@ -139,6 +139,7 @@ export default function PersonalInfoAIAssistantDialog({
             title={presentation.title}
             summary={review.summary}
             issues={review.issues}
+            typos={review.typos}
             onAccept={() =>
               handleAcceptSuggestion(
                 presentation.field,

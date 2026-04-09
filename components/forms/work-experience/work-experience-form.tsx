@@ -7,8 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronDown, Trash2 } from "lucide-react";
 
+import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveWorkExperienceDialog } from "@/components/dialogs/remove-work-experience-dialog";
+import WorkExperienceAIAssistantDialog from "@/components/dialogs/work-experience-ai-assistant-dialog";
 import StatusBedge from "@/components/status-bedge";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,9 +48,11 @@ import {
 } from "@/hooks/cv/use-work-experience";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
+import { WORK_EXPERIENCE_MODULE } from "@/lib/constants/ai-prompts";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
+import { CVWorkExperienceAIReview, cvWorkExperienceAIReviewSchema } from "@/types/ai-work-experience-review";
 import { EMPLOYMENT_TYPE_OPTIONS } from "@/types/emplyment-types";
 import {
   WorkExperienceFormValues,
@@ -64,6 +68,8 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
   const [employmentPickerIndex, setEmploymentPickerIndex] = useState<
     number | null
   >(null);
+  const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
+  const [aiReview, setAIReview] = useState<CVWorkExperienceAIReview | null>(null);
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const { data } = useWorkExperience(id);
@@ -119,7 +125,6 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
   }, [data, reset]);
 
   const onSubmit = (values: WorkExperienceFormValues) => {
-    debugger;
     mutate(values, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
@@ -424,6 +429,16 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
               >
                 Add another role
               </Button>
+              <CVBuilderAIAssistant<CVWorkExperienceAIReview>
+                value={form.getValues()}
+                prompt={WORK_EXPERIENCE_MODULE}
+                responseSchema={cvWorkExperienceAIReviewSchema}
+                handleResponse={(response) => {
+                  if (!response) return;
+                  setAIReview(response);
+                  setIsOpenAIAssistantDialog(true);
+                }}
+              />
               <Button
                 type="submit"
                 disabled={isPending || !form.formState.isValid}
@@ -448,6 +463,22 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
             remove(removeIndex);
             setRemoveIndex(null);
           }
+        }}
+      />
+
+      <WorkExperienceAIAssistantDialog
+        isOpenDialog={isOpenAIAssistantDialog}
+        setIsOpenDialog={setIsOpenAIAssistantDialog}
+        aiReview={aiReview}
+        formId={id}
+        currentValues={{
+          workExperience: watchedExperiences ?? [],
+        }}
+        onLocalApplySuggestion={(roleIndex, achievements) => {
+          form.setValue(`workExperience.${roleIndex}.achievements`, achievements, {
+            shouldDirty: true,
+            shouldTouch: true,
+          });
         }}
       />
 

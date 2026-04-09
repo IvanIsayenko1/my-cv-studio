@@ -66,12 +66,13 @@ export default function ProfessionalSummaryAIAssistantDialog({
   const dialogContent =
     reviewNeedsAttention && aiReview ? (
       <AIContentSuggestionCard
-        cardKey={aiReview.field}
-        title="Professional Summary"
-        summary={aiReview.summary}
-        issues={aiReview.issues}
-        onAccept={handleAcceptSuggestion}
-        isPending={isPending && isApplyingSuggestion}
+      cardKey={aiReview.field}
+      title="Professional Summary"
+      summary={aiReview.summary}
+      issues={aiReview.issues}
+      typos={aiReview.typos}
+      onAccept={handleAcceptSuggestion}
+      isPending={isPending && isApplyingSuggestion}
       >
         <CardContent>
           <Field className="gap-2">
