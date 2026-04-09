@@ -32,7 +32,10 @@ import {
 import { PROFESSIONAL_INFORMATION_MODULE } from "@/lib/constants/ai-prompts";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
-import { CVPersonalInformationAIReview } from "@/types/ai";
+import {
+  cvPersonalInformationAIReviewSchema,
+  CVPersonalInformationAIReview,
+} from "@/types/ai";
 import {
   PersonalInfoFormValues,
   personalInfoSchema,
@@ -348,6 +351,7 @@ export function PersonalInfoForm({ id }: { id: string }) {
             <CVBuilderAIAssistant<CVPersonalInformationAIReview>
               value={form.getValues()}
               prompt={PROFESSIONAL_INFORMATION_MODULE}
+              responseSchema={cvPersonalInformationAIReviewSchema}
               handleResponse={(e) => {
                 setAIReview(e);
                 setIsOpenAIAssistantDialog(true);

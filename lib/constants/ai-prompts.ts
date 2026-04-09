@@ -9,6 +9,8 @@ You always:
 - Do NOT hallucinate missing data
 - Prefer globally recognized standards
 - Work for ANY profession
+- Base judgments only on the provided input
+- Keep outputs concise and concrete
 
 You also check for:
 - Spelling mistakes
@@ -19,113 +21,80 @@ Return ONLY valid JSON.
 `;
 
 export const PROFESSIONAL_INFORMATION_MODULE = `
-FIELDS: professionalTitle, email
+Review exactly these two fields from the provided object:
+- professionalTitle
+- email
 
-Evaluate and improve BOTH fields.
+Important constraints:
+- Use only the provided data. Do not invent employers, seniority, specialization, location, or credentials.
+- If evidence is missing, say so briefly in the summary or issues instead of guessing.
+- Return exactly 2 results: one for "professionalTitle" and one for "email".
+- Keep the results array in this order:
+  1. professionalTitle
+  2. email
+- Every score must be an integer from 1 to 10.
 
-----------------------------------------
-FIELD: professionalTitle
-----------------------------------------
+Scoring rubric:
+- 9-10: strong, no meaningful change needed
+- 7-8: minor improvements possible
+- 4-6: moderate issues that should be improved
+- 1-3: severe issue or invalid field
 
-Checks:
+Field rules:
 
-1. Role clarity
-- Is the job title clear and standard?
+professionalTitle
+- Evaluate clarity, standard naming, searchable keywords, specialization, seniority when supported, and brevity.
+- Prefer a concise title, usually 2-8 words and never more than 12 words.
+- Do not add unsupported claims.
+- If the title is already strong, still fill improvements, but keep them very close to the original and avoid unnecessary invention.
+- "keywords.missing" should include only broadly standard keywords clearly implied by the input context.
 
-2. Seniority
-- Is level defined when appropriate?
+email
+- Evaluate professionalism, readability, format validity, naming quality, and consistency with the provided name if available.
+- Do not suggest changing the domain unless the current domain is clearly low-quality or invalid.
+- If the current email is already strong, include the current email as the first suggestion.
+- Suggestions must look like real email addresses and stay conservative.
 
-3. Specialization
-- Clear domain or focus area?
+Output requirements:
+- Return ONLY valid JSON.
+- Do NOT use markdown.
+- Do NOT wrap the JSON in code fences.
+- Do NOT include any text before or after the JSON.
+- Every required field must be present.
 
-4. ATS keywords
-- Contains searchable, standard keywords?
-
-5. Value proposition
-- Shows strength or differentiation (optional)
-
-6. Clarity and length
-- 5–12 words
-- No fluff (e.g., "hardworking", "motivated")
-
-7. Consistency (context-aware)
-- Align with links or other provided info
-
-8. Language quality
-- Detect typos
-- Detect grammar issues
-- Detect unnatural phrasing
-
-----------------------------------------
-FIELD: email
-----------------------------------------
-
-Checks:
-
-1. Professionalism
-- Name-based email preferred
-
-2. Clarity
-- Easy to read and understand
-
-3. Format validity
-- Standard email format (name@domain.com)
-
-4. Domain quality
-- Trusted providers preferred
-
-5. Naming quality
-- Avoid nicknames, slang, excessive numbers
-
-6. ATS friendliness
-- Simple and searchable
-
-7. Consistency
-- Matches candidate name if possible
-
-8. Language quality
-- Detect typos or confusing structure
-
-----------------------------------------
-OUTPUT (STRICT JSON)
-----------------------------------------
-
-Return ONLY valid JSON.
-Do NOT use markdown.
-Do NOT wrap in \`\`\`.
-
+Expected JSON shape:
 {
   "results": [
     {
       "field": "professionalTitle",
-      "score": number,
-      "summary": string,
-      "issues": string[],
+      "score": 1,
+      "summary": "string",
+      "issues": ["string"],
       "typos": {
-        "hasTypos": boolean,
-        "details": string[]
+        "hasTypos": false,
+        "details": ["string"]
       },
       "improvements": {
-        "atsOptimized": string,
-        "balanced": string,
-        "humanFriendly": string
+        "atsOptimized": "string",
+        "balanced": "string",
+        "humanFriendly": "string"
       },
       "keywords": {
-        "detected": string[],
-        "missing": string[]
+        "detected": ["string"],
+        "missing": ["string"]
       }
     },
     {
       "field": "email",
-      "score": number,
-      "summary": string,
-      "issues": string[],
+      "score": 1,
+      "summary": "string",
+      "issues": ["string"],
       "typos": {
-        "hasTypos": boolean,
-        "details": string[]
+        "hasTypos": false,
+        "details": ["string"]
       },
-      "isProfessional": boolean,
-      "suggestions": string[]
+      "isProfessional": true,
+      "suggestions": ["string"]
     }
   ]
 }

@@ -85,9 +85,9 @@ export default function PersonalInfoAIAssistantDialog({
   const getFieldConfig = (field: keyof typeof fieldConfig) => {
     return fieldConfig[field];
   };
-  const [pendingField, setPendingField] = useState<keyof typeof fieldConfig | null>(
-    null
-  );
+  const [pendingField, setPendingField] = useState<
+    keyof typeof fieldConfig | null
+  >(null);
 
   const getReviewPresentation = (
     review: CVPersonalInformationAIReview["results"][number]
@@ -184,7 +184,9 @@ export default function PersonalInfoAIAssistantDialog({
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 space-y-4 overflow-y-auto pr-1">{dialogContent}</div>
+          <div className="flex-1 space-y-4 overflow-y-auto pr-1">
+            {dialogContent}
+          </div>
         </DialogContent>
       </Dialog>
     );

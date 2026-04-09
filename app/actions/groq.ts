@@ -3,6 +3,8 @@
 import Groq from "groq-sdk";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const REVIEW_MODEL = "llama-3.3-70b-versatile";
+const REVIEW_SEED = 42;
 
 export async function main() {
   const chatCompletion = await getGroqChatCompletion();
@@ -18,7 +20,9 @@ export async function getGroqChatCompletion() {
         content: "Explain the importance of fast language models",
       },
     ],
-    model: "llama-3.3-70b-versatile",
+    model: REVIEW_MODEL,
+    temperature: 0,
+    seed: REVIEW_SEED,
   });
 }
 
@@ -30,7 +34,12 @@ export async function askGroq<T>(prompt: string): Promise<T> {
         content: prompt,
       },
     ],
-    model: "llama-3.3-70b-versatile",
+    model: REVIEW_MODEL,
+    temperature: 0,
+    seed: REVIEW_SEED,
+    response_format: {
+      type: "json_object",
+    },
   });
 
   const cleanReponse = (chatCompletion.choices[0]?.message?.content || "")
