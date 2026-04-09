@@ -35,286 +35,289 @@ export async function POST(
   // 2) Insert if free
   const { id } = await context.params;
   const newRandomId = randomUUID();
+  const tx = await db.transaction("write");
 
-  // fetch the existing CV
-  const existingCV = await getCompleteCV(id);
-  if (!existingCV) {
-    return NextResponse.json({ error: "CV not found" }, { status: 404 });
-  }
+  try {
+    // fetch the existing CV
+    const existingCV = await getCompleteCV(id);
+    if (!existingCV) {
+      return NextResponse.json({ error: "CV not found" }, { status: 404 });
+    }
 
-  // insert a new CV with the same data to de database
-  const {
-    personalInfo,
-    professionalSummary,
-    skills,
-    languages,
-    workExperience,
-    education,
-    certifications,
-    projects,
-    awards,
-  } = existingCV;
-  const personalLinksStorage = serializeProfessionalLinksForStorage({
-    professionalLinks: personalInfo.professionalLinks ?? [],
-    linkedIn: personalInfo.linkedIn ?? "",
-    portfolio: personalInfo.portfolio ?? "",
-  });
+    // insert a new CV with the same data to de database
+    const {
+      personalInfo,
+      professionalSummary,
+      skills,
+      languages,
+      workExperience,
+      education,
+      certifications,
+      projects,
+      awards,
+    } = existingCV;
+    const personalLinksStorage = serializeProfessionalLinksForStorage({
+      professionalLinks: personalInfo.professionalLinks ?? [],
+      linkedIn: personalInfo.linkedIn ?? "",
+      portfolio: personalInfo.portfolio ?? "",
+    });
 
-  // cv
-  await db.execute({
-    sql: `
-      INSERT INTO cvs (id, user_id, title)
-      VALUES (?, ?, ?)
-    `,
-    args: [newRandomId, userId, title || "Untitled CV"],
-  });
+    await tx.execute({
+      sql: `
+        INSERT INTO cvs (id, user_id, title)
+        VALUES (?, ?, ?)
+      `,
+      args: [newRandomId, userId, title || "Untitled CV"],
+    });
 
-  // personal info
-  await db.execute(
-    `
-        INSERT INTO cv_personal_info (
-          cv_id,
-          first_name,
-          last_name,
-          professional_title,
-          email,
-          phone,
-          city,
-          country,
-          linkedin,
-          portfolio,
-          photo
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    await tx.execute({
+      sql: `
+          INSERT INTO cv_personal_info (
+            cv_id,
+            first_name,
+            last_name,
+            professional_title,
+            email,
+            phone,
+            city,
+            country,
+            linkedin,
+            portfolio,
+            photo
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(cv_id) DO UPDATE SET
+            first_name = excluded.first_name,
+            last_name = excluded.last_name,
+            professional_title = excluded.professional_title,
+            email = excluded.email,
+            phone = excluded.phone,
+            city = excluded.city,
+            country = excluded.country,
+            linkedin = excluded.linkedin,
+            portfolio = excluded.portfolio,
+            photo = excluded.photo
+          `,
+      args: [
+        newRandomId,
+        personalInfo.firstName,
+        personalInfo.lastName,
+        personalInfo.professionalTitle,
+        personalInfo.email,
+        personalInfo.phone,
+        personalInfo.city,
+        personalInfo.country,
+        personalLinksStorage.linkedIn,
+        personalLinksStorage.portfolio,
+        personalInfo.photo ?? null,
+      ],
+    });
+
+    await tx.execute({
+      sql: `
+        INSERT INTO cv_summary (cv_id, professional_summary)
+        VALUES (?, ?)
         ON CONFLICT(cv_id) DO UPDATE SET
-          first_name = excluded.first_name,
-          last_name = excluded.last_name,
-          professional_title = excluded.professional_title,
-          email = excluded.email,
-          phone = excluded.phone,
-          city = excluded.city,
-          country = excluded.country,
-          linkedin = excluded.linkedin,
-          portfolio = excluded.portfolio,
-          photo = excluded.photo
+          professional_summary = excluded.professional_summary
         `,
-    [
-      newRandomId,
-      personalInfo.firstName,
-      personalInfo.lastName,
-      personalInfo.professionalTitle,
-      personalInfo.email,
-      personalInfo.phone,
-      personalInfo.city,
-      personalInfo.country,
-      personalLinksStorage.linkedIn,
-      personalLinksStorage.portfolio,
-      personalInfo.photo ?? null,
-    ]
-  );
+      args: [newRandomId, professionalSummary],
+    });
 
-  // professional summary
-  await db.execute(
-    `
-      INSERT INTO cv_summary (cv_id, professional_summary)
+    for (const w of workExperience) {
+      const workId = randomUUID();
+      await tx.execute({
+        sql: `
+        INSERT INTO cv_work_experience (
+          id,
+          cv_id,
+          job_title,
+          company,
+          location,
+          employment_type,
+          start_date,
+          end_date
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          workId,
+          newRandomId,
+          w.jobTitle,
+          w.company,
+          w.location,
+          w.employmentType,
+          w.startDate,
+          w.endDate,
+        ],
+      });
+
+      const achievementItems = (w.achievements ?? "")
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      for (const text of achievementItems) {
+        await tx.execute({
+          sql: `
+          INSERT INTO cv_work_experience_achievement (
+            id,
+            work_experience_id,
+            text
+          ) VALUES (?, ?, ?)
+          `,
+          args: [randomUUID(), workId, text],
+        });
+      }
+
+      for (const name of w.toolsAndMethods ?? []) {
+        await tx.execute({
+          sql: `
+          INSERT INTO cv_work_experience_technology (
+            id,
+            work_experience_id,
+            name
+          ) VALUES (?, ?, ?)
+          `,
+          args: [randomUUID(), workId, name],
+        });
+      }
+    }
+
+    for (const ed of education) {
+      const educationMeta = serializeEducationMeta({
+        grade: ed.grade,
+        gradingScale: ed.gradingScale,
+        honors: ed.honors,
+      });
+      await tx.execute({
+        sql: `
+        INSERT INTO cv_education (
+          id,
+          cv_id,
+          degree,
+          field_of_study,
+          institution,
+          location,
+          graduation_date,
+          gpa,
+          honors
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          randomUUID(),
+          newRandomId,
+          ed.degree,
+          ed.fieldOfStudy,
+          ed.institution,
+          ed.location,
+          ed.graduationDate,
+          educationMeta.gpa,
+          educationMeta.honors,
+        ],
+      });
+    }
+
+    const serializedSkills = serializeSkillsForStorage(skills);
+    await tx.execute({
+      sql: `
+      INSERT INTO cv_skills (cv_id, categorySkills)
       VALUES (?, ?)
       ON CONFLICT(cv_id) DO UPDATE SET
-        professional_summary = excluded.professional_summary
+        categorySkills = excluded.categorySkills
       `,
-    [newRandomId, professionalSummary]
-  );
-
-  // work experience
-  for (const w of workExperience) {
-    const workId = randomUUID();
-    await db.execute(
-      `
-      INSERT INTO cv_work_experience (
-        id,
-        cv_id,
-        job_title,
-        company,
-        location,
-        employment_type,
-        start_date,
-        end_date
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        workId,
-        newRandomId,
-        w.jobTitle,
-        w.company,
-        w.location,
-        w.employmentType,
-        w.startDate,
-        w.endDate,
-      ]
-    );
-
-    for (const text of w.achievements ?? []) {
-      await db.execute(
-        `
-        INSERT INTO cv_work_experience_achievement (
-          id,
-          work_experience_id,
-          text
-        ) VALUES (?, ?, ?)
-        `,
-        [randomUUID(), workId, text]
-      );
-    }
-
-    for (const name of w.toolsAndMethods ?? []) {
-      await db.execute(
-        `
-        INSERT INTO cv_work_experience_technology (
-          id,
-          work_experience_id,
-          name
-        ) VALUES (?, ?, ?)
-        `,
-        [randomUUID(), workId, name]
-      );
-    }
-  }
-
-  // education
-  for (const ed of education) {
-    const educationMeta = serializeEducationMeta({
-      grade: ed.grade,
-      gradingScale: ed.gradingScale,
-      honors: ed.honors,
+      args: [newRandomId, serializedSkills.categorySkills],
     });
-    await db.execute(
-      `
-      INSERT INTO cv_education (
-        id,
-        cv_id,
-        degree,
-        field_of_study,
-        institution,
-        location,
-        graduation_date,
-        gpa,
-        honors
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+    const serializedLanguages = serializeLanguagesForStorage({ languages });
+    await tx.execute({
+      sql: `
+      INSERT INTO cv_languages (cv_id, languages)
+      VALUES (?, ?)
+      ON CONFLICT(cv_id) DO UPDATE SET
+        languages = excluded.languages
       `,
-      [
-        randomUUID(),
-        newRandomId,
-        ed.degree,
-        ed.fieldOfStudy,
-        ed.institution,
-        ed.location,
-        ed.graduationDate,
-        educationMeta.gpa,
-        educationMeta.honors,
-      ]
-    );
+      args: [newRandomId, serializedLanguages.languages],
+    });
+
+    for (const cert of certifications) {
+      await tx.execute({
+        sql: `
+        INSERT INTO cv_certifications (
+          id,
+          cv_id,
+          name,
+          issuing_org,
+          issue_date,
+          expiration_date,
+          credential_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          randomUUID(),
+          newRandomId,
+          cert.name,
+          cert.issuingOrg,
+          cert.issueDate,
+          cert.expirationDate || null,
+          cert.credentialId || null,
+        ],
+      });
+    }
+
+    for (const project of projects ?? []) {
+      await tx.execute({
+        sql: `
+        INSERT INTO cv_projects (
+          id,
+          cv_id,
+          name,
+          role,
+          start_date,
+          end_date,
+          description,
+          url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          randomUUID(),
+          newRandomId,
+          project.name,
+          project.role,
+          project.startDate,
+          project.endDate,
+          project.description,
+          project.url || null,
+        ],
+      });
+    }
+
+    for (const award of awards ?? []) {
+      await tx.execute({
+        sql: `
+        INSERT INTO cv_awards (
+          id,
+          cv_id,
+          name,
+          issuer,
+          date,
+          description
+        ) VALUES (?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          randomUUID(),
+          newRandomId,
+          award.name,
+          award.issuer,
+          award.date,
+          award.description,
+        ],
+      });
+    }
+
+    await tx.commit();
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    await tx.rollback();
+    throw error;
+  } finally {
+    tx.close();
   }
-
-  // skills
-  const serializedSkills = serializeSkillsForStorage(skills);
-  await db.execute(
-    `
-    INSERT INTO cv_skills (cv_id, categorySkills, languages)
-    VALUES (?, ?, ?)
-    ON CONFLICT(cv_id) DO UPDATE SET
-      categorySkills = excluded.categorySkills,
-      languages = excluded.languages
-    `,
-    [newRandomId, serializedSkills.categorySkills]
-  );
-
-  // languages
-  const serializedLanguages = serializeLanguagesForStorage({ languages });
-  await db.execute(
-    `
-    INSERT INTO cv_languages (cv_id, languages)
-    VALUES (?, ?)
-    ON CONFLICT(cv_id) DO UPDATE SET
-      languages = excluded.languages
-    `,
-    [newRandomId, serializedLanguages.languages]
-  );
-
-  // certifications
-  for (const cert of certifications) {
-    await db.execute(
-      `
-      INSERT INTO cv_certifications (
-        id,
-        cv_id,
-        name,
-        issuing_org,
-        issue_date,
-        expiration_date,
-        credential_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        randomUUID(),
-        newRandomId,
-        cert.name,
-        cert.issuingOrg,
-        cert.issueDate,
-        cert.expirationDate || null,
-        cert.credentialId || null,
-      ]
-    );
-  }
-
-  // projects
-  for (const project of projects ?? []) {
-    await db.execute(
-      `
-      INSERT INTO cv_projects (
-        id,
-        cv_id,
-        name,
-        role,
-        start_date,
-        end_date,
-        description,
-        url
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        randomUUID(),
-        newRandomId,
-        project.name,
-        project.role,
-        project.startDate,
-        project.endDate,
-        project.description,
-        project.url || null,
-      ]
-    );
-  }
-
-  // awards
-  for (const award of awards ?? []) {
-    await db.execute(
-      `
-      INSERT INTO cv_awards (
-        id,
-        cv_id,
-        name,
-        issuer,
-        date,
-        description
-      ) VALUES (?, ?, ?, ?, ?, ?)
-      `,
-      [
-        randomUUID(),
-        newRandomId,
-        award.name,
-        award.issuer,
-        award.date,
-        award.description,
-      ]
-    );
-  }
-
-  return NextResponse.json({ success: true });
 }

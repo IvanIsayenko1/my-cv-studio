@@ -52,7 +52,6 @@ export function LoginForm({
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

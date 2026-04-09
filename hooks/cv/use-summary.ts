@@ -23,6 +23,7 @@ export function useSaveSummary(id: string) {
     onSuccess: () => {
       toast.success("Summary has been updated");
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SUMMARY, id] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
     },
     onError: (error) => {
       toast.error("Failed to update summary");
