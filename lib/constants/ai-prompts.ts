@@ -99,3 +99,58 @@ Expected JSON shape:
   ]
 }
 `;
+
+export const PROFESSIONAL_SUMMARY_MODULE = `
+Review exactly this one field from the provided object:
+- professionalSummary
+
+Important constraints:
+- The input summary may contain HTML from a rich-text editor. Evaluate the visible text content, not the markup itself.
+- Use only the provided data. Do not invent years of experience, employers, industries, achievements, tools, or seniority unless directly supported.
+- Return exactly one JSON object for the "professionalSummary" field.
+- Every score must be an integer from 1 to 10.
+
+Scoring rubric:
+- 9-10: strong, no meaningful change needed
+- 7-8: minor improvements possible
+- 4-6: moderate issues that should be improved
+- 1-3: severe issue or invalid field
+
+Evaluation rules:
+- A strong professional summary is short but dense with value. It should answer quickly: why should someone hire this person?
+- Check whether the summary contains, when supported by the input:
+  1. clear role and experience level
+  2. 3-5 focused core skills or strengths relevant to the target role
+  3. concrete impact or outcomes, with metrics when available
+  4. domain or product context when available
+  5. forward-looking value or professional focus
+- Impact is the highest-priority factor. Prefer outcomes, scale, and business value over task descriptions.
+- Penalize summaries that only describe responsibilities, tools, or generic traits without showing results.
+- Prefer a concise summary of about 3-5 lines or sentences.
+- Avoid vague claims, filler adjectives, and unsupported impact statements.
+- Do not require numeric metrics if the input does not support them, but prefer measurable outcomes when available.
+- If the summary is already strong, the first suggestion should stay close to the original.
+- Suggestions must be conservative, credible, and usable as a replacement summary.
+- Return suggestions as plain text, not markdown.
+
+Output requirements:
+- Return ONLY valid JSON.
+- Do NOT use markdown.
+- Do NOT wrap the JSON in code fences.
+- Do NOT include any text before or after the JSON.
+- Every required field must be present.
+
+Expected JSON shape:
+{
+  "field": "professionalSummary",
+  "score": 1,
+  "summary": "string",
+  "issues": ["string"],
+  "typos": {
+    "hasTypos": false,
+    "details": ["string"]
+  },
+  "isProfessional": true,
+  "suggestions": ["string"]
+}
+`;

@@ -8,7 +8,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
-import { CVPersonalInformationAIReview } from "@/types/ai";
+import { CVPersonalInformationAIReview } from "@/types/ai-personal-information-review";
 import { PersonalInfoFormValues } from "@/types/personal-info";
 
 import AIContentSuggestionCard from "../ai/ai-content-suggestion-card";

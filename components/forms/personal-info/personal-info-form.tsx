@@ -33,9 +33,9 @@ import { PROFESSIONAL_INFORMATION_MODULE } from "@/lib/constants/ai-prompts";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
 import {
-  cvPersonalInformationAIReviewSchema,
   CVPersonalInformationAIReview,
-} from "@/types/ai";
+  cvPersonalInformationAIReviewSchema,
+} from "@/types/ai-personal-information-review";
 import {
   PersonalInfoFormValues,
   personalInfoSchema,

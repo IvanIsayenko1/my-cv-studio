@@ -1,17 +1,6 @@
 import { z } from "zod";
 
-const typoReviewSchema = z.object({
-  hasTypos: z.boolean(),
-  details: z.array(z.string()),
-});
-
-const baseFieldAIReviewSchema = z.object({
-  field: z.string(),
-  score: z.number().min(1).max(10),
-  summary: z.string().min(1),
-  issues: z.array(z.string()),
-  typos: typoReviewSchema,
-});
+import { baseFieldAIReviewSchema } from "./ai-base-review";
 
 export const professionalTitleAIReviewSchema = baseFieldAIReviewSchema.extend({
   field: z.literal("professionalTitle"),

@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 
+import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import ProfessionalSummaryAIAssistantDialog from "@/components/dialogs/professional-summary-ai-assistant-dialog";
 import StatusBedge from "@/components/status-bedge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +24,13 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 import { useSaveSummary, useSummary } from "@/hooks/cv/use-summary";
 
+import { PROFESSIONAL_SUMMARY_MODULE } from "@/lib/constants/ai-prompts";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
+import {
+  CVProfessionalSummaryAIReview,
+  cvProfessionalSummaryReviewSchema,
+} from "@/types/ai-professional-summary-review";
 import { SummaryFormValues, summarySchema } from "@/types/summary";
 
 interface SummaryFormProps {
@@ -34,6 +41,10 @@ export function SummaryForm({ id }: SummaryFormProps) {
   const { data } = useSummary(id);
   const { mutate, isPending } = useSaveSummary(id);
   const queryClient = useQueryClient();
+  const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
+  const [aiReview, setAIReview] = useState<CVProfessionalSummaryAIReview | null>(
+    null
+  );
 
   const form = useForm<SummaryFormValues>({
     resolver: zodResolver(summarySchema),
@@ -100,6 +111,16 @@ export function SummaryForm({ id }: SummaryFormProps) {
           />
 
           <div className="cv-form-actions">
+            <CVBuilderAIAssistant<CVProfessionalSummaryAIReview>
+              value={form.getValues()}
+              prompt={PROFESSIONAL_SUMMARY_MODULE}
+              responseSchema={cvProfessionalSummaryReviewSchema}
+              handleResponse={(response) => {
+                if (!response) return;
+                setAIReview(response);
+                setIsOpenAIAssistantDialog(true);
+              }}
+            />
             <Button
               type="submit"
               disabled={isPending}
@@ -110,6 +131,13 @@ export function SummaryForm({ id }: SummaryFormProps) {
           </div>
         </form>
       </Form>
+
+      <ProfessionalSummaryAIAssistantDialog
+        isOpenDialog={isOpenAIAssistantDialog}
+        setIsOpenDialog={setIsOpenAIAssistantDialog}
+        aiReview={aiReview}
+        formId={id}
+      />
     </SectionWrapper>
   );
 }
