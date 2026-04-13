@@ -36,7 +36,6 @@ export default function CVBuilderAIAssistant<T>({
           const response = responseSchema
             ? responseSchema.parse(rawResponse)
             : (rawResponse as T);
-          console.log("AI response:", response);
           handleResponse(response);
         } catch (error) {
           console.error(error);

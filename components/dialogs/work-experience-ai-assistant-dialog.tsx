@@ -48,6 +48,7 @@ export default function WorkExperienceAIAssistantDialog({
   currentValues: WorkExperienceFormValues;
   onLocalApplySuggestion: (roleIndex: number, achievements: string) => void;
 }) {
+  console.log(currentValues);
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
   const queryClient = useQueryClient();
   const { mutate, isPending } = useSaveWorkExperience(formId);
@@ -56,7 +57,7 @@ export default function WorkExperienceAIAssistantDialog({
   >(null);
 
   const reviewNeedsAttention = aiReview
-    ? aiReview.results.filter((result) => result.score < 7)
+    ? aiReview.results.filter((result) => result.score < 8)
     : [];
 
   const handleAcceptSuggestion = (
@@ -209,7 +210,7 @@ export default function WorkExperienceAIAssistantDialog({
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 space-y-4 overflow-y-auto pr-1">
+          <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto pr-1">
             {dialogContent}
           </div>
         </DialogContent>

@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { useSaveSkills } from "@/hooks/cv/use-skills";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
@@ -50,9 +50,9 @@ export default function SkillsAIAssistantDialog({
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
   const queryClient = useQueryClient();
   const { mutate, isPending } = useSaveSkills(formId);
-  const [pendingCategoryIndex, setPendingCategoryIndex] = useState<number | null>(
-    null
-  );
+  const [pendingCategoryIndex, setPendingCategoryIndex] = useState<
+    number | null
+  >(null);
 
   const reviewNeedsAttention = aiReview
     ? aiReview.results.filter((result) => result.score < 8)
@@ -81,7 +81,9 @@ export default function SkillsAIAssistantDialog({
     setPendingCategoryIndex(categoryIndex);
     mutate(nextValues, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, formId] });
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.STATUS, formId],
+        });
       },
       onSettled: () => {
         setPendingCategoryIndex((current) =>
@@ -130,7 +132,9 @@ export default function SkillsAIAssistantDialog({
                 toListHtml(review.suggestedItems)
               )
             }
-            isPending={isPending && pendingCategoryIndex === review.categoryIndex}
+            isPending={
+              isPending && pendingCategoryIndex === review.categoryIndex
+            }
           >
             <CardContent className="space-y-4">
               <Field className="gap-2">
@@ -185,7 +189,7 @@ export default function SkillsAIAssistantDialog({
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 space-y-4 overflow-y-auto pr-1">
+          <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto pr-1">
             {dialogContent}
           </div>
         </DialogContent>
