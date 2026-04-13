@@ -2,14 +2,18 @@ import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
 
 import { renderATSCleanPreviewHTML } from "./ats-friendly-clean-html";
+import type { PreviewRenderOptions } from "./shared";
 import { renderVisualClearPreviewHTML } from "./visual-clear-html";
 
-export function renderPreviewHTML(cv: CV): string {
+export function renderPreviewHTML(
+  cv: CV,
+  options?: PreviewRenderOptions
+): string {
   switch (cv.templateId) {
-    case TemplateId.VISUAL_CLEAR:
-      return renderVisualClearPreviewHTML(cv);
-    case TemplateId.ATS_FRIENDLY_CLEAN:
+    case TemplateId.DESIGN_MINIMALIST:
+      return renderVisualClearPreviewHTML(cv, options);
+    case TemplateId.ATS_FRIENDLY_SIMPLE:
     default:
-      return renderATSCleanPreviewHTML(cv);
+      return renderATSCleanPreviewHTML(cv, options);
   }
 }

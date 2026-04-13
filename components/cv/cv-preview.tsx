@@ -216,7 +216,8 @@ export default function CVPreview({ id }: { id: string }) {
         date: item.date,
         description: item.description,
       })),
-      templateId: (template?.id as TemplateId) ?? TemplateId.ATS_FRIENDLY_CLEAN,
+      templateId:
+        (template?.id as TemplateId) ?? TemplateId.ATS_FRIENDLY_SIMPLE,
     };
   }, [
     awards,

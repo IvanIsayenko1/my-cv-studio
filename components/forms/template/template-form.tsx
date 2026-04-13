@@ -46,14 +46,14 @@ export function TemplateForm({ id }: TemplateFormProps) {
   const form = useForm<TemplateFormValues>({
     resolver: zodResolver(templateSchema),
     defaultValues: {
-      id: TemplateId.ATS_FRIENDLY_CLEAN,
+      id: TemplateId.ATS_FRIENDLY_SIMPLE,
     },
   });
   const { control, handleSubmit, reset } = form;
 
   useEffect(() => {
     if (!data) return;
-    reset({ id: data.id ?? TemplateId.ATS_FRIENDLY_CLEAN });
+    reset({ id: data.id ?? TemplateId.ATS_FRIENDLY_SIMPLE });
   }, [data, reset]);
 
   const onSubmit = (values: TemplateFormValues) => {

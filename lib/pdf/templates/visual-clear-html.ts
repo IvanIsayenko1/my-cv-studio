@@ -3,8 +3,10 @@ import { CV } from "@/types/cv";
 import {
   escapeHtml,
   getSharedTemplateData,
+  renderCVFontFace,
   renderRichTextBlock,
 } from "./shared";
+import type { PreviewRenderOptions } from "./shared";
 
 function renderBadgeSection(
   title: string,
@@ -22,7 +24,10 @@ function renderBadgeSection(
   `;
 }
 
-export function renderVisualClearPreviewHTML(cv: CV): string {
+export function renderVisualClearPreviewHTML(
+  cv: CV,
+  options?: PreviewRenderOptions
+): string {
   const {
     awardItems,
     certificationItems,
@@ -284,6 +289,8 @@ export function renderVisualClearPreviewHTML(cv: CV): string {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>${escapeHtml(fullName || cv.cvData.title || "CV")}</title>
         <style>
+          ${renderCVFontFace(options)}
+
           :root {
             color-scheme: light;
             --page-bg: #ffffff;
@@ -294,8 +301,8 @@ export function renderVisualClearPreviewHTML(cv: CV): string {
             --muted-text: #586171;
             --section-accent: #171c26;
             --section-border: rgba(18, 24, 38, 0.1);
-            --font-body: "Aptos", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
-            --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            --font-body: "CVGeist", "Aptos", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+            --font-heading: "CVGeist", "Helvetica Neue", Helvetica, Arial, sans-serif;
             --section-gap: 11px;
             --section-title-gap: 7px;
             --entry-gap: 9px;

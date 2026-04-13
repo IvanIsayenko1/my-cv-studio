@@ -3,10 +3,15 @@ import { CV } from "@/types/cv";
 import {
   escapeHtml,
   getSharedTemplateData,
+  renderCVFontFace,
   renderRichTextBlock,
 } from "./shared";
+import type { PreviewRenderOptions } from "./shared";
 
-export function renderATSCleanPreviewHTML(cv: CV): string {
+export function renderATSCleanPreviewHTML(
+  cv: CV,
+  options?: PreviewRenderOptions
+): string {
   const {
     awardItems,
     certificationItems,
@@ -234,6 +239,8 @@ export function renderATSCleanPreviewHTML(cv: CV): string {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>${escapeHtml(fullName || cv.cvData.title || "CV")}</title>
         <style>
+          ${renderCVFontFace(options)}
+
           :root {
             color-scheme: light;
             --text-primary: #0a0a0a;
@@ -250,7 +257,7 @@ export function renderATSCleanPreviewHTML(cv: CV): string {
             padding: 0;
             background: #ffffff;
             color: var(--text-primary);
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: "CVGeist", Arial, Helvetica, sans-serif;
             font-size: 12px;
             line-height: 1.5;
             overflow: auto;

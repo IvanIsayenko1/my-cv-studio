@@ -2,6 +2,26 @@ import { categoryItemsToList } from "@/lib/utils/skill-items";
 
 import { CV } from "@/types/cv";
 
+export type PreviewRenderOptions = {
+  fontSource?: string;
+};
+
+const DEFAULT_CV_FONT_SOURCE = "/fonts/Geist-Variable.woff2";
+
+export function renderCVFontFace(options: PreviewRenderOptions = {}) {
+  const fontSource = options.fontSource ?? DEFAULT_CV_FONT_SOURCE;
+
+  return `
+    @font-face {
+      font-family: "CVGeist";
+      src: url("${fontSource}") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+  `;
+}
+
 const ALLOWED_RICH_TEXT_TAGS = new Set([
   "p",
   "div",
