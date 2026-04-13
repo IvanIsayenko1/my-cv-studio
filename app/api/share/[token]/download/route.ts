@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getCVBasicInfoByShareToken } from "@/lib/db/queries";
+import { getCVBasicInfoByShareToken, getCompleteCV } from "@/lib/db/queries";
 import { generateHTMLCVPDF } from "@/lib/pdf/html-generator";
 
 export const runtime = "nodejs";
@@ -20,14 +20,22 @@ export async function GET(
       );
     }
 
-    const pdfBuffer = await generateHTMLCVPDF(cv);
+    const completeCv = await getCompleteCV(cv.cvId);
+    if (!completeCv) {
+      return NextResponse.json(
+        { error: "Shared CV not found or revoked" },
+        { status: 404 }
+      );
+    }
+
+    const pdfBuffer = await generateHTMLCVPDF(completeCv);
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Cache-Control": "no-store",
-        "Content-Disposition": `attachment; filename="${cv.cvData.title
+        "Content-Disposition": `attachment; filename="${completeCv.cvData.title
           .toLowerCase()
           .replace(/\s+/g, "-")}.pdf"`,
         "Content-Length": pdfBuffer.length.toString(),
