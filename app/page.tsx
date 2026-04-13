@@ -1,10 +1,31 @@
 import { CSSProperties } from "react";
 
 import { auth } from "@clerk/nextjs/server";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
+
+export const metadata: Metadata = {
+  title: "Build a Better CV Before You Apply",
+  description:
+    "Use mycvstudio to create a complete CV, improve resume sections with AI, organize versions, share a live CV link, and download your resume.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Build a Better CV Before You Apply",
+    description:
+      "Create, improve, share, and download your CV with a guided builder and AI writing assistant.",
+    url: "/",
+  },
+  twitter: {
+    title: "Build a Better CV Before You Apply",
+    description:
+      "Create, improve, share, and download your CV with a guided builder and AI writing assistant.",
+  },
+};
 
 const relatedApps = [
   {
@@ -54,6 +75,29 @@ const highlights = [
   },
 ] as const;
 
+const softwareSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "mycvstudio",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://my-cv-studio.vercel.app",
+  description:
+    "A web app for creating CVs, improving resume content with AI, organizing versions, sharing CV links, and downloading resumes.",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  featureList: [
+    "Guided CV builder",
+    "AI resume writing assistant",
+    "CV version organization",
+    "Shareable CV links",
+    "CV downloads",
+  ],
+} as const;
+
 export default async function Home() {
   const { userId } = await auth();
 
@@ -62,6 +106,10 @@ export default async function Home() {
       className="load-stagger"
       style={{ "--stagger": 2 } as CSSProperties}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
       <div className="mx-auto flex min-h-[calc(100vh-10rem)] max-w-5xl flex-col justify-center px-4 pt-6 pb-10 sm:px-6 lg:px-8">
         <div className="space-y-10 sm:space-y-12">
           <div className="space-y-6">
