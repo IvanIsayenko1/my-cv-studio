@@ -2,7 +2,13 @@
 
 import { useEffect } from "react";
 
-import { Copy, Link2, RefreshCcw, ShieldBan } from "lucide-react";
+import {
+  Copy,
+  Link2,
+  RefreshCcw,
+  ShieldBan,
+  TriangleAlert,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -109,6 +115,14 @@ export default function ShareCVDialog({
           Anyone with this link can only view the CV preview and download PDF.
           No editing actions are available.
         </p>
+
+        <div className="flex gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs leading-5 text-amber-900 dark:text-amber-200">
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" />
+          <p>
+            This is a live share link. Any update you make to this CV will also
+            appear on the shared link.
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">

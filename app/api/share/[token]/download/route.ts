@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getCompleteCVByShareToken } from "@/lib/db/queries";
+import { getCVBasicInfoByShareToken } from "@/lib/db/queries";
 import { generateHTMLCVPDF } from "@/lib/pdf/html-generator";
 
 export const runtime = "nodejs";
@@ -12,7 +12,7 @@ export async function GET(
   const { token } = await context.params;
 
   try {
-    const cv = await getCompleteCVByShareToken(String(token));
+    const cv = await getCVBasicInfoByShareToken(String(token));
     if (!cv) {
       return NextResponse.json(
         { error: "Shared CV not found or revoked" },

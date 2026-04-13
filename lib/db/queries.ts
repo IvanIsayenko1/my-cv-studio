@@ -7,7 +7,7 @@ import { CV } from "@/types/cv";
 import { TemplateId } from "@/types/template";
 
 import { db } from "./client";
-import { getActiveShareByToken } from "./share";
+import { ShareRecord, getActiveShareByToken } from "./share";
 
 export async function getCompleteCV(cvId: string): Promise<CV | null> {
   const cvMeta = await db.execute(
@@ -254,11 +254,11 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
   };
 }
 
-export async function getCompleteCVByShareToken(
+export async function getCVBasicInfoByShareToken(
   token: string
-): Promise<CV | null> {
+): Promise<ShareRecord | null> {
   const share = await getActiveShareByToken(token);
   if (!share) return null;
 
-  return getCompleteCV(share.cvId);
+  return share;
 }
