@@ -43,9 +43,9 @@ const highlights = [
       "Start with rough notes and ask the assistant to help write clearer bullet points, stronger summaries, and better resume sections.",
   },
   {
-    title: "Check ATS readiness",
+    title: "Keep versions organized",
     description:
-      "ATS means Applicant Tracking System. Many companies use this software to scan resumes before a recruiter reads them. The checker helps you make your CV easier for these systems to read.",
+      "Create different CVs for different roles, keep your edits in one place, and come back when you need to improve a version.",
   },
   {
     title: "Share and download",
@@ -74,9 +74,9 @@ export default async function Home() {
               </h1>
               <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
                 mycvstudio helps you write, improve, share, and download your
-                resume. Build your CV step by step, check if it is friendly for
-                hiring software, and use the AI assistant when you need help
-                turning your experience into clear resume text.
+                resume. Build your CV step by step and use the AI assistant
+                when you need help turning your experience into clear resume
+                text.
               </p>
             </div>
           </div>
