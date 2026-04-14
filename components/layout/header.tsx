@@ -9,7 +9,7 @@ import ResponsiveHeader from "../header/responsive-header";
 export default function Header() {
   return (
     <header
-      className="load-stagger sticky top-0 z-50 w-full backdrop-blur-3xl"
+      className="load-stagger sticky top-0 z-50 w-full"
       style={{ "--stagger": 0 } as CSSProperties}
       aria-label="Site header"
     >

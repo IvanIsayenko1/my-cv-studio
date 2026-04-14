@@ -301,8 +301,8 @@ export function renderVisualClearPreviewHTML(
             --muted-text: #586171;
             --section-accent: #171c26;
             --section-border: rgba(18, 24, 38, 0.1);
-            --font-body: "CVGeist", "Aptos", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
-            --font-heading: "CVGeist", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            --font-body: "CVInter", "Aptos", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+            --font-heading: "CVInter", "Helvetica Neue", Helvetica, Arial, sans-serif;
             --section-gap: 11px;
             --section-title-gap: 7px;
             --entry-gap: 9px;

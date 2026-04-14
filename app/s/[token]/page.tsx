@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import Link from "next/link";
 
+import { readFileSync } from "fs";
 import { Download } from "lucide-react";
 
 import CVPreview from "@/components/cv/cv-preview";
@@ -10,6 +11,10 @@ import PageContent from "@/components/layout/page-content";
 import { Button } from "@/components/ui/button";
 
 import { getCVBasicInfoByShareToken } from "@/lib/db/queries";
+
+const CV_FONT_DATA_URI = `data:font/woff2;base64,${readFileSync(
+  `${process.cwd()}/public/fonts/Inter.woff2`
+).toString("base64")}`;
 
 export default async function SharedCVPage({
   params,
@@ -47,7 +52,7 @@ export default async function SharedCVPage({
       </section>
 
       <Suspense fallback={<CVPreviewSkeleton />}>
-        <CVPreview id={cv.cvId} />
+        <CVPreview id={cv.cvId} fontDataUri={CV_FONT_DATA_URI} />
       </Suspense>
     </PageContent>
   );

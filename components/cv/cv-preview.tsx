@@ -30,30 +30,31 @@ const PAGE_MARGIN_PX = PAGE_MARGIN_MM * MM_TO_PX;
 const PRINTABLE_WIDTH_PX = PAGE_WIDTH_PX - PAGE_MARGIN_PX * 2;
 const PRINTABLE_HEIGHT_PX = PAGE_HEIGHT_PX - PAGE_MARGIN_PX * 2;
 
+// Chrome's print-mode renderer (Puppeteer) renders text fractionally taller
+// than screen mode, so content that fits in the preview can overflow in the PDF.
+// This offset shrinks the effective preview page height to match what Puppeteer
+// actually fits per page.
+const PRINT_MODE_HEIGHT_COMPENSATION_PX = 20;
+const EFFECTIVE_PAGE_HEIGHT_PX = PRINTABLE_HEIGHT_PX - PRINT_MODE_HEIGHT_COMPENSATION_PX;
+
 type PageMetrics = {
   pageStarts: number[];
   totalHeight: number;
 };
 
-const PAGE_BREAK_SELECTORS = [
-  ".header",
-  ".hero",
-  ".preview-section",
-  ".section",
-  ".entry",
-  ".timeline-entry",
-  ".mini-block",
-  ".language-list > div",
-].join(", ");
+// How far back from pageEnd we're willing to move the break to land on a
+// block boundary. Covers up to ~2 wrapped text lines (≈36px) plus a little
+// extra for larger fonts used in the Visual template.
+const SNAP_THRESHOLD_PX = 40;
 
 function computePageStarts(doc: Document, totalHeight: number) {
-  const candidates = Array.from(
-    doc.querySelectorAll<HTMLElement>(PAGE_BREAK_SELECTORS)
+  // Collect both top and bottom edges of every block-level text element so
+  // we can snap the page break to either edge — whichever is closest to
+  // pageEnd — without splitting a line in half.
+  const blocks = Array.from(
+    doc.querySelectorAll<HTMLElement>("p, li, h1, h2, h3, h4, h5, h6, .mini-block")
   )
-    .map((element) => ({
-      top: element.offsetTop,
-      bottom: element.offsetTop + element.offsetHeight,
-    }))
+    .map((el) => ({ top: el.offsetTop, bottom: el.offsetTop + el.offsetHeight }))
     .filter(({ bottom }) => bottom > 0)
     .sort((a, b) => a.top - b.top);
 
@@ -63,24 +64,26 @@ function computePageStarts(doc: Document, totalHeight: number) {
   while (currentStart + PRINTABLE_HEIGHT_PX < totalHeight - 1) {
     const pageEnd = currentStart + PRINTABLE_HEIGHT_PX;
 
-    const lastCandidateWithinPage = candidates.reduce<number | null>(
-      (latest, candidate) => {
-        if (candidate.top <= currentStart + 8) return latest;
-        if (candidate.top >= pageEnd - 8) return latest;
-        return candidate.top;
-      },
-      null
-    );
+    // Collect every element edge that is:
+    //   • a bottom edge  ≤ pageEnd and within threshold  (element ends just before cut)
+    //   • a top edge     < pageEnd and bottom > pageEnd  (element straddles the cut)
+    //     and that top is within threshold of pageEnd
+    // Then pick the edge closest to pageEnd — this is the safest break point.
+    let best: number | null = null;
 
-    const nextStart =
-      lastCandidateWithinPage && lastCandidateWithinPage > currentStart + 8
-        ? lastCandidateWithinPage
-        : pageEnd;
+    for (const { top, bottom } of blocks) {
+      if (top <= currentStart) continue;
 
-    if (nextStart >= totalHeight || nextStart <= currentStart + 8) {
-      break;
+      if (bottom <= pageEnd && pageEnd - bottom <= SNAP_THRESHOLD_PX) {
+        if (best === null || bottom > best) best = bottom;
+      }
+
+      if (top < pageEnd && bottom > pageEnd && pageEnd - top <= SNAP_THRESHOLD_PX) {
+        if (best === null || top > best) best = top;
+      }
     }
 
+    const nextStart = best ?? pageEnd;
     pageStarts.push(nextStart);
     currentStart = nextStart;
   }
@@ -101,6 +104,9 @@ function PreviewPage({
   totalHeight: number;
   scale: number;
 }) {
+  const marginH = PAGE_MARGIN_PX * scale;
+  const marginW = PAGE_MARGIN_PX * scale;
+
   return (
     <article
       className="border-border relative w-full overflow-hidden rounded-xl border bg-white shadow-lg"
@@ -109,8 +115,8 @@ function PreviewPage({
       <div
         className="absolute overflow-hidden"
         style={{
-          top: PAGE_MARGIN_PX * scale,
-          left: PAGE_MARGIN_PX * scale,
+          top: marginH,
+          left: marginW,
           width: PRINTABLE_WIDTH_PX * scale,
           height: visibleHeight * scale,
         }}
@@ -128,11 +134,17 @@ function PreviewPage({
           }}
         />
       </div>
+      {/* White bars covering the margin areas — prevents iframe content from
+          bleeding through when CSS transforms escape the overflow:hidden clip */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 bg-white" style={{ height: marginH }} />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-white" style={{ height: marginH }} />
+      <div className="pointer-events-none absolute inset-y-0 left-0 bg-white" style={{ width: marginW }} />
+      <div className="pointer-events-none absolute inset-y-0 right-0 bg-white" style={{ width: marginW }} />
     </article>
   );
 }
 
-export default function CVPreview({ id }: { id: string }) {
+export default function CVPreview({ id, fontDataUri }: { id: string; fontDataUri: string }) {
   const measureIframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -235,8 +247,8 @@ export default function CVPreview({ id }: { id: string }) {
 
   const htmlPreview = useMemo(() => {
     if (!fullCV) return "";
-    return renderPreviewHTML(fullCV);
-  }, [fullCV]);
+    return renderPreviewHTML(fullCV, { fontSource: fontDataUri });
+  }, [fullCV, fontDataUri]);
 
   useEffect(() => {
     const element = containerRef.current;

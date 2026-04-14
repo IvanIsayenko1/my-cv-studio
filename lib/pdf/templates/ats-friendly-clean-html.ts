@@ -148,11 +148,11 @@ export function renderATSCleanPreviewHTML(
     sections.push(`
       <section class="preview-section">
         <h3 class="section-title">Projects</h3>
-        <div class="stack-sm">
+        <div class="entry-list">
           ${projectItems
             .map(
               (project) => `
-                <article class="stack-xs">
+                <article class="entry stack-sm">
                   <p class="line-title">${escapeHtml(project.name)} · ${escapeHtml(project.role)}</p>
                   <p class="line-meta">${escapeHtml(project.startDate)} - ${escapeHtml(project.endDate)}</p>
                   ${
@@ -162,7 +162,7 @@ export function renderATSCleanPreviewHTML(
                   }
                   ${
                     project.url
-                      ? `<p class="line-meta"><span class="line-label">URL:</span> ${escapeHtml(project.url)}</p>`
+                      ? `<p class="line-meta project-url"><span class="line-label">URL:</span> ${escapeHtml(project.url)}</p>`
                       : ""
                   }
                 </article>
@@ -257,7 +257,7 @@ export function renderATSCleanPreviewHTML(
             padding: 0;
             background: #ffffff;
             color: var(--text-primary);
-            font-family: "CVGeist", Arial, Helvetica, sans-serif;
+            font-family: "CVInter", Arial, Helvetica, sans-serif;
             font-size: 12px;
             line-height: 1.5;
             overflow: auto;
@@ -400,6 +400,10 @@ export function renderATSCleanPreviewHTML(
           .rich-text ol {
             margin: 0;
             padding-left: 20px;
+          }
+
+          .project-url {
+            margin-top: 4px;
           }
 
         </style>

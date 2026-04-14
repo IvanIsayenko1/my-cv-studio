@@ -10,7 +10,7 @@ import CVBuilderHeader from "./cv-builder-header/cv-builder-header";
 import CVPreview from "./cv-preview";
 import CVPreviewSkeleton from "./cv-preview-skeleton";
 
-export default function CVBuilder() {
+export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
   const params = useParams();
   const id = params.id as string;
   const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
@@ -29,7 +29,7 @@ export default function CVBuilder() {
           style={stagger(6)}
         >
           <Suspense fallback={<CVPreviewSkeleton />}>
-            <CVPreview id={id} />
+            <CVPreview id={id} fontDataUri={fontDataUri} />
           </Suspense>
         </aside>
       </div>
