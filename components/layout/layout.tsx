@@ -1,6 +1,5 @@
 import { CSSProperties } from "react";
 
-import { ThemeSwitcher } from "@/components/layout/theme-switcher";
 import { Toaster } from "@/components/ui/sonner";
 
 import Header from "./header";
@@ -13,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main
-        className="load-stagger h-[calc(100dvh_-_4.5rem)] w-full"
+        className="load-stagger h-[calc(100dvh_-_4.5rem)] w-full overflow-auto"
         style={{ "--stagger": 1 } as CSSProperties}
       >
         {children}
