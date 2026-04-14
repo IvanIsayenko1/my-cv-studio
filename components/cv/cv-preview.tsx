@@ -30,6 +30,13 @@ const PAGE_MARGIN_PX = PAGE_MARGIN_MM * MM_TO_PX;
 const PRINTABLE_WIDTH_PX = PAGE_WIDTH_PX - PAGE_MARGIN_PX * 2;
 const PRINTABLE_HEIGHT_PX = PAGE_HEIGHT_PX - PAGE_MARGIN_PX * 2;
 
+// Chrome's print-mode renderer (Puppeteer) renders text fractionally taller
+// than screen mode, so content that fits in the preview can overflow in the PDF.
+// This offset shrinks the effective preview page height to match what Puppeteer
+// actually fits per page.
+const PRINT_MODE_HEIGHT_COMPENSATION_PX = 20;
+const EFFECTIVE_PAGE_HEIGHT_PX = PRINTABLE_HEIGHT_PX - PRINT_MODE_HEIGHT_COMPENSATION_PX;
+
 type PageMetrics = {
   pageStarts: number[];
   totalHeight: number;
@@ -38,7 +45,7 @@ type PageMetrics = {
 const PAGE_BREAK_SELECTORS = [
   ".header",
   ".hero",
-  ".preview-section",
+  ".preview-section:not(.nested)",
   ".section",
   ".entry",
   ".timeline-entry",
@@ -60,8 +67,8 @@ function computePageStarts(doc: Document, totalHeight: number) {
   const pageStarts = [0];
   let currentStart = 0;
 
-  while (currentStart + PRINTABLE_HEIGHT_PX < totalHeight - 1) {
-    const pageEnd = currentStart + PRINTABLE_HEIGHT_PX;
+  while (currentStart + EFFECTIVE_PAGE_HEIGHT_PX < totalHeight - 1) {
+    const pageEnd = currentStart + EFFECTIVE_PAGE_HEIGHT_PX;
 
     const lastCandidateWithinPage = candidates.reduce<number | null>(
       (latest, candidate) => {
@@ -104,7 +111,7 @@ function PreviewPage({
   return (
     <article
       className="border-border relative w-full overflow-hidden rounded-xl border bg-white shadow-lg"
-      style={{ aspectRatio: `${PAGE_WIDTH_MM} / ${PAGE_HEIGHT_MM}` }}
+      style={{ height: (PAGE_MARGIN_PX * 2 + visibleHeight) * scale }}
     >
       <div
         className="absolute overflow-hidden"
@@ -132,7 +139,7 @@ function PreviewPage({
   );
 }
 
-export default function CVPreview({ id }: { id: string }) {
+export default function CVPreview({ id, fontDataUri }: { id: string; fontDataUri: string }) {
   const measureIframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -235,8 +242,8 @@ export default function CVPreview({ id }: { id: string }) {
 
   const htmlPreview = useMemo(() => {
     if (!fullCV) return "";
-    return renderPreviewHTML(fullCV);
-  }, [fullCV]);
+    return renderPreviewHTML(fullCV, { fontSource: fontDataUri });
+  }, [fullCV, fontDataUri]);
 
   useEffect(() => {
     const element = containerRef.current;
@@ -297,7 +304,7 @@ export default function CVPreview({ id }: { id: string }) {
       pageStart,
       visibleHeight: Math.max(
         0,
-        Math.min(PRINTABLE_HEIGHT_PX, nextStart - pageStart)
+        Math.min(EFFECTIVE_PAGE_HEIGHT_PX, nextStart - pageStart)
       ),
     };
   });

@@ -17,7 +17,7 @@ export function renderCVFontFace(options: PreviewRenderOptions = {}) {
       src: url("${fontSource}") format("woff2");
       font-weight: 100 900;
       font-style: normal;
-      font-display: swap;
+      font-display: block;
     }
   `;
 }

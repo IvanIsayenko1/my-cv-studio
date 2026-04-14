@@ -35,6 +35,13 @@ export async function generateHTMLCVPDF(cv: CV): Promise<Buffer> {
 
   try {
     const page = await browser.newPage();
+    // Match the printable width so text wraps identically in preview and PDF.
+    // A4 minus 16 mm margins on each side = 178 mm ≈ 673 px at 96 dpi.
+    await page.setViewport({
+      width: Math.round((210 - 32) * (96 / 25.4)), // ≈ 673 px
+      height: Math.round((297 - 32) * (96 / 25.4)), // ≈ 1002 px
+      deviceScaleFactor: 1,
+    });
     await page.setContent(
       renderPreviewHTML(cv, { fontSource: CV_FONT_DATA_URI }),
       {
