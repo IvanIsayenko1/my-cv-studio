@@ -80,6 +80,12 @@ export default function DuplicateCVDialog({
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_LIST] });
       toast.success("CV has been duplicated");
     },
+    onError: (error) => {
+      if (error.message)
+        setError("name", {
+          message: error.message,
+        });
+    },
   });
 
   const onSubmit = (data: CVNameFormValues) => {
@@ -116,15 +122,23 @@ export default function DuplicateCVDialog({
     // Desktop presentation
     return (
       <Dialog open={open} onOpenChange={onHandleOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Duplicate existing CV</DialogTitle>
           </DialogHeader>
           <Form {...form}>
-            <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              id={formId}
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
               {nameField}
 
-              <DialogFooter className="pt-2">
+              <DialogFooter>
+                <Button type="submit" disabled={isDuplicatePending}>
+                  {isDuplicatePending && <Spinner />}
+                  {isDuplicatePending ? "Duplicating..." : "Duplicate"}
+                </Button>
                 <DialogClose asChild>
                   <Button
                     type="button"
@@ -135,10 +149,6 @@ export default function DuplicateCVDialog({
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={isDuplicatePending}>
-                  {isDuplicatePending && <Spinner />}
-                  {isDuplicatePending ? "Duplicating..." : "Duplicate"}
-                </Button>
               </DialogFooter>
             </form>
           </Form>
