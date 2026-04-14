@@ -47,7 +47,7 @@ export function useSaveAwards(id: string) {
  * Suspense query hook to fetch awards data.
  * @param id The ID of the CV/resume.
  */
-export function useAwards(id: string) {
+export function useAwardsSuspenseQuery(id: string): { data: AwardsFormValues } {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.AWARDS, id],
     queryFn: () => fetchAwards(id),

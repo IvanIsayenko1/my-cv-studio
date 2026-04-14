@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
@@ -25,42 +24,42 @@ import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Separator } from "@/components/ui/separator";
 
-import { useSaveSkills, useSkills } from "@/hooks/cv/use-skills";
+import { useSaveSkills } from "@/hooks/cv/use-skills";
 
 import { SKILLS_MODULE } from "@/lib/constants/ai-prompts";
-import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
-import { CVSkillsAIReview, cvSkillsAIReviewSchema } from "@/types/ai-skills-review";
+import {
+  CVSkillsAIReview,
+  cvSkillsAIReviewSchema,
+} from "@/types/ai-skills-review";
+import { BuilderFormProps } from "@/types/builder-form";
 import { SkillsFormValues, skillsSchema } from "@/types/skills";
-
-interface SkillsFormProps {
-  id: string;
-}
 
 const createEmptyCategory = () => ({
   name: "",
   items: "",
 });
 
-export function SkillsForm({ id }: SkillsFormProps) {
+export function SkillsForm({
+  id,
+  formData,
+}: BuilderFormProps<SkillsFormValues>) {
   const [removeCategoryIndex, setRemoveCategoryIndex] = useState<number | null>(
     null
   );
   const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
   const [aiReview, setAIReview] = useState<CVSkillsAIReview | null>(null);
 
-  const { data } = useSkills(id);
   const { mutate, isPending } = useSaveSkills(id);
-  const queryClient = useQueryClient();
 
   const form = useForm<SkillsFormValues>({
     resolver: zodResolver(skillsSchema),
     defaultValues: {
-      categories: [createEmptyCategory()],
+      categories: formData.categories || [createEmptyCategory()],
     },
   });
 
-  const { control, reset, formState, handleSubmit } = form;
+  const { control, formState, handleSubmit } = form;
   const isComplete = formState.isValid;
 
   const {
@@ -72,23 +71,8 @@ export function SkillsForm({ id }: SkillsFormProps) {
     name: "categories",
   });
 
-  useEffect(() => {
-    if (!data) return;
-
-    reset({
-      categories:
-        data?.categories?.length && data.categories.length > 0
-          ? data.categories
-          : [createEmptyCategory()],
-    });
-  }, [data, reset]);
-
   const onSubmit = (values: SkillsFormValues) => {
-    mutate(values, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
-      },
-    });
+    mutate(values);
   };
 
   const watchedCategories = useWatch({
@@ -119,12 +103,12 @@ export function SkillsForm({ id }: SkillsFormProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 flex gap-8 flex-col"
+            className="flex flex-col gap-8 space-y-8"
           >
             {categoryFields.map((field, index) => (
-              <div key={field.id} className="space-y-4 mb-0">
+              <div key={field.id} className="mb-0 space-y-4">
                 <div className="mb-2 flex items-start justify-between">
-                  <div className="text-sm font-medium text-muted-foreground">
+                  <div className="text-muted-foreground text-sm font-medium">
                     Category {index + 1}
                   </div>
                   {categoryFields.length > 1 && (

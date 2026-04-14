@@ -36,7 +36,9 @@ export function useSaveTemplate(id: string) {
  * Suspense query hook to fetch template settings.
  * @param id The ID of the CV/resume.
  */
-export function useTemplate(id: string) {
+export function useTemplateSuspenseQuery(id: string): {
+  data: TemplateFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.TEMPLATE, id],
     queryFn: () => fetchTemplate(id),

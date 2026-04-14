@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,50 +21,35 @@ import { Input } from "@/components/ui/input";
 import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { Separator } from "@/components/ui/separator";
 
-import {
-  useCertifications,
-  useSaveCertifications,
-} from "@/hooks/cv/use-certifications";
+import { useSaveCertifications } from "@/hooks/cv/use-certifications";
 
+import { BuilderFormProps } from "@/types/builder-form";
 import {
   CertificationsFormValues,
   certificationsSchema,
 } from "@/types/certifications";
 
-interface CertificationsFormProps {
-  id: string;
-}
-
-export function CertificationsForm({ id }: CertificationsFormProps) {
+export function CertificationsForm({
+  id,
+  formData,
+}: BuilderFormProps<CertificationsFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
-  const { data } = useCertifications(id);
   const { mutate, isPending } = useSaveCertifications(id);
 
   const form = useForm<CertificationsFormValues>({
     resolver: zodResolver(certificationsSchema),
     defaultValues: {
-      certifications: [],
+      certifications: formData.certifications || [],
     },
   });
 
-  const { control, reset, formState, handleSubmit } = form;
+  const { control, handleSubmit } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "certifications",
   });
-
-  useEffect(() => {
-    if (!data) return;
-
-    reset({
-      certifications:
-        data.certifications && data.certifications.length > 0
-          ? data.certifications
-          : [],
-    });
-  }, [data, reset]);
 
   const onSubmit = (values: CertificationsFormValues) => {
     mutate(values);
@@ -94,12 +79,12 @@ export function CertificationsForm({ id }: CertificationsFormProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 flex gap-8 flex-col"
+            className="flex flex-col gap-8 space-y-8"
           >
             {fields.map((field, index) => (
-              <div key={field.id} className="space-y-4 mb-0">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="font-medium text-sm text-muted-foreground">
+              <div key={field.id} className="mb-0 space-y-4">
+                <div className="mb-2 flex items-start justify-between">
+                  <div className="text-muted-foreground text-sm font-medium">
                     Certification {index + 1}
                   </div>
                   {fields.length > 0 && (

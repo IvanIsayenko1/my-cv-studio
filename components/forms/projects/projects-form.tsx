@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,43 +22,32 @@ import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Separator } from "@/components/ui/separator";
 
-import { useProjects, useSaveProjects } from "@/hooks/cv/use-projects";
+import { useSaveProjects } from "@/hooks/cv/use-projects";
 
+import { BuilderFormProps } from "@/types/builder-form";
 import { ProjectsFormValues, projectsSchema } from "@/types/projects";
 
-interface ProjectsFormProps {
-  id: string;
-  sectionTitle?: string;
-}
-
-export function ProjectsForm({ id }: ProjectsFormProps) {
+export function ProjectsForm({
+  id,
+  formData,
+}: BuilderFormProps<ProjectsFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
-  const { data } = useProjects(id);
   const { mutate, isPending } = useSaveProjects(id);
 
   const form = useForm<ProjectsFormValues>({
     resolver: zodResolver(projectsSchema),
     defaultValues: {
-      projects: [], // allow having no projects
+      projects: formData?.projects || [], // allow having no projects
     },
   });
 
-  const { control, reset, formState, handleSubmit } = form;
-  const { isDirty } = formState;
+  const { control, handleSubmit } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "projects",
   });
-
-  useEffect(() => {
-    if (!data) return;
-
-    reset({
-      projects: data.projects && data.projects.length > 0 ? data.projects : [],
-    });
-  }, [data, reset]);
 
   const onSubmit = (values: ProjectsFormValues) => {
     mutate(values);
@@ -91,12 +80,12 @@ export function ProjectsForm({ id }: ProjectsFormProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 flex gap-8 flex-col"
+            className="flex flex-col gap-8 space-y-8"
           >
             {fields.map((field, index) => (
-              <div key={field.id} className="space-y-4 mb-0">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="font-medium text-sm text-muted-foreground">
+              <div key={field.id} className="mb-0 space-y-4">
+                <div className="mb-2 flex items-start justify-between">
+                  <div className="text-muted-foreground text-sm font-medium">
                     Project {index + 1}
                   </div>
                   {fields.length > 0 && (

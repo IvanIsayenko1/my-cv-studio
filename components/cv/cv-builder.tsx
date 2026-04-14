@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 
 import PageContent from "../layout/page-content";
 import CVBuilderForm from "./cv-builder-form";
+import CVBuilderFormSkeleton from "./cv-builder-form-skeleton";
 import CVBuilderHeader from "./cv-builder-header/cv-builder-header";
 import CVPreview from "./cv-preview";
 import CVPreviewSkeleton from "./cv-preview-skeleton";
@@ -21,7 +22,9 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
       <CVBuilderHeader />
       <div className="grid h-full min-h-0 w-full grid-cols-1 gap-2 overflow-hidden lg:grid-cols-2">
         {/* The forms */}
-        <CVBuilderForm />
+        <Suspense fallback={<CVBuilderFormSkeleton />}>
+          <CVBuilderForm />
+        </Suspense>
 
         {/* The preview, hidden on smaller screens to save space */}
         <aside

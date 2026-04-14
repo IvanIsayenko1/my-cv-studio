@@ -53,7 +53,9 @@ export function useSaveCertifications(id: string) {
  * Suspense query hook to fetch certifications data.
  * @param id The ID of the CV/resume.
  */
-export function useCertifications(id: string) {
+export function useCertificationsSuspenseQuery(id: string): {
+  data: CertificationsFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.CERTIFICATIONS, id],
     queryFn: () => fetchCertifications(id),

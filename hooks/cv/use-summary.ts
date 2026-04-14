@@ -36,7 +36,9 @@ export function useSaveSummary(id: string) {
  * Suspense query hook to fetch the professional summary.
  * @param id The ID of the CV/resume.
  */
-export function useSummary(id: string) {
+export function useSummarySuspenseQuery(id: string): {
+  data: SummaryFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.SUMMARY, id],
     queryFn: () => fetchSummary(id),

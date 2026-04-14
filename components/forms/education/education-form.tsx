@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
@@ -23,27 +22,23 @@ import { Input } from "@/components/ui/input";
 import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { Separator } from "@/components/ui/separator";
 
-import { useEducation, useSaveEducation } from "@/hooks/cv/use-education";
+import { useSaveEducation } from "@/hooks/cv/use-education";
 
-import { QUERY_KEYS } from "@/lib/constants/query-keys";
-
+import { BuilderFormProps } from "@/types/builder-form";
 import { EducationFormValues, educationSchema } from "@/types/education";
 
-interface EducationFormProps {
-  id: string;
-}
-
-export function EducationForm({ id }: EducationFormProps) {
+export function EducationForm({
+  id,
+  formData,
+}: BuilderFormProps<EducationFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
-  const { data } = useEducation(id);
   const { mutate, isPending } = useSaveEducation(id);
-  const queryClient = useQueryClient();
 
   const form = useForm<EducationFormValues>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      education: [
+      education: formData?.education || [
         {
           degree: "",
           fieldOfStudy: "",
@@ -58,7 +53,7 @@ export function EducationForm({ id }: EducationFormProps) {
     },
   });
 
-  const { control, reset, formState, handleSubmit } = form;
+  const { control, handleSubmit } = form;
   const isComplete = form.formState.isValid;
 
   const { fields, append, remove } = useFieldArray({
@@ -66,44 +61,8 @@ export function EducationForm({ id }: EducationFormProps) {
     name: "education",
   });
 
-  // hydrate from API, but always ensure at least one item
-  useEffect(() => {
-    if (!data) return;
-
-    reset({
-      education:
-        data.education && data.education.length > 0
-          ? data.education.map((edu: any) => ({
-              degree: edu.degree ?? "",
-              fieldOfStudy: edu.fieldOfStudy ?? "",
-              institution: edu.institution ?? "",
-              location: edu.location ?? "",
-              graduationDate: edu.graduationDate ?? "",
-              grade: edu.grade ?? "",
-              gradingScale: edu.gradingScale ?? "",
-              honors: edu.honors ?? "",
-            }))
-          : [
-              {
-                degree: "",
-                fieldOfStudy: "",
-                institution: "",
-                location: "",
-                graduationDate: "",
-                grade: "",
-                gradingScale: "",
-                honors: "",
-              },
-            ],
-    });
-  }, [data, reset]);
-
   const onSubmit = (values: EducationFormValues) => {
-    mutate(values, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
-      },
-    });
+    mutate(values);
   };
 
   const watchedEducation = useWatch({
@@ -136,12 +95,12 @@ export function EducationForm({ id }: EducationFormProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 flex gap-8 flex-col"
+            className="flex flex-col gap-8 space-y-8"
           >
             {fields.map((field, index) => (
-              <div key={field.id} className="space-y-4 mb-0">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="font-medium text-sm text-muted-foreground">
+              <div key={field.id} className="mb-0 space-y-4">
+                <div className="mb-2 flex items-start justify-between">
+                  <div className="text-muted-foreground text-sm font-medium">
                     Education {index + 1}
                   </div>
                   {fields.length > 1 && (

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import Image from "next/image";
@@ -24,10 +23,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { useSaveTemplate, useTemplate } from "@/hooks/cv/use-template";
+import { useSaveTemplate } from "@/hooks/cv/use-template";
 
 import { cn } from "@/lib/utils/cn";
 
+import { BuilderFormProps } from "@/types/builder-form";
 import {
   TEMPLATE_OPTIONS,
   TemplateFormValues,
@@ -35,26 +35,19 @@ import {
   templateSchema,
 } from "@/types/template";
 
-interface TemplateFormProps {
-  id: string;
-}
-
-export function TemplateForm({ id }: TemplateFormProps) {
-  const { data } = useTemplate(id);
+export function TemplateForm({
+  id,
+  formData,
+}: BuilderFormProps<TemplateFormValues>) {
   const { mutate, isPending } = useSaveTemplate(id);
 
   const form = useForm<TemplateFormValues>({
     resolver: zodResolver(templateSchema),
     defaultValues: {
-      id: TemplateId.ATS_FRIENDLY_SIMPLE,
+      id: formData?.id || TemplateId.ATS_FRIENDLY_SIMPLE,
     },
   });
-  const { control, handleSubmit, reset } = form;
-
-  useEffect(() => {
-    if (!data) return;
-    reset({ id: data.id ?? TemplateId.ATS_FRIENDLY_SIMPLE });
-  }, [data, reset]);
+  const { control, handleSubmit } = form;
 
   const onSubmit = (values: TemplateFormValues) => {
     mutate(values);

@@ -39,6 +39,7 @@ export function useSaveWorkExperience(id: string) {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.WORK_EXPERIENCE, id],
       });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
     },
     onError: (error) => {
       toast.error("Failed to update work experience");
@@ -51,7 +52,9 @@ export function useSaveWorkExperience(id: string) {
  * Suspense query hook to fetch work experience data.
  * @param id The ID of the CV/resume.
  */
-export function useWorkExperience(id: string) {
+export function useWorkExperienceSuspenseQuery(id: string): {
+  data: WorkExperienceFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.WORK_EXPERIENCE, id],
     queryFn: () => fetchWorkExperience(id),

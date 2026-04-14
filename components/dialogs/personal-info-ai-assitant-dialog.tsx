@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import {
-  usePersonalInfo,
+  usePersonalInfoSuspenseQuery,
   useSavePersonalInfo,
 } from "@/hooks/cv/use-personal-info";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -45,7 +45,7 @@ export default function PersonalInfoAIAssistantDialog({
   formId: string;
 }) {
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
-  const { data: personalInfo } = usePersonalInfo(formId);
+  const { data: personalInfo } = usePersonalInfoSuspenseQuery(formId);
   const { mutate, isPending } = useSavePersonalInfo(formId);
   const reviewNeedsAttention = aiReview
     ? aiReview.results.filter((result) => result.score < 8)

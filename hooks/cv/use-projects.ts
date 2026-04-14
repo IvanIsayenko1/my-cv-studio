@@ -55,7 +55,9 @@ export function useSaveProjects(id: string) {
  * Suspense query hook to fetch projects data.
  * @param id The ID of the CV/resume.
  */
-export function useProjects(id: string) {
+export function useProjectsSuspenseQuery(id: string): {
+  data: ProjectsFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.PROJECTS, id],
     queryFn: () => fetchProjects(id),

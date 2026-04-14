@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronDown, Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
@@ -21,14 +20,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import {
   MobileOverlay,
   MobileOverlayBody,
   MobileOverlayClose,
@@ -37,33 +28,34 @@ import {
   MobileOverlayHeader,
   MobileOverlayTitle,
 } from "@/components/ui/mobile-overlay";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
-import { useLanguages, useSaveLanguages } from "@/hooks/cv/use-languages";
+import { useSaveLanguages } from "@/hooks/cv/use-languages";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
-import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
-import { LanguagesFormValues, languagesSchema } from "@/schemas/languages";
+import type { BuilderFormProps } from "@/types/builder-form";
+import { PROFICIENCY_OPTIONS } from "@/types/languages";
 
-interface LanguagesFormProps {
-  id: string;
-}
+import { LanguagesFormValues, languagesSchema } from "@/schemas/languages";
 
 const createEmptyLanguage = () => ({
   language: "",
   proficiency: "",
 });
 
-const PROFICIENCY_OPTIONS = [
-  { value: "Native", label: "Native" },
-  { value: "Fluent", label: "Fluent / C1–C2" },
-  { value: "Advanced", label: "Advanced / B2" },
-  { value: "Intermediate", label: "Intermediate / B1" },
-  { value: "Basic", label: "Basic / A1–A2" },
-] as const;
-
-export function LanguagesForm({ id }: LanguagesFormProps) {
+export function LanguagesForm({
+  id,
+  formData,
+}: BuilderFormProps<LanguagesFormValues>) {
   const [removeLanguageIndex, setRemoveLanguageIndex] = useState<number | null>(
     null
   );
@@ -72,18 +64,16 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
   >(null);
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
-  const { data } = useLanguages(id);
   const { mutate, isPending } = useSaveLanguages(id);
-  const queryClient = useQueryClient();
 
   const form = useForm<LanguagesFormValues>({
     resolver: zodResolver(languagesSchema),
     defaultValues: {
-      languages: [createEmptyLanguage()],
+      languages: formData?.languages || [createEmptyLanguage()],
     },
   });
 
-  const { control, reset, formState, handleSubmit } = form;
+  const { control, formState, handleSubmit } = form;
   const isComplete = formState.isValid;
 
   const {
@@ -95,23 +85,8 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
     name: "languages",
   });
 
-  useEffect(() => {
-    if (!data) return;
-
-    reset({
-      languages:
-        data?.languages?.length && data.languages.length > 0
-          ? data.languages
-          : [createEmptyLanguage()],
-    });
-  }, [data, reset]);
-
   const onSubmit = (values: LanguagesFormValues) => {
-    mutate(values, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
-      },
-    });
+    mutate(values);
   };
 
   const watchedLanguages = useWatch({
@@ -141,12 +116,12 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 flex gap-8 flex-col"
+            className="flex flex-col gap-8 space-y-8"
           >
             {languageFields.map((field, index) => (
-              <div key={field.id} className="space-y-4 mb-0">
+              <div key={field.id} className="mb-0 space-y-4">
                 <div className="mb-2 flex items-start justify-between">
-                  <div className="text-sm font-medium text-muted-foreground">
+                  <div className="text-muted-foreground text-sm font-medium">
                     Language {index + 1}
                   </div>
                   {languageFields.length > 1 && (
@@ -324,7 +299,12 @@ export function LanguagesForm({ id }: LanguagesFormProps) {
           </MobileOverlayBody>
           <MobileOverlayFooter>
             <MobileOverlayClose asChild>
-              <Button type="button" variant="outline" size="lg" className="w-full">
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
+              >
                 Close
               </Button>
             </MobileOverlayClose>

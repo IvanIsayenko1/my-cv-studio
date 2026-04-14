@@ -23,6 +23,7 @@ export function useSaveEducation(id: string) {
     onSuccess: () => {
       toast.success("Education has been updated");
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EDUCATION, id] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
     },
     onError: (error) => {
       toast.error("Failed to update education");
@@ -35,7 +36,9 @@ export function useSaveEducation(id: string) {
  * Suspense query hook to fetch education data.
  * @param id The ID of the CV/resume.
  */
-export function useEducation(id: string) {
+export function useEducationSuspenseQuery(id: string): {
+  data: EducationFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.EDUCATION, id],
     queryFn: () => fetchEducation(id),

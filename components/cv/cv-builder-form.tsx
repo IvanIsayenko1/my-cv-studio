@@ -1,160 +1,57 @@
 "use client";
 
-import { CSSProperties, Suspense, useLayoutEffect } from "react";
-
 import { useParams } from "next/navigation";
 
 import { AwardsForm } from "@/components/forms/awards/awards-form";
-import AwardsFormSkeleton from "@/components/forms/awards/awards-form-skeleton";
 import { CertificationsForm } from "@/components/forms/certifications/certifications-form";
-import { CertificationsFormSkeleton } from "@/components/forms/certifications/certifications-form-skeleton";
 import { EducationForm } from "@/components/forms/education/education-form";
-import { EducationFormSkeleton } from "@/components/forms/education/education-form-skeleton";
 import { PersonalInfoForm } from "@/components/forms/personal-info/personal-info-form";
 import { ProjectsForm } from "@/components/forms/projects/projects-form";
-import ProjectsFormSkeleton from "@/components/forms/projects/projects-form-skeleton";
 import { SkillsForm } from "@/components/forms/skills/skills-form";
-import { SkillsFormSkeleton } from "@/components/forms/skills/skills-form-skeleton";
 import { SummaryForm } from "@/components/forms/summary/summary-form";
-import { SummaryFormSkeleton } from "@/components/forms/summary/summary-form-skeleton";
 import { TemplateForm } from "@/components/forms/template/template-form";
-import TemplateFormSkeleton from "@/components/forms/template/template-form-skeleton";
 import { WorkExperienceForm } from "@/components/forms/work-experience/work-experience-form";
-import { WorkExperienceFormSkeleton } from "@/components/forms/work-experience/work-experience-form-skeleton";
+
+import { useAwardsSuspenseQuery } from "@/hooks/cv/use-awards";
+import { useCertificationsSuspenseQuery } from "@/hooks/cv/use-certifications";
+import { useEducationSuspenseQuery } from "@/hooks/cv/use-education";
+import { useLanguagesSuspenseQuery } from "@/hooks/cv/use-languages";
+import { usePersonalInfoSuspenseQuery } from "@/hooks/cv/use-personal-info";
+import { useProjectsSuspenseQuery } from "@/hooks/cv/use-projects";
+import { useSkillsSuspenseQuery } from "@/hooks/cv/use-skills";
+import { useSummarySuspenseQuery } from "@/hooks/cv/use-summary";
+import { useTemplateSuspenseQuery } from "@/hooks/cv/use-template";
+import { useWorkExperienceSuspenseQuery } from "@/hooks/cv/use-work-experience";
 
 import { LanguagesForm } from "../forms/languages/languages-form";
-import { LanguagesFormSkeleton } from "../forms/languages/languages-form-skeleton";
-import { PersonalInfoFormSkeleton } from "../forms/personal-info/personal-info-form-skeleton";
 
 export default function CVBuilderForm() {
   const params = useParams();
   const id = params.id as string;
-  const collapsedSections = JSON.parse(
-    localStorage.getItem(`cv-form-closed-sections-${id}`) || "[]"
-  ) as string[];
-  const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
+
+  const { data: personalInfoData } = usePersonalInfoSuspenseQuery(id);
+  const { data: summaryData } = useSummarySuspenseQuery(id);
+  const { data: awardsData } = useAwardsSuspenseQuery(id);
+  const { data: workExperienceData } = useWorkExperienceSuspenseQuery(id);
+  const { data: skillsData } = useSkillsSuspenseQuery(id);
+  const { data: educationData } = useEducationSuspenseQuery(id);
+  const { data: languagesData } = useLanguagesSuspenseQuery(id);
+  const { data: certificationsData } = useCertificationsSuspenseQuery(id);
+  const { data: projectsData } = useProjectsSuspenseQuery(id);
+  const { data: templateData } = useTemplateSuspenseQuery(id);
 
   return (
     <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto pb-4">
-      <div className="load-stagger" style={stagger(3)}>
-        <Suspense
-          fallback={
-            <PersonalInfoFormSkeleton
-              collapsed={collapsedSections.includes("personal-info")}
-            />
-          }
-        >
-          <PersonalInfoForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(4)}>
-        <Suspense
-          fallback={
-            <SummaryFormSkeleton
-              collapsed={collapsedSections.includes("summary")}
-            />
-          }
-        >
-          <SummaryForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(5)}>
-        <Suspense
-          fallback={
-            <WorkExperienceFormSkeleton
-              collapsed={collapsedSections.includes("work-experience")}
-            />
-          }
-        >
-          <WorkExperienceForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(6)}>
-        <Suspense
-          fallback={
-            <SkillsFormSkeleton
-              collapsed={collapsedSections.includes("skills")}
-            />
-          }
-        >
-          <SkillsForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(7)}>
-        <Suspense
-          fallback={
-            <EducationFormSkeleton
-              collapsed={collapsedSections.includes("education")}
-            />
-          }
-        >
-          <EducationForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(8)}>
-        <Suspense
-          fallback={
-            <LanguagesFormSkeleton
-              collapsed={collapsedSections.includes("languages")}
-            />
-          }
-        >
-          <LanguagesForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(9)}>
-        <Suspense
-          fallback={
-            <CertificationsFormSkeleton
-              collapsed={collapsedSections.includes("certifications")}
-            />
-          }
-        >
-          <CertificationsForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(10)}>
-        <Suspense
-          fallback={
-            <ProjectsFormSkeleton
-              collapsed={collapsedSections.includes("projects")}
-            />
-          }
-        >
-          <ProjectsForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(11)}>
-        <Suspense
-          fallback={
-            <AwardsFormSkeleton
-              collapsed={collapsedSections.includes("awards")}
-            />
-          }
-        >
-          <AwardsForm id={id} />
-        </Suspense>
-      </div>
-
-      <div className="load-stagger" style={stagger(12)}>
-        <Suspense
-          fallback={
-            <TemplateFormSkeleton
-              collapsed={collapsedSections.includes("template")}
-            />
-          }
-        >
-          <TemplateForm id={id} />
-        </Suspense>
-      </div>
+      <PersonalInfoForm id={id} formData={personalInfoData} />
+      <SummaryForm id={id} formData={summaryData} />
+      <WorkExperienceForm id={id} formData={workExperienceData} />
+      <SkillsForm id={id} formData={skillsData} />
+      <EducationForm id={id} formData={educationData} />
+      <LanguagesForm id={id} formData={languagesData} />
+      <CertificationsForm id={id} formData={certificationsData} />
+      <ProjectsForm id={id} formData={projectsData} />
+      <AwardsForm id={id} formData={awardsData} />
+      <TemplateForm id={id} formData={templateData} />
     </div>
   );
 }

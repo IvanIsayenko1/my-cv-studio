@@ -26,6 +26,7 @@ export function useSavePersonalInfo(id: string) {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PERSONAL_INFO, id],
       });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
     },
     onError: (error) => {
       toast.error("Failed to update personal information");
@@ -38,7 +39,9 @@ export function useSavePersonalInfo(id: string) {
  * Suspense query hook to fetch personal information.
  * @param id The ID of the CV/resume.
  */
-export function usePersonalInfo(id: string) {
+export function usePersonalInfoSuspenseQuery(id: string): {
+  data: PersonalInfoFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.PERSONAL_INFO, id],
     queryFn: () => getPersonalInfo(id),

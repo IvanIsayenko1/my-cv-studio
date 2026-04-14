@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
@@ -24,27 +23,25 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
-import {
-  usePersonalInfo,
-  useSavePersonalInfo,
-} from "@/hooks/cv/use-personal-info";
+import { useSavePersonalInfo } from "@/hooks/cv/use-personal-info";
 
 import { PROFESSIONAL_INFORMATION_MODULE } from "@/lib/constants/ai-prompts";
-import { QUERY_KEYS } from "@/lib/constants/query-keys";
 
 import {
   CVPersonalInformationAIReview,
   cvPersonalInformationAIReviewSchema,
 } from "@/types/ai-personal-information-review";
+import { BuilderFormProps } from "@/types/builder-form";
 import {
   PersonalInfoFormValues,
   personalInfoSchema,
 } from "@/types/personal-info";
 
-export function PersonalInfoForm({ id }: { id: string }) {
-  const { data } = usePersonalInfo(id);
+export function PersonalInfoForm({
+  id,
+  formData,
+}: BuilderFormProps<PersonalInfoFormValues>) {
   const { mutate, isPending } = useSavePersonalInfo(id);
-  const queryClient = useQueryClient();
 
   const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
   const [aiReview, setAIReview] =
@@ -53,14 +50,14 @@ export function PersonalInfoForm({ id }: { id: string }) {
   const form = useForm<PersonalInfoFormValues>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      professionalTitle: "",
-      email: "",
-      phone: "",
-      city: "",
-      country: "",
-      professionalLinks: [],
+      firstName: formData?.firstName || "",
+      lastName: formData?.lastName || "",
+      professionalTitle: formData?.professionalTitle || "",
+      email: formData?.email || "",
+      phone: formData?.phone || "",
+      city: formData?.city || "",
+      country: formData?.country || "",
+      professionalLinks: formData?.professionalLinks || [],
     },
   });
 
@@ -70,24 +67,6 @@ export function PersonalInfoForm({ id }: { id: string }) {
   });
 
   const isComplete = form.formState.isValid;
-
-  useEffect(() => {
-    if (data) {
-      form.reset({
-        firstName: data.firstName ?? "",
-        lastName: data.lastName ?? "",
-        professionalTitle: data.professionalTitle ?? "",
-        email: data.email ?? "",
-        phone: data.phone ?? "",
-        city: data.city ?? "",
-        country: data.country ?? "",
-        professionalLinks:
-          data.professionalLinks && data.professionalLinks.length > 0
-            ? data.professionalLinks
-            : [],
-      });
-    }
-  }, [data, form]);
 
   const watchedProfessionalLinks = useWatch({
     control: form.control,
@@ -99,11 +78,7 @@ export function PersonalInfoForm({ id }: { id: string }) {
     : true;
 
   const onSubmit = async (values: PersonalInfoFormValues) => {
-    mutate(values, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
-      },
-    });
+    mutate(values);
   };
 
   return (

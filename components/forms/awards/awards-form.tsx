@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,41 +22,32 @@ import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Separator } from "@/components/ui/separator";
 
-import { useAwards, useSaveAwards } from "@/hooks/cv/use-awards";
+import { useSaveAwards } from "@/hooks/cv/use-awards";
 
 import { AwardsFormValues, awardsSchema } from "@/types/awards";
 
 interface AwardsFormProps {
   id: string;
+  formData: AwardsFormValues;
 }
 
-export function AwardsForm({ id }: AwardsFormProps) {
+export function AwardsForm({ id, formData }: AwardsFormProps) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
-  const { data } = useAwards(id);
   const { mutate, isPending } = useSaveAwards(id);
 
   const form = useForm<AwardsFormValues>({
     resolver: zodResolver(awardsSchema),
     defaultValues: {
-      awards: [],
+      awards: formData.awards || [],
     },
   });
-  const { control, reset, formState, handleSubmit } = form;
-  const { isDirty } = formState;
+  const { control, handleSubmit } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "awards",
   });
-
-  useEffect(() => {
-    if (!data) return;
-
-    reset({
-      awards: data.awards && data.awards.length > 0 ? data.awards : [],
-    });
-  }, [data, reset]);
 
   const onSubmit = (values: AwardsFormValues) => {
     mutate(values);
@@ -87,12 +78,12 @@ export function AwardsForm({ id }: AwardsFormProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 flex gap-8 flex-col"
+            className="flex flex-col gap-8 space-y-8"
           >
             {fields.map((field, index) => (
-              <div key={field.id} className="space-y-4 mb-0">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="font-medium text-sm text-muted-foreground">
+              <div key={field.id} className="mb-0 space-y-4">
+                <div className="mb-2 flex items-start justify-between">
+                  <div className="text-muted-foreground text-sm font-medium">
                     Award {index + 1}
                   </div>
                   {fields.length > 0 && (

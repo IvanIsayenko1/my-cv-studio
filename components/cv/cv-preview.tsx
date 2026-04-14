@@ -2,18 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useAwards } from "@/hooks/cv/use-awards";
-import { useCertifications } from "@/hooks/cv/use-certifications";
+import { useAwardsSuspenseQuery } from "@/hooks/cv/use-awards";
+import { useCertificationsSuspenseQuery } from "@/hooks/cv/use-certifications";
 import { useCVData } from "@/hooks/cv/use-cv";
-import { useEducation } from "@/hooks/cv/use-education";
-import { useLanguages } from "@/hooks/cv/use-languages";
-import { usePersonalInfo } from "@/hooks/cv/use-personal-info";
-import { useProjects } from "@/hooks/cv/use-projects";
-import { useSkills } from "@/hooks/cv/use-skills";
+import { useEducationSuspenseQuery } from "@/hooks/cv/use-education";
+import { useLanguagesSuspenseQuery } from "@/hooks/cv/use-languages";
+import { usePersonalInfoSuspenseQuery } from "@/hooks/cv/use-personal-info";
+import { useProjectsSuspenseQuery } from "@/hooks/cv/use-projects";
+import { useSkillsSuspenseQuery } from "@/hooks/cv/use-skills";
 import { useStatus } from "@/hooks/cv/use-status";
-import { useSummary } from "@/hooks/cv/use-summary";
-import { useTemplate } from "@/hooks/cv/use-template";
-import { useWorkExperience } from "@/hooks/cv/use-work-experience";
+import { useSummarySuspenseQuery } from "@/hooks/cv/use-summary";
+import { useTemplateSuspenseQuery } from "@/hooks/cv/use-template";
+import { useWorkExperienceSuspenseQuery } from "@/hooks/cv/use-work-experience";
 
 import { renderPreviewHTML } from "@/lib/pdf/templates/render-preview-html";
 
@@ -35,7 +35,8 @@ const PRINTABLE_HEIGHT_PX = PAGE_HEIGHT_PX - PAGE_MARGIN_PX * 2;
 // This offset shrinks the effective preview page height to match what Puppeteer
 // actually fits per page.
 const PRINT_MODE_HEIGHT_COMPENSATION_PX = 20;
-const EFFECTIVE_PAGE_HEIGHT_PX = PRINTABLE_HEIGHT_PX - PRINT_MODE_HEIGHT_COMPENSATION_PX;
+const EFFECTIVE_PAGE_HEIGHT_PX =
+  PRINTABLE_HEIGHT_PX - PRINT_MODE_HEIGHT_COMPENSATION_PX;
 
 type PageMetrics = {
   pageStarts: number[];
@@ -52,9 +53,14 @@ function computePageStarts(doc: Document, totalHeight: number) {
   // we can snap the page break to either edge — whichever is closest to
   // pageEnd — without splitting a line in half.
   const blocks = Array.from(
-    doc.querySelectorAll<HTMLElement>("p, li, h1, h2, h3, h4, h5, h6, .mini-block")
+    doc.querySelectorAll<HTMLElement>(
+      "p, li, h1, h2, h3, h4, h5, h6, .mini-block"
+    )
   )
-    .map((el) => ({ top: el.offsetTop, bottom: el.offsetTop + el.offsetHeight }))
+    .map((el) => ({
+      top: el.offsetTop,
+      bottom: el.offsetTop + el.offsetHeight,
+    }))
     .filter(({ bottom }) => bottom > 0)
     .sort((a, b) => a.top - b.top);
 
@@ -78,7 +84,11 @@ function computePageStarts(doc: Document, totalHeight: number) {
         if (best === null || bottom > best) best = bottom;
       }
 
-      if (top < pageEnd && bottom > pageEnd && pageEnd - top <= SNAP_THRESHOLD_PX) {
+      if (
+        top < pageEnd &&
+        bottom > pageEnd &&
+        pageEnd - top <= SNAP_THRESHOLD_PX
+      ) {
         if (best === null || top > best) best = top;
       }
     }
@@ -136,15 +146,33 @@ function PreviewPage({
       </div>
       {/* White bars covering the margin areas — prevents iframe content from
           bleeding through when CSS transforms escape the overflow:hidden clip */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 bg-white" style={{ height: marginH }} />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-white" style={{ height: marginH }} />
-      <div className="pointer-events-none absolute inset-y-0 left-0 bg-white" style={{ width: marginW }} />
-      <div className="pointer-events-none absolute inset-y-0 right-0 bg-white" style={{ width: marginW }} />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 bg-white"
+        style={{ height: marginH }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 bg-white"
+        style={{ height: marginH }}
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 bg-white"
+        style={{ width: marginW }}
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 bg-white"
+        style={{ width: marginW }}
+      />
     </article>
   );
 }
 
-export default function CVPreview({ id, fontDataUri }: { id: string; fontDataUri: string }) {
+export default function CVPreview({
+  id,
+  fontDataUri,
+}: {
+  id: string;
+  fontDataUri: string;
+}) {
   const measureIframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -156,16 +184,16 @@ export default function CVPreview({ id, fontDataUri }: { id: string; fontDataUri
 
   const { data: status } = useStatus(id);
   const { data: cvData } = useCVData(id);
-  const { data: template } = useTemplate(id);
-  const { data: personalInfo } = usePersonalInfo(id);
-  const { data: summary } = useSummary(id);
-  const { data: workExperience } = useWorkExperience(id);
-  const { data: education } = useEducation(id);
-  const { data: skills } = useSkills(id);
-  const { data: languages } = useLanguages(id);
-  const { data: projects } = useProjects(id);
-  const { data: certifications } = useCertifications(id);
-  const { data: awards } = useAwards(id);
+  const { data: template } = useTemplateSuspenseQuery(id);
+  const { data: personalInfo } = usePersonalInfoSuspenseQuery(id);
+  const { data: summary } = useSummarySuspenseQuery(id);
+  const { data: workExperience } = useWorkExperienceSuspenseQuery(id);
+  const { data: education } = useEducationSuspenseQuery(id);
+  const { data: skills } = useSkillsSuspenseQuery(id);
+  const { data: languages } = useLanguagesSuspenseQuery(id);
+  const { data: projects } = useProjectsSuspenseQuery(id);
+  const { data: certifications } = useCertificationsSuspenseQuery(id);
+  const { data: awards } = useAwardsSuspenseQuery(id);
 
   const fullCV = useMemo<CV | null>(() => {
     if (!cvData) return null;

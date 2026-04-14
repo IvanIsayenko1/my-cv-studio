@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronDown, Trash2 } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
@@ -42,59 +41,47 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 
-import {
-  useSaveWorkExperience,
-  useWorkExperience,
-} from "@/hooks/cv/use-work-experience";
+import { useSaveWorkExperience } from "@/hooks/cv/use-work-experience";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { WORK_EXPERIENCE_MODULE } from "@/lib/constants/ai-prompts";
-import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
-import { CVWorkExperienceAIReview, cvWorkExperienceAIReviewSchema } from "@/types/ai-work-experience-review";
+import {
+  CVWorkExperienceAIReview,
+  cvWorkExperienceAIReviewSchema,
+} from "@/types/ai-work-experience-review";
+import { BuilderFormProps } from "@/types/builder-form";
 import { EMPLOYMENT_TYPE_OPTIONS } from "@/types/emplyment-types";
 import {
   WorkExperienceFormValues,
   workExperienceSchema,
 } from "@/types/work-experience";
 
-interface WorkExperienceFormProps {
-  id: string;
-}
-
-export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
+export function WorkExperienceForm({
+  id,
+  formData,
+}: BuilderFormProps<WorkExperienceFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const [employmentPickerIndex, setEmploymentPickerIndex] = useState<
     number | null
   >(null);
   const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
-  const [aiReview, setAIReview] = useState<CVWorkExperienceAIReview | null>(null);
+  const [aiReview, setAIReview] = useState<CVWorkExperienceAIReview | null>(
+    null
+  );
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
-  const { data } = useWorkExperience(id);
   const { mutate, isPending } = useSaveWorkExperience(id);
-  const queryClient = useQueryClient();
 
   const form = useForm<WorkExperienceFormValues>({
     resolver: zodResolver(workExperienceSchema),
     defaultValues: {
-      workExperience: [
-        {
-          jobTitle: "",
-          company: "",
-          location: "",
-          employmentType: "Full-time",
-          startDate: "",
-          endDate: "Present",
-          achievements: "",
-          toolsAndMethods: [],
-        },
-      ],
+      workExperience: formData.workExperience || [],
     },
   });
 
-  const { control, reset, formState, handleSubmit } = form;
+  const { control, handleSubmit } = form;
   const isComplete = form.formState.isValid;
 
   const { fields, append, remove } = useFieldArray({
@@ -102,34 +89,8 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
     name: "workExperience",
   });
 
-  useEffect(() => {
-    if (!data) return;
-
-    reset({
-      workExperience:
-        data.workExperience && data.workExperience.length > 0
-          ? data.workExperience
-          : [
-              {
-                jobTitle: "",
-                company: "",
-                location: "",
-                employmentType: "Full-time",
-                startDate: "",
-                endDate: "Present",
-                achievements: "",
-                toolsAndMethods: [],
-              },
-            ],
-    });
-  }, [data, reset]);
-
   const onSubmit = (values: WorkExperienceFormValues) => {
-    mutate(values, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
-      },
-    });
+    mutate(values);
   };
 
   // Watch all workExperience items for "can add another role" logic
@@ -164,13 +125,13 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 flex gap-8 flex-col"
+            className="flex flex-col gap-8 space-y-8"
           >
             {fields.map((field, index) => (
-              <div key={field.id} className="space-y-4 mb-0">
+              <div key={field.id} className="mb-0 space-y-4">
                 {/* Top row with title and delete button */}
-                <div className="flex justify-between items-start mb-2">
-                  <div className="font-medium text-sm text-muted-foreground">
+                <div className="mb-2 flex items-start justify-between">
+                  <div className="text-muted-foreground text-sm font-medium">
                     Role {index + 1}
                   </div>
                   {fields.length > 1 && (
@@ -368,7 +329,7 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
                                 {tech}
                                 <button
                                   type="button"
-                                  className="-mr-1 ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:h-5 sm:w-5"
+                                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive -mr-1 ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors sm:h-5 sm:w-5"
                                   aria-label={`Remove tool/method ${tech}`}
                                   onClick={() =>
                                     field.onChange(
@@ -475,10 +436,14 @@ export function WorkExperienceForm({ id }: WorkExperienceFormProps) {
           workExperience: watchedExperiences ?? [],
         }}
         onLocalApplySuggestion={(roleIndex, achievements) => {
-          form.setValue(`workExperience.${roleIndex}.achievements`, achievements, {
-            shouldDirty: true,
-            shouldTouch: true,
-          });
+          form.setValue(
+            `workExperience.${roleIndex}.achievements`,
+            achievements,
+            {
+              shouldDirty: true,
+              shouldTouch: true,
+            }
+          );
         }}
       />
 

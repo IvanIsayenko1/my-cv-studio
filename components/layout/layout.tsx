@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main
-        className="load-stagger h-[calc(100dvh_-_4.5rem)] w-full overflow-auto"
+        className="load-stagger h-[calc(100dvh_-_4.5rem)] w-full"
         style={{ "--stagger": 1 } as CSSProperties}
       >
         {children}

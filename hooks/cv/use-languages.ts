@@ -36,6 +36,7 @@ export function useSaveLanguages(id: string) {
     onSuccess: () => {
       toast.success("Languages have been updated");
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LANGUAGES, id] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
     },
     onError: (error) => {
       toast.error("Failed to update languages");
@@ -48,7 +49,9 @@ export function useSaveLanguages(id: string) {
  * Suspense query hook to fetch languages data.
  * @param id The ID of the CV/resume.
  */
-export function useLanguages(id: string) {
+export function useLanguagesSuspenseQuery(id: string): {
+  data: LanguagesFormValues;
+} {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.LANGUAGES, id],
     queryFn: () => getLanguages(id),

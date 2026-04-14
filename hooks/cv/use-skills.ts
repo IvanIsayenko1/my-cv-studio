@@ -36,6 +36,7 @@ export function useSaveSkills(id: string) {
     onSuccess: () => {
       toast.success("Skills have been updated");
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SKILLS, id] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STATUS, id] });
     },
     onError: (error) => {
       toast.error("Failed to update skills");
@@ -48,7 +49,7 @@ export function useSaveSkills(id: string) {
  * Suspense query hook to fetch skills data.
  * @param id The ID of the CV/resume.
  */
-export function useSkills(id: string) {
+export function useSkillsSuspenseQuery(id: string): { data: SkillsFormValues } {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.SKILLS, id],
     queryFn: () => getSkills(id),
