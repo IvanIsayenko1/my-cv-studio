@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -83,29 +82,17 @@ export default function DuplicateCVDialog({
     },
   });
 
-  // If source CV title changes (or loads later), keep input prefilled.
-  useEffect(() => {
-    if (!cv?.title) return;
-    reset({ name: cv.title });
-  }, [cv?.title, reset]);
-
-  // Re-opening should not show stale validation/API errors from prior attempts.
-  useEffect(() => {
-    if (!open) return;
-    clearErrors("name");
-  }, [open, clearErrors]);
-
-  // Surface mutation error inline on the name field.
-  useEffect(() => {
-    if (!error?.message) return;
-    setError("name", {
-      message: error.message,
-    });
-  }, [error?.message, setError]);
-
   const onSubmit = (data: CVNameFormValues) => {
     clearErrors("name");
     duplicateCV({ id, title: data.name });
+  };
+
+  const onHandleOpenChange = (open: boolean) => {
+    setOpen(open);
+    if (!open) {
+      reset({ name: cv?.title || "" });
+      clearErrors("name");
+    }
   };
 
   // Shared field markup used by both desktop Dialog and mobile Drawer layouts.
@@ -128,7 +115,7 @@ export default function DuplicateCVDialog({
   if (isDesktop) {
     // Desktop presentation
     return (
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={onHandleOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Duplicate existing CV</DialogTitle>
@@ -162,7 +149,7 @@ export default function DuplicateCVDialog({
 
   // Mobile presentation
   return (
-    <MobileOverlay open={open} onOpenChange={setOpen}>
+    <MobileOverlay open={open} onOpenChange={onHandleOpenChange}>
       <MobileOverlayContent onPointerDownOutside={() => setOpen(false)}>
         <MobileOverlayHeader>
           <MobileOverlayTitle>Duplicate existing CV</MobileOverlayTitle>

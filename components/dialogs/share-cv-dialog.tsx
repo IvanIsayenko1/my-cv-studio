@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 import {
   Copy,
   Link2,
@@ -23,7 +21,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
-import { useCreateShare, useRevokeShare, useShareInfo } from "@/hooks/cv/use-share";
+import {
+  useCreateShare,
+  useRevokeShare,
+  useShareInfo,
+} from "@/hooks/cv/use-share";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
@@ -50,18 +52,11 @@ export default function ShareCVDialog({
 }) {
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
-  const {
-    data: share,
-    isLoading: isShareLoading,
-    refetch,
-  } = useShareInfo(id, open);
-  const { mutate: createShare, isPending: isCreatePending } = useCreateShare(id);
-  const { mutate: revokeShare, isPending: isRevokePending } = useRevokeShare(id);
-
-  useEffect(() => {
-    if (!open) return;
-    refetch();
-  }, [open, refetch]);
+  const { data: share, isLoading: isShareLoading } = useShareInfo(id, open);
+  const { mutate: createShare, isPending: isCreatePending } =
+    useCreateShare(id);
+  const { mutate: revokeShare, isPending: isRevokePending } =
+    useRevokeShare(id);
 
   const isBusy = isCreatePending || isRevokePending;
   const shareUrl = share?.url ?? "";
@@ -71,7 +66,9 @@ export default function ShareCVDialog({
       { regenerate },
       {
         onSuccess: (data) => {
-          toast.success(regenerate ? "Share link regenerated" : "Share link ready");
+          toast.success(
+            regenerate ? "Share link regenerated" : "Share link ready"
+          );
           if (data.url) {
             navigator.clipboard
               .writeText(data.url)
@@ -111,7 +108,7 @@ export default function ShareCVDialog({
           <Input value={shareUrl} readOnly placeholder="No active share link" />
         </div>
 
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           Anyone with this link can only view the CV preview and download PDF.
           No editing actions are available.
         </p>
