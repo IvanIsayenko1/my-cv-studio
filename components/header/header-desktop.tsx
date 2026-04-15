@@ -34,7 +34,7 @@ export default function HeaderDesktop() {
                   className={cn(
                     navigationMenuTriggerStyle(),
                     "px-3",
-                    isActive && "bg-primary/10 text-primary"
+                    isActive && "bg-primary/20 text-primary"
                   )}
                 >
                   <Link href={item.href}>{item.label}</Link>
@@ -45,7 +45,7 @@ export default function HeaderDesktop() {
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className="shrink-0 flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <LoginSignupButton />
         <ThemeSwitcher />
       </div>

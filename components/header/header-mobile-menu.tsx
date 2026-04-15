@@ -35,10 +35,10 @@ export default function HeaderMobileMenu() {
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <Dialog.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/55 backdrop-blur-sm" />
         <Dialog.Content
           className={cn(
-            "fixed inset-0 z-50 flex h-[100dvh] w-screen flex-col overflow-hidden bg-background",
+            "bg-background fixed inset-0 z-50 flex h-[100dvh] w-screen flex-col overflow-hidden",
             "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-200"
           )}
         >
@@ -47,7 +47,7 @@ export default function HeaderMobileMenu() {
               <Dialog.Title className="text-base font-semibold">
                 Menu
               </Dialog.Title>
-              <Dialog.Description className="text-xs text-muted-foreground">
+              <Dialog.Description className="text-muted-foreground text-xs">
                 Navigate and manage your account.
               </Dialog.Description>
             </div>
@@ -61,7 +61,7 @@ export default function HeaderMobileMenu() {
 
           <nav className="flex-1 overflow-y-auto px-3 py-4">
             <div className="space-y-2">
-              <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <p className="text-muted-foreground px-2 text-xs font-medium tracking-wide uppercase">
                 Navigation
               </p>
               {HEADER_NAV_ITEMS.map((item) => {
@@ -88,10 +88,10 @@ export default function HeaderMobileMenu() {
             <Separator className="my-5" />
 
             <div className="space-y-3">
-              <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <p className="text-muted-foreground px-2 text-xs font-medium tracking-wide uppercase">
                 Appearance
               </p>
-              <div className="space-y-2 px-2 flex flex-row items-center justify-between">
+              <div className="flex flex-row items-center justify-between space-y-2 px-2">
                 <span className="text-sm">Theme</span>
                 <ToggleGroup
                   size="lg"
@@ -101,7 +101,7 @@ export default function HeaderMobileMenu() {
                   onValueChange={(value) => {
                     if (value) setTheme(value);
                   }}
-                  className=" justify-start"
+                  className="justify-start"
                 >
                   <ToggleGroupItem value="system" aria-label="Toggle system">
                     System
@@ -119,17 +119,19 @@ export default function HeaderMobileMenu() {
             <Separator className="my-5" />
 
             <div className="space-y-3 pb-2">
-              <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <p className="text-muted-foreground px-2 text-xs font-medium tracking-wide uppercase">
                 Account
               </p>
               {isLoaded && isSignedIn ? (
-                <div className="mx-2 rounded-md border border-border/70 bg-muted/40 p-3">
-                  <p className="truncate text-sm font-medium text-foreground">
-                    {[user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+                <div className="rounded-md p-3">
+                  <p className="text-foreground truncate text-sm font-medium">
+                    {[user?.firstName, user?.lastName]
+                      .filter(Boolean)
+                      .join(" ") ||
                       user?.username ||
                       "Account"}
                   </p>
-                  <p className="truncate text-xs text-muted-foreground">
+                  <p className="text-muted-foreground truncate text-xs">
                     {user?.emailAddresses[0]?.emailAddress}
                   </p>
                 </div>
@@ -138,6 +140,7 @@ export default function HeaderMobileMenu() {
                 <Button
                   variant="destructive"
                   size="lg"
+                  aria-label="Logout"
                   className="w-full"
                   onClick={() => {
                     signOut();

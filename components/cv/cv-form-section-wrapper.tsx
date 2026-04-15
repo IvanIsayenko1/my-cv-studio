@@ -46,11 +46,11 @@ export default function SectionWrapper({
   return (
     <CollapsibleCard
       title={
-        <div className="flex flex-row gap-2 items-center">
+        <div className="flex flex-row items-center gap-2">
           <h4 className="font-display scroll-m-20 text-xl font-semibold tracking-tight">
             {title}
           </h4>
-          <span className="hover:no-underline flex"> {status}</span>
+          <span className="flex hover:no-underline"> {status}</span>
         </div>
       }
       description={description}

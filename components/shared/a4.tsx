@@ -28,15 +28,15 @@ export function A4({
   };
 
   return (
-    <div className="w-full flex justify-center">
+    <div className="flex w-full justify-center">
       <div
         onClick={onClick}
         onKeyDown={handleKeyDown}
         role={onClick ? "button" : undefined}
         tabIndex={onClick ? 0 : undefined}
         className={cn(
-          "group w-full max-w-[210mm] rounded-xl",
-          "bg-card text-card-foreground border border-border",
+          "group w-full max-w-[210mm] rounded-4xl",
+          "bg-card text-card-foreground border-border border",
           "shadow-lg transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
           "hover:-translate-y-1 hover:scale-[1.01] hover:shadow-2xl",
           onClick ? "cursor-pointer" : "",
@@ -50,7 +50,7 @@ export function A4({
         }}
         {...props}
       >
-        <div className="w-full h-full p-3 overflow-auto">{children}</div>
+        <div className="h-full w-full overflow-auto p-3">{children}</div>
       </div>
     </div>
   );

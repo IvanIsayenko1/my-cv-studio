@@ -87,6 +87,7 @@ export default function DeleteCVDialog({
               Keep the CV
             </AlertDialogCancel>
             <AlertDialogAction
+              variant="destructive"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={isDeletePending}

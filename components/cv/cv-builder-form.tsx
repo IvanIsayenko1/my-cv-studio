@@ -24,6 +24,19 @@ import { useTemplateSuspenseQuery } from "@/hooks/cv/use-template";
 import { useWorkExperienceSuspenseQuery } from "@/hooks/cv/use-work-experience";
 
 import { LanguagesForm } from "../forms/languages/languages-form";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export default function CVBuilderForm() {
   const params = useParams();
@@ -40,6 +53,27 @@ export default function CVBuilderForm() {
   const { data: projectsData } = useProjectsSuspenseQuery(id);
   const { data: templateData } = useTemplateSuspenseQuery(id);
 
+  const items = [
+    {
+      value: "plans",
+      trigger: "What subscription plans do you offer?",
+      content:
+        "We offer three subscription tiers: Starter ($9/month), Professional ($29/month), and Enterprise ($99/month). Each plan includes increasing storage limits, API access, priority support, and team collaboration features.",
+    },
+    {
+      value: "billing",
+      trigger: "How does billing work?",
+      content:
+        "Billing occurs automatically at the start of each billing cycle. We accept all major credit cards, PayPal, and ACH transfers for enterprise customers. You'll receive an invoice via email after each payment.",
+    },
+    {
+      value: "cancel",
+      trigger: "How do I cancel my subscription?",
+      content:
+        "You can cancel your subscription anytime from your account settings. There are no cancellation fees or penalties. Your access will continue until the end of your current billing period.",
+    },
+  ];
+
   return (
     <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto pb-4">
       <PersonalInfoForm id={id} formData={personalInfoData} />
@@ -52,6 +86,25 @@ export default function CVBuilderForm() {
       <ProjectsForm id={id} formData={projectsData} />
       <AwardsForm id={id} formData={awardsData} />
       <TemplateForm id={id} formData={templateData} />
+      {/* <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Subscription & Billing</CardTitle>
+          <CardDescription>
+            Common questions about your account, plans, payments and
+            cancellations.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Accordion defaultValue={["plans"]} type="multiple">
+            {items.map((item) => (
+              <AccordionItem key={item.value} value={item.value}>
+                <AccordionTrigger>{item.trigger}</AccordionTrigger>
+                <AccordionContent>{item.content}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card> */}
     </div>
   );
 }

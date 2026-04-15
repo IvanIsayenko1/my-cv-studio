@@ -6,13 +6,13 @@ import Header from "./header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-background min-h-screen overflow-hidden">
+    <div className="bg-background min-h-screen overflow-auto">
       {/* Sticky Header with Actions */}
       <Header />
 
       {/* Main Content */}
       <main
-        className="load-stagger h-[calc(100dvh_-_4.5rem)] w-full overflow-auto"
+        className="load-stagger h-[calc(100dvh_-_4.5rem)] w-full"
         style={{ "--stagger": 1 } as CSSProperties}
       >
         {children}

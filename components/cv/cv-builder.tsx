@@ -17,18 +17,20 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
   const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
 
   return (
-    <PageContent className="flex h-full min-h-0 w-full flex-col gap-2">
-      {/* Title, navigations and form actions */}
+    <PageContent className="flex h-full flex-col gap-2">
+      {/* Back button, title, status, actions */}
       <CVBuilderHeader />
-      <div className="grid h-full min-h-0 w-full grid-cols-1 gap-2 overflow-hidden lg:grid-cols-2">
-        {/* The forms */}
+
+      {/* Form + Preview — each column scrolls independently */}
+      <div className="flex min-h-0 flex-1 gap-2">
+        {/* Form — full width on mobile, half on desktop */}
         <Suspense fallback={<CVBuilderFormSkeleton />}>
           <CVBuilderForm />
         </Suspense>
 
-        {/* The preview, hidden on smaller screens to save space */}
+        {/* Preview — hidden on mobile, half on desktop */}
         <aside
-          className="load-stagger no-scrollbar hidden min-h-0 overflow-y-auto pb-4 lg:block"
+          className="load-stagger no-scrollbar hidden min-h-0 flex-1 overflow-y-auto pb-4 lg:block"
           style={stagger(6)}
         >
           <Suspense fallback={<CVPreviewSkeleton />}>

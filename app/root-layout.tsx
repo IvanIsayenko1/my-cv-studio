@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Geist } from "next/font/google";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
@@ -6,8 +7,13 @@ import { GeistSans } from "geist/font/sans";
 import Layout from "@/components/layout/layout";
 import { QueryProvider } from "@/components/shared/providers/query-provider";
 import { ThemeProvider } from "@/components/shared/providers/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+import { cn } from "@/lib/utils";
 
 import "./globals.css";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const siteUrl =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://my-cv-studio.vercel.app";
@@ -83,7 +89,11 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <html lang="en" suppressHydrationWarning className={GeistSans.className}>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={cn(GeistSans.className, "font-sans", geist.variable)}
+      >
         <head />
         <body>
           <ThemeProvider
@@ -99,7 +109,9 @@ export default function RootLayout({
               }}
             >
               <QueryProvider>
-                <Layout>{children}</Layout>
+                <TooltipProvider>
+                  <Layout>{children}</Layout>
+                </TooltipProvider>
               </QueryProvider>
             </ClerkProvider>
           </ThemeProvider>

@@ -3,9 +3,8 @@
 import { useRouter } from "next/navigation";
 
 import { useClerk, useUser } from "@clerk/nextjs";
-import { LogOut, User } from "lucide-react";
+import { User } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
 export default function LoginSignupButton() {
@@ -47,15 +47,13 @@ export default function LoginSignupButton() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuLabel>
-            <div className="border-border/70 bg-muted/40 rounded-md border p-3">
-              <p className="text-foreground truncate text-sm font-medium">
-                {displayName}
-              </p>
-              <p className="text-muted-foreground truncate text-xs">{email}</p>
-            </div>
+            <p className="text-foreground truncate text-sm font-medium">
+              {displayName}
+            </p>
+            <p className="text-muted-foreground truncate text-xs">{email}</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Button
               variant="destructive"
               aria-label="Logout"
@@ -63,7 +61,6 @@ export default function LoginSignupButton() {
               size="sm"
               onClick={() => signOut()}
             >
-              {/* <LogOut /> */}
               Logout
             </Button>
           </DropdownMenuItem>
