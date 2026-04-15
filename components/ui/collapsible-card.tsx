@@ -48,7 +48,7 @@ export function CollapsibleCard({
   return (
     <section
       className={cn(
-        "bg-card text-card-foreground rounded-xl border shadow-sm",
+        "bg-card text-card-foreground rounded-3xl border shadow-sm",
         className
       )}
     >
@@ -59,7 +59,7 @@ export function CollapsibleCard({
         aria-controls={contentId}
         onClick={() => setOpenState(!isOpen)}
         className={cn(
-          "focus-visible:border-ring focus-visible:ring-ring/50 flex w-full min-h-11 items-center justify-between gap-4 rounded-xl px-4 py-6 text-left outline-none transition-colors hover:bg-accent/40 focus-visible:ring-[3px] sm:min-h-10 sm:px-6 disabled:cursor-not-allowed disabled:opacity-60 [touch-action:manipulation]",
+          "focus-visible:border-ring focus-visible:ring-ring/50 hover:bg-accent/40 flex min-h-11 w-full [touch-action:manipulation] items-center justify-between gap-4 rounded-xl px-4 py-6 text-left transition-colors outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10 sm:px-6",
           triggerClassName
         )}
       >

@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { ROUTES } from "@/config/routes";
 
+import { PersonalInfoFormSkeleton } from "../forms/personal-info/personal-info-form-skeleton";
 import PageContent from "../layout/page-content";
 import CVBuilderForm from "./cv-builder-form";
 import CVBuilderFormSkeleton from "./cv-builder-form-skeleton";
@@ -69,6 +70,8 @@ export default function CVBuilderV2({ fontDataUri }: { fontDataUri: string }) {
             style={stagger(2)}
           >
             <Suspense fallback={<CVBuilderFormSkeleton />}>
+              <PersonalInfoFormSkeleton />
+
               <CVBuilderForm />
             </Suspense>
           </div>

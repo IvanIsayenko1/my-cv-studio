@@ -185,7 +185,7 @@ export default function PersonalInfoAIAssistantDialog({
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 space-y-4 overflow-y-auto pr-1">
+          <div className="flex-1 space-y-4 overflow-y-auto p-[1px] pr-1">
             {dialogContent}
           </div>
         </DialogContent>

@@ -119,7 +119,7 @@ function PreviewPage({
 
   return (
     <article
-      className="border-border relative w-full overflow-hidden rounded-xl border bg-white shadow-lg"
+      className="border-border relative w-full overflow-hidden rounded-3xl border bg-white shadow-lg"
       style={{ aspectRatio: `${PAGE_WIDTH_MM} / ${PAGE_HEIGHT_MM}` }}
     >
       <div
@@ -314,7 +314,7 @@ export default function CVPreview({
 
   if (!status?.isReady) {
     return (
-      <div className="border-border bg-muted/30 flex h-full w-full max-w-[210mm] items-center justify-center rounded-xl border border-dashed px-6 py-12 text-center">
+      <div className="border-border bg-muted/30 flex h-full w-full max-w-[210mm] items-center justify-center rounded-3xl border border-dashed px-6 py-12 text-center">
         <p className="text-muted-foreground max-w-[32ch] text-sm">
           Fill the required sections to see the preview.
         </p>
@@ -324,7 +324,7 @@ export default function CVPreview({
 
   if (!htmlPreview) {
     return (
-      <div className="border-border text-muted-foreground rounded-lg border p-4 text-sm">
+      <div className="border-border text-muted-foreground rounded-3xl border p-4 text-sm">
         CV preview is unavailable.
       </div>
     );
