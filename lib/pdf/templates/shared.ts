@@ -66,6 +66,42 @@ export function renderRichTextBlock(html: string, className = "rich-text") {
   return sanitized ? `<div class="${className}">${sanitized}</div>` : "";
 }
 
+function renderContactLineHTML(email: string, phone: string): string {
+  const parts: string[] = [];
+
+  if (email) {
+    parts.push(`<a href="mailto:${escapeHtml(email)}" target="_blank" rel="noopener noreferrer">${escapeHtml(email)}</a>`);
+  }
+  if (phone) {
+    parts.push(`<a href="tel:${escapeHtml(phone)}" target="_blank" rel="noopener noreferrer">${escapeHtml(phone)}</a>`);
+  }
+
+  return parts.join(" • ");
+}
+
+function renderLinksLineHTML(
+  professionalLinks: Array<{ label: string; url: string }> | undefined,
+  linkedIn: string | undefined,
+  portfolio: string | undefined
+): string {
+  const linkItems =
+    professionalLinks?.filter(
+      (item) => item?.label?.trim() && item?.url?.trim()
+    ) ?? [];
+
+  const links = linkItems.length
+    ? linkItems.map(
+        (item) =>
+          `<a href="${escapeHtml(item.url.trim())}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.label.trim())}</a>`
+      )
+    : [
+        linkedIn ? `<a href="${escapeHtml(linkedIn)}" target="_blank" rel="noopener noreferrer">LinkedIn</a>` : null,
+        portfolio ? `<a href="${escapeHtml(portfolio)}" target="_blank" rel="noopener noreferrer">Portfolio</a>` : null,
+      ].filter(Boolean);
+
+  return links.join(" | ");
+}
+
 export function getSharedTemplateData(cv: CV) {
   const fullName = [cv.personalInfo.firstName, cv.personalInfo.lastName]
     .filter(Boolean)
@@ -73,6 +109,10 @@ export function getSharedTemplateData(cv: CV) {
   const contactLine = [cv.personalInfo.email, cv.personalInfo.phone]
     .filter(Boolean)
     .join(" • ");
+  const contactLineHTML = renderContactLineHTML(
+    cv.personalInfo.email,
+    cv.personalInfo.phone
+  );
   const locationLine = [cv.personalInfo.city, cv.personalInfo.country]
     .filter(Boolean)
     .join(", ");
@@ -87,6 +127,11 @@ export function getSharedTemplateData(cv: CV) {
     : [cv.personalInfo.linkedIn, cv.personalInfo.portfolio]
         .filter(Boolean)
         .join(" | ");
+  const linksLineHTML = renderLinksLineHTML(
+    cv.personalInfo.professionalLinks,
+    cv.personalInfo.linkedIn,
+    cv.personalInfo.portfolio
+  );
 
   const skillCategories = (cv.skills?.categories ?? [])
     .map((category) => ({
@@ -98,8 +143,10 @@ export function getSharedTemplateData(cv: CV) {
   return {
     fullName,
     contactLine,
+    contactLineHTML,
     locationLine,
     linksLine,
+    linksLineHTML,
     skillCategories,
     workItems: cv.workExperience ?? [],
     educationItems: cv.education ?? [],

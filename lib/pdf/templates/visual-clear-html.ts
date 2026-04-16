@@ -31,11 +31,11 @@ export function renderVisualClearPreviewHTML(
   const {
     awardItems,
     certificationItems,
-    contactLine,
+    contactLineHTML,
     educationItems,
     fullName,
     languageItems,
-    linksLine,
+    linksLineHTML,
     locationLine,
     projectItems,
     skillCategories,
@@ -43,11 +43,11 @@ export function renderVisualClearPreviewHTML(
   } = getSharedTemplateData(cv);
 
   const heroMeta = [
-    cv.personalInfo.professionalTitle,
-    locationLine,
-    contactLine,
-    linksLine,
-  ].filter(Boolean);
+    { text: cv.personalInfo.professionalTitle, isHtml: false },
+    { text: locationLine, isHtml: false },
+    { text: contactLineHTML, isHtml: true },
+    { text: linksLineHTML, isHtml: true },
+  ].filter((item) => item.text);
 
   const sections: string[] = [];
 
@@ -113,7 +113,7 @@ export function renderVisualClearPreviewHTML(
                     <h3 class="entry-title">${escapeHtml(project.name)}${project.role ? `, ${escapeHtml(project.role)}` : ""}</h3>
                     ${
                       project.url
-                        ? `<p class="entry-subtitle">${escapeHtml(project.url)}</p>`
+                        ? `<p class="entry-subtitle"><a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(project.url)}</a></p>`
                         : ""
                     }
                   </div>
@@ -391,6 +391,15 @@ export function renderVisualClearPreviewHTML(
             color: rgba(18, 24, 38, 0.88);
           }
 
+          a {
+            color: inherit;
+            text-decoration: underline;
+          }
+
+          a:hover {
+            opacity: 0.7;
+          }
+
           .main {
             padding: 0 2mm 0;
           }
@@ -632,11 +641,14 @@ export function renderVisualClearPreviewHTML(
               ${
                 heroMeta.length > 0
                   ? heroMeta
-                      .map((item, index) =>
-                        index === 0
-                          ? `<p class="hero-title">${escapeHtml(item)}</p>`
-                          : `<p class="hero-meta">${escapeHtml(item)}</p>`
-                      )
+                      .map((item, index) => {
+                        const content = item.isHtml
+                          ? item.text
+                          : escapeHtml(item.text);
+                        return index === 0
+                          ? `<p class="hero-title">${content}</p>`
+                          : `<p class="hero-meta">${content}</p>`;
+                      })
                       .join("")
                   : ""
               }

@@ -16,10 +16,12 @@ export function renderATSCleanPreviewHTML(
     awardItems,
     certificationItems,
     contactLine,
+    contactLineHTML,
     educationItems,
     fullName,
     languageItems,
     linksLine,
+    linksLineHTML,
     locationLine,
     projectItems,
     skillCategories,
@@ -162,7 +164,7 @@ export function renderATSCleanPreviewHTML(
                   }
                   ${
                     project.url
-                      ? `<p class="line-meta project-url"><span class="line-label">URL:</span> ${escapeHtml(project.url)}</p>`
+                      ? `<p class="line-meta project-url"><span class="line-label">URL:</span> <a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(project.url)}</a></p>`
                       : ""
                   }
                 </article>
@@ -305,6 +307,15 @@ export function renderATSCleanPreviewHTML(
             color: var(--text-secondary);
           }
 
+          a {
+            color: inherit;
+            text-decoration: underline;
+          }
+
+          a:hover {
+            opacity: 0.7;
+          }
+
           .content {
             display: block;
           }
@@ -418,8 +429,8 @@ export function renderATSCleanPreviewHTML(
                 : ""
             }
             ${
-              contactLine
-                ? `<p class="meta">${escapeHtml(contactLine)}</p>`
+              contactLineHTML
+                ? `<p class="meta">${contactLineHTML}</p>`
                 : ""
             }
             ${
@@ -427,7 +438,7 @@ export function renderATSCleanPreviewHTML(
                 ? `<p class="meta">${escapeHtml(locationLine)}</p>`
                 : ""
             }
-            ${linksLine ? `<p class="meta">${escapeHtml(linksLine)}</p>` : ""}
+            ${linksLineHTML ? `<p class="meta">${linksLineHTML}</p>` : ""}
           </section>
 
           <section class="content">

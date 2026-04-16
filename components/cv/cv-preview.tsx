@@ -127,7 +127,7 @@ function PreviewPage({
           title={`CV preview page`}
           srcDoc={htmlPreview}
           scrolling="no"
-          className="pointer-events-none block border-0 bg-white"
+          className="block border-0 bg-white"
           style={{
             width: PRINTABLE_WIDTH_PX,
             height: totalHeight,
