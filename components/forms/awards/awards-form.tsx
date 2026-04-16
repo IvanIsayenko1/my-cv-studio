@@ -4,10 +4,17 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2 } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveAwardDialog } from "@/components/dialogs/remove-award-dialog";
+import FormStatusBedge from "@/components/form-status-bedge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveAwards } from "@/hooks/cv/use-awards";
 
@@ -33,6 +40,7 @@ interface AwardsFormProps {
 
 export function AwardsForm({ id, formData }: AwardsFormProps) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
+  const [openItems, setOpenItems] = useState<string[]>([]);
 
   const { mutate, isPending } = useSaveAwards(id);
 
@@ -42,7 +50,7 @@ export function AwardsForm({ id, formData }: AwardsFormProps) {
       awards: formData.awards || [],
     },
   });
-  const { control, handleSubmit } = form;
+  const { control, handleSubmit, formState } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -50,7 +58,7 @@ export function AwardsForm({ id, formData }: AwardsFormProps) {
   });
 
   const onSubmit = (values: AwardsFormValues) => {
-    mutate(values);
+    mutate(values, { onSuccess: () => form.reset(values) });
   };
 
   const watchedAwards = useWatch({
@@ -67,6 +75,12 @@ export function AwardsForm({ id, formData }: AwardsFormProps) {
     last.description?.trim();
   const canAddAward = !hasAny || lastComplete;
 
+  const getSectionTitle = (index: number) => {
+    return watchedAwards && watchedAwards[index] && watchedAwards[index].name
+      ? `${watchedAwards[index].name}`
+      : `Project ${index + 1}`;
+  };
+
   return (
     <>
       <SectionWrapper
@@ -74,115 +88,126 @@ export function AwardsForm({ id, formData }: AwardsFormProps) {
         title="Awards"
         description="Add notable awards or recognitions relevant to your career."
         cvId={id}
+        status={<FormStatusBedge isNotSaved={formState.isDirty} />}
       >
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-8 space-y-8"
+            className="flex flex-col gap-8"
           >
-            {fields.map((field, index) => (
-              <div key={field.id} className="mb-0 space-y-4">
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="text-muted-foreground text-sm font-medium">
-                    Award {index + 1}
-                  </div>
-                  {fields.length > 0 && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => setRemoveIndex(index)}
-                      aria-label="Remove award"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-
-                {/* Name / Issuer */}
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`awards.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Award name <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Best Developer Award"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name={`awards.${index}.issuer`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Issuer <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Company / Organization"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Date */}
-                <FormField
-                  control={control}
-                  name={`awards.${index}.date`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Date (MM/YYYY){" "}
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <MonthYearPicker {...field} placeholder="MM/YYYY" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Description */}
-                <FormField
-                  control={control}
-                  name={`awards.${index}.description`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Description <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <RichTextEditor
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          placeholder="Briefly describe the award and why you received it."
+            {!!fields.length && (
+              <Accordion
+                type="multiple"
+                value={openItems}
+                onValueChange={setOpenItems}
+              >
+                {fields.map((field, index) => (
+                  <AccordionItem key={field.id} value={`item-${index}`}>
+                    <AccordionTrigger>
+                      {getSectionTitle(index)}
+                    </AccordionTrigger>
+                    <AccordionContent className="mb-0 max-h-none space-y-4">
+                      {/* Name / Issuer */}
+                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        <FormField
+                          control={control}
+                          name={`awards.${index}.name`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Award name{" "}
+                                <span className="text-destructive">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Best Developer Award"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                {index < fields.length - 1 && <Separator className="mt-8" />}
-              </div>
-            ))}
+                        <FormField
+                          control={control}
+                          name={`awards.${index}.issuer`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Issuer{" "}
+                                <span className="text-destructive">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Company / Organization"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Date */}
+                      <FormField
+                        control={control}
+                        name={`awards.${index}.date`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Date (MM/YYYY){" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <MonthYearPicker
+                                {...field}
+                                placeholder="MM/YYYY"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Description */}
+                      <FormField
+                        control={control}
+                        name={`awards.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Description{" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <RichTextEditor
+                                value={field.value || ""}
+                                onChange={field.onChange}
+                                placeholder="Briefly describe the award and why you received it."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => setRemoveIndex(index)}
+                        aria-label="Remove award"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
 
             <div className="cv-form-actions">
               <Button
@@ -190,26 +215,25 @@ export function AwardsForm({ id, formData }: AwardsFormProps) {
                 variant="outline"
                 className="cv-form-primary-action"
                 disabled={!canAddAward}
-                onClick={() =>
+                onClick={() => {
                   append({
                     name: "",
                     issuer: "",
                     date: "",
                     description: "",
-                  })
-                }
+                  });
+                  setOpenItems((prev) => [...prev, `item-${fields.length}`]);
+                }}
               >
+                <Plus />
                 {hasAny ? "Add another award" : "Add award"}
               </Button>
               <Button
                 type="submit"
-                disabled={
-                  isPending ||
-                  !form.formState.isValid ||
-                  form.formState.isDirty === false
-                }
+                disabled={isPending}
                 className="cv-form-primary-action"
               >
+                {isPending ? <Spinner /> : <Save />}
                 {isPending ? "Saving..." : "Save"}
               </Button>
             </div>

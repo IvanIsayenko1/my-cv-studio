@@ -53,7 +53,7 @@ export default function DeleteCVDialog({
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_LIST] });
       toast.success("CV has been deleted");
-      router.push(ROUTES.MAKER);
+      router.push(ROUTES.CV_LIST);
     },
     onError: (error) => {
       toast.error(error.message || "Failed to delete CV");

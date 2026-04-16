@@ -171,7 +171,7 @@ export default function SkillsAIAssistantDialog({
         );
       })
     ) : (
-      <Card>
+      <Card className="m-1">
         <CardHeader>
           <CardTitle>All good!</CardTitle>
           <CardDescription>

@@ -1,5 +1,3 @@
-import { CSSProperties } from "react";
-
 import Link from "next/link";
 
 import { ROUTES } from "@/config/routes";
@@ -9,8 +7,7 @@ import ResponsiveHeader from "../header/responsive-header";
 export default function Header() {
   return (
     <header
-      className="load-stagger sticky top-0 z-50 w-full backdrop-blur-2xl"
-      style={{ "--stagger": 0 } as CSSProperties}
+      className="sticky top-0 z-50 w-full backdrop-blur-2xl"
       aria-label="Site header"
     >
       <div className="mx-auto px-4 py-3 sm:px-6 sm:py-4 lg:px-8">

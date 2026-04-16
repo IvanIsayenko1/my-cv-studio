@@ -67,26 +67,24 @@ export default function DuplicateCVDialog({
 
   const { reset, clearErrors, setError } = form;
 
-  const {
-    mutate: duplicateCV,
-    isPending: isDuplicatePending,
-    error,
-  } = useDuplicateCV({
-    // Keep success side effects together to avoid fragmented lifecycle logic.
-    onSuccess: () => {
-      setOpen(false);
-      reset({ name: cv?.title || "" });
-      clearErrors("name");
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_LIST] });
-      toast.success("CV has been duplicated");
-    },
-    onError: (error) => {
-      if (error.message)
-        setError("name", {
-          message: error.message,
-        });
-    },
-  });
+  const { mutate: duplicateCV, isPending: isDuplicatePending } = useDuplicateCV(
+    {
+      // Keep success side effects together to avoid fragmented lifecycle logic.
+      onSuccess: () => {
+        setOpen(false);
+        reset({ name: cv?.title || "" });
+        clearErrors("name");
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CV_LIST] });
+        toast.success("CV has been duplicated");
+      },
+      onError: (error) => {
+        if (error.message)
+          setError("name", {
+            message: error.message,
+          });
+      },
+    }
+  );
 
   const onSubmit = (data: CVNameFormValues) => {
     clearErrors("name");

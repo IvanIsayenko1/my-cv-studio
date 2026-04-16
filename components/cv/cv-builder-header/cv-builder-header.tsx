@@ -22,34 +22,38 @@ export default function CVBuilderHeader() {
   const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
 
   return (
-    <div
-      className="load-stagger flex flex-wrap items-center gap-3 sm:gap-4 w-full"
-      style={stagger(1)}
+    <header
+      className="sticky top-0 z-50 w-full backdrop-blur-sm"
+      aria-label="Site header"
     >
-      <div className="min-w-0 flex-1 flex items-center gap-2 sm:gap-4 md:flex">
-        <Button
-          asChild
-          variant="outline"
-          size="icon-lg"
-          className="!p-0"
-          style={stagger(0)}
-        >
-          <Link href={ROUTES.MAKER} aria-label="Go Back">
-            <ArrowLeftIcon aria-hidden="true" />
-          </Link>
-        </Button>
-        <Suspense fallback={<Skeleton className="h-9 w-32" />}>
-          <CVBuilderTitle id={id} />
-        </Suspense>
+      <div className="mx-auto px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+        <div className="flex items-center justify-between gap-4 sm:gap-6">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4 md:flex">
+            <Button
+              asChild
+              variant="outline"
+              size="icon-lg"
+              className="!p-0"
+              style={stagger(0)}
+            >
+              <Link href={ROUTES.CV_LIST} aria-label="Go Back">
+                <ArrowLeftIcon aria-hidden="true" />
+              </Link>
+            </Button>
+            <Suspense fallback={<Skeleton className="h-9 w-32" />}>
+              <CVBuilderTitle id={id} />
+            </Suspense>
+          </div>
+          <Suspense fallback={<Skeleton className="h-6 w-16" />}>
+            <CVStatus id={id} />
+          </Suspense>
+          <div className="shrink-0">
+            <Suspense fallback={<CVBuilderMenuSkeleton />}>
+              <CVBuilderMenu id={id} />
+            </Suspense>
+          </div>
+        </div>
       </div>
-      <Suspense fallback={<Skeleton className="h-6 w-16" />}>
-        <CVStatus id={id} />
-      </Suspense>
-      <div className="shrink-0">
-        <Suspense fallback={<CVBuilderMenuSkeleton />}>
-          <CVBuilderMenu id={id} />
-        </Suspense>
-      </div>
-    </div>
+    </header>
   );
 }

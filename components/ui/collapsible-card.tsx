@@ -3,7 +3,6 @@
 import * as React from "react";
 
 import { ChevronDownIcon } from "lucide-react";
-import { is } from "zod/v4/locales";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -48,7 +47,7 @@ export function CollapsibleCard({
   return (
     <section
       className={cn(
-        "bg-card text-card-foreground rounded-3xl border shadow-sm",
+        "bg-card text-card-foreground rounded-4xl border shadow-sm",
         className
       )}
     >
@@ -59,14 +58,12 @@ export function CollapsibleCard({
         aria-controls={contentId}
         onClick={() => setOpenState(!isOpen)}
         className={cn(
-          "focus-visible:border-ring focus-visible:ring-ring/50 hover:bg-accent/40 flex min-h-11 w-full [touch-action:manipulation] items-center justify-between gap-4 rounded-xl px-4 py-6 text-left transition-colors outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10 sm:px-6",
+          "focus-visible:border-ring focus-visible:ring-ring/50 hover:bg-accent/40 flex min-h-11 w-full [touch-action:manipulation] items-center justify-between gap-4 rounded-3xl px-4 py-6 text-left transition-colors outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10 sm:px-6",
           triggerClassName
         )}
       >
         <span className="flex min-w-0 flex-col gap-1">
-          <span className="truncate text-base font-semibold sm:text-lg">
-            {title}
-          </span>
+          <span className="truncate">{title}</span>
           {description ? (
             <span className="text-muted-foreground text-sm">{description}</span>
           ) : null}

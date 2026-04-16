@@ -252,6 +252,13 @@ export function RichTextEditor({
     if (typeof document === "undefined") return;
 
     const handler = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+      const editor = editorRef.current;
+      if (!editor || !editor.contains(range.commonAncestorContainer)) return;
+
       saveSelection();
       refreshToolbarState();
     };
@@ -292,11 +299,11 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-md border border-input bg-transparent",
+        "overflow-hidden rounded-3xl border border-transparent bg-transparent",
         className
       )}
     >
-      <div className="flex items-center gap-1 overflow-x-auto border-b border-input bg-muted/40 p-1.5 sm:flex-wrap sm:p-2">
+      <div className="border-input bg-input/50 flex items-center gap-1 overflow-x-auto border-b p-1.5 sm:flex-wrap sm:p-2">
         {toolbarButtons.map((button) => {
           const Icon = button.icon;
           return (
@@ -304,7 +311,7 @@ export function RichTextEditor({
               key={button.key}
               type="button"
               size="icon"
-              variant={button.active ? "secondary" : "ghost"}
+              variant={button.active ? "default" : "ghost"}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => runCommand(button.onClick)}
               disabled={disabled || button.disabled}
@@ -337,9 +344,9 @@ export function RichTextEditor({
         }}
         className={cn(
           minHeightClassName,
-          "prose prose-sm dark:prose-invert max-w-none px-3 py-2 text-base leading-6 outline-none sm:text-sm sm:leading-5",
-          "[&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1",
-          "empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]",
+          "prose prose-sm dark:prose-invert bg-input/50 max-w-none px-3 py-2 text-base leading-6 outline-none sm:text-sm sm:leading-5",
+          "[&_li]:my-1 [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6",
+          "empty:before:text-muted-foreground empty:before:pointer-events-none empty:before:content-[attr(data-placeholder)]",
           disabled && "cursor-not-allowed opacity-60"
         )}
       />

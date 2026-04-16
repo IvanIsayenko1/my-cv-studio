@@ -17,14 +17,14 @@ import {
   DialogTitle,
 } from "./dialog";
 import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "./mobile-overlay";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "./drawer";
 import {
   Select,
   SelectContent,
@@ -130,7 +130,7 @@ export function MonthYearPicker({
   };
 
   const panel = (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <Button
           type="button"
@@ -214,8 +214,8 @@ export function MonthYearPicker({
       }}
       disabled={disabled}
       className={cn(
-        "border-input text-left dark:bg-input/30 h-10 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+        "bg-input/50 h-10 w-full rounded-3xl border border-transparent px-3 py-2 text-left text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-1",
         "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
         "flex items-center justify-between gap-2",
         className
@@ -232,17 +232,22 @@ export function MonthYearPicker({
     return (
       <>
         {trigger}
-        <MobileOverlay open={open} onOpenChange={setOpen}>
-          <MobileOverlayContent>
-            <MobileOverlayHeader>
-              <MobileOverlayTitle>Pick month and year</MobileOverlayTitle>
-            </MobileOverlayHeader>
-            <MobileOverlayBody>{panel}</MobileOverlayBody>
-            <MobileOverlayFooter className="space-y-2">
-              <Button type="button" onClick={applySelection} size="lg" className="w-full">
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent className="mb-4">
+            <DrawerHeader>
+              <DrawerTitle>Pick month and year</DrawerTitle>
+            </DrawerHeader>
+            <DrawerDescription>{panel}</DrawerDescription>
+            <DrawerFooter className="pt-4">
+              <Button
+                type="button"
+                onClick={applySelection}
+                size="lg"
+                className="w-full"
+              >
                 Select
               </Button>
-              <MobileOverlayClose asChild>
+              <DrawerClose asChild>
                 <Button
                   type="button"
                   variant="outline"
@@ -252,10 +257,10 @@ export function MonthYearPicker({
                 >
                   Close
                 </Button>
-              </MobileOverlayClose>
-            </MobileOverlayFooter>
-          </MobileOverlayContent>
-        </MobileOverlay>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       </>
     );
   }

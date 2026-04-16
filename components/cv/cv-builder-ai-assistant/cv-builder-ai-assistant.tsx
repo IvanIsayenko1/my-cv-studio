@@ -15,11 +15,13 @@ export default function CVBuilderAIAssistant<T>({
   prompt,
   handleResponse,
   responseSchema,
+  disabled,
 }: {
   value: any;
   prompt: string;
   handleResponse: (response: T | null) => void;
   responseSchema?: ZodType<T>;
+  disabled: boolean;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +47,7 @@ export default function CVBuilderAIAssistant<T>({
           setLoading(false);
         }
       }}
-      disabled={loading}
+      disabled={loading || disabled}
     >
       {loading && <Spinner />}
       <SparklesIcon aria-hidden="true" />

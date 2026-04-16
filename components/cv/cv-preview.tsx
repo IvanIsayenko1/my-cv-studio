@@ -30,14 +30,6 @@ const PAGE_MARGIN_PX = PAGE_MARGIN_MM * MM_TO_PX;
 const PRINTABLE_WIDTH_PX = PAGE_WIDTH_PX - PAGE_MARGIN_PX * 2;
 const PRINTABLE_HEIGHT_PX = PAGE_HEIGHT_PX - PAGE_MARGIN_PX * 2;
 
-// Chrome's print-mode renderer (Puppeteer) renders text fractionally taller
-// than screen mode, so content that fits in the preview can overflow in the PDF.
-// This offset shrinks the effective preview page height to match what Puppeteer
-// actually fits per page.
-const PRINT_MODE_HEIGHT_COMPENSATION_PX = 20;
-const EFFECTIVE_PAGE_HEIGHT_PX =
-  PRINTABLE_HEIGHT_PX - PRINT_MODE_HEIGHT_COMPENSATION_PX;
-
 type PageMetrics = {
   pageStarts: number[];
   totalHeight: number;

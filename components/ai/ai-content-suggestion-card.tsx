@@ -33,7 +33,7 @@ export default function AIContentSuggestionCard({
   showDefaultAction?: boolean;
 }) {
   return (
-    <Card key={cardKey}>
+    <Card key={cardKey} className="m-1">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>

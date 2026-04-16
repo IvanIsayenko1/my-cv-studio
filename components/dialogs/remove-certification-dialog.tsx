@@ -49,7 +49,7 @@ export const RemoveCertificationDialog = ({
           <DrawerHeader className="text-left">
             <DrawerTitle>Remove this certification?</DrawerTitle>
           </DrawerHeader>
-          <DrawerDescription className="px-4 text-left text-sm text-muted-foreground">
+          <DrawerDescription className="text-muted-foreground px-4 text-left text-sm">
             This certification will be permanently removed from your CV. You can
             add it again later if needed.
           </DrawerDescription>
@@ -85,10 +85,7 @@ export const RemoveCertificationDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={onRemove}
-          >
+          <AlertDialogAction variant="destructive" onClick={onRemove}>
             Remove
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -53,7 +53,7 @@ export const RemoveSkillsDialog = ({
           <DrawerHeader className="text-left">
             <DrawerTitle>{title}</DrawerTitle>
           </DrawerHeader>
-          <DrawerDescription className="px-4 text-left text-sm text-muted-foreground">
+          <DrawerDescription className="text-muted-foreground px-4 text-left text-sm">
             {description}
           </DrawerDescription>
           <DrawerFooter className="pt-2">
@@ -85,10 +85,7 @@ export const RemoveSkillsDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={onRemove}
-          >
+          <AlertDialogAction variant="destructive" onClick={onRemove}>
             Remove
           </AlertDialogAction>
         </AlertDialogFooter>

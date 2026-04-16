@@ -4,11 +4,19 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronDown, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Plus, Save, Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveSkillsDialog } from "@/components/dialogs/remove-skills-dialog";
-import StatusBedge from "@/components/status-bedge";
+import SelectorDrawer from "@/components/dialogs/selector-drawer";
+import FormStatusBedge from "@/components/form-status-bedge";
+import SectionStatusBedge from "@/components/section-status-bedge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,22 +28,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "@/components/ui/mobile-overlay";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveLanguages } from "@/hooks/cv/use-languages";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -59,6 +58,7 @@ export function LanguagesForm({
   const [removeLanguageIndex, setRemoveLanguageIndex] = useState<number | null>(
     null
   );
+  const [openItems, setOpenItems] = useState<string[]>([]);
   const [proficiencyPickerIndex, setProficiencyPickerIndex] = useState<
     number | null
   >(null);
@@ -69,7 +69,10 @@ export function LanguagesForm({
   const form = useForm<LanguagesFormValues>({
     resolver: zodResolver(languagesSchema),
     defaultValues: {
-      languages: formData?.languages || [createEmptyLanguage()],
+      languages:
+        formData.languages && formData.languages.length > 0
+          ? formData?.languages
+          : [createEmptyLanguage()],
     },
   });
 
@@ -86,7 +89,9 @@ export function LanguagesForm({
   });
 
   const onSubmit = (values: LanguagesFormValues) => {
-    mutate(values);
+    mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
   };
 
   const watchedLanguages = useWatch({
@@ -98,6 +103,13 @@ export function LanguagesForm({
   const canAddLanguage =
     !lastLanguage ||
     (!!lastLanguage.language?.trim() && !!lastLanguage.proficiency?.trim());
+
+  const getSectionTitle = (index: number) => {
+    return watchedLanguages[index] && watchedLanguages[index].language
+      ? `${watchedLanguages[index].language}`
+      : `Language ${index + 1}`;
+  };
+
   return (
     <>
       <SectionWrapper
@@ -106,111 +118,117 @@ export function LanguagesForm({
         description="Add languages you speak and your proficiency level."
         cvId={id}
         status={
-          <StatusBedge
-            isReady={isComplete}
-            readyText="Complete"
-            notReadyText="Incomplete"
-          />
+          <div className="space-x-2">
+            <FormStatusBedge isNotSaved={formState.isDirty} />
+            <SectionStatusBedge
+              isReady={isComplete}
+              readyText="Complete"
+              notReadyText="Incomplete"
+            />
+          </div>
         }
       >
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-8 space-y-8"
+            className="flex flex-col gap-8"
           >
-            {languageFields.map((field, index) => (
-              <div key={field.id} className="mb-0 space-y-4">
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="text-muted-foreground text-sm font-medium">
-                    Language {index + 1}
-                  </div>
-                  {languageFields.length > 1 && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setRemoveLanguageIndex(index)}
-                      aria-label="Remove language"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
+            <Accordion
+              type="multiple"
+              value={openItems}
+              onValueChange={setOpenItems}
+            >
+              {languageFields.map((field, index) => (
+                <AccordionItem key={field.id} value={`item-${index}`}>
+                  <AccordionTrigger>{getSectionTitle(index)}</AccordionTrigger>
+                  <AccordionContent className="mb-0 max-h-none space-y-4">
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name={`languages.${index}.language`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Language{" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="English" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`languages.${index}.language`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Language <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="English" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                      <FormField
+                        control={control}
+                        name={`languages.${index}.proficiency`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Proficiency{" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              {isDesktop ? (
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select level" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {PROFICIENCY_OPTIONS.map((option) => (
+                                      <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                      >
+                                        {option.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className="h-11 w-full justify-between px-3"
+                                  onClick={() =>
+                                    setProficiencyPickerIndex(index)
+                                  }
+                                  aria-label="Choose language proficiency"
+                                >
+                                  <span className="truncate text-left">
+                                    {PROFICIENCY_OPTIONS.find(
+                                      (option) => option.value === field.value
+                                    )?.label || "Select level"}
+                                  </span>
+                                  <ChevronDown className="size-4 opacity-70" />
+                                </Button>
+                              )}
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {languageFields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => setRemoveLanguageIndex(index)}
+                        aria-label="Remove language"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
                     )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name={`languages.${index}.proficiency`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Proficiency{" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          {isDesktop ? (
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select level" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {PROFICIENCY_OPTIONS.map((option) => (
-                                  <SelectItem
-                                    key={option.value}
-                                    value={option.value}
-                                  >
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="h-11 w-full justify-between px-3"
-                              onClick={() => setProficiencyPickerIndex(index)}
-                              aria-label="Choose language proficiency"
-                            >
-                              <span className="truncate text-left">
-                                {PROFICIENCY_OPTIONS.find(
-                                  (option) => option.value === field.value
-                                )?.label || "Select level"}
-                              </span>
-                              <ChevronDown className="size-4 opacity-70" />
-                            </Button>
-                          )}
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                {index < languageFields.length - 1 && (
-                  <Separator className="mt-8" />
-                )}
-              </div>
-            ))}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
 
             <div className="cv-form-actions">
               <Button
@@ -218,10 +236,15 @@ export function LanguagesForm({
                 variant="outline"
                 disabled={!canAddLanguage}
                 className="cv-form-primary-action"
-                onClick={() =>
-                  appendLanguage(createEmptyLanguage(), { shouldFocus: false })
-                }
+                onClick={() => {
+                  appendLanguage(createEmptyLanguage(), { shouldFocus: false });
+                  setOpenItems((prev) => [
+                    ...prev,
+                    `item-${languageFields.length}`,
+                  ]);
+                }}
               >
+                <Plus />
                 Add another language
               </Button>
               <Button
@@ -229,6 +252,7 @@ export function LanguagesForm({
                 disabled={isPending}
                 className="cv-form-primary-action"
               >
+                {isPending ? <Spinner /> : <Save />}
                 {isPending ? "Saving..." : "Save"}
               </Button>
             </div>
@@ -252,65 +276,46 @@ export function LanguagesForm({
         }}
       />
 
-      <MobileOverlay
+      <SelectorDrawer
         open={proficiencyPickerIndex !== null}
         onOpenChange={(open) => {
           if (!open) setProficiencyPickerIndex(null);
         }}
-      >
-        <MobileOverlayContent>
-          <MobileOverlayHeader>
-            <MobileOverlayTitle>Select Proficiency</MobileOverlayTitle>
-          </MobileOverlayHeader>
-          <MobileOverlayBody className="max-h-[55vh] space-y-1">
-            {PROFICIENCY_OPTIONS.map((option) => {
-              const selected =
-                proficiencyPickerIndex !== null &&
-                form.getValues(
-                  `languages.${proficiencyPickerIndex}.proficiency`
-                ) === option.value;
+        title="Select Proficiency"
+        content={PROFICIENCY_OPTIONS.map((option) => {
+          const selected =
+            proficiencyPickerIndex !== null &&
+            form.getValues(
+              `languages.${proficiencyPickerIndex}.proficiency`
+            ) === option.value;
 
-              return (
-                <Button
-                  key={option.value}
-                  type="button"
-                  variant={selected ? "secondary" : "ghost"}
-                  size="lg"
-                  className="h-12 w-full justify-between px-4 text-left"
-                  onClick={() => {
-                    if (proficiencyPickerIndex === null) return;
-                    form.setValue(
-                      `languages.${proficiencyPickerIndex}.proficiency`,
-                      option.value,
-                      {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      }
-                    );
-                    setProficiencyPickerIndex(null);
-                  }}
-                >
-                  <span>{option.label}</span>
-                  {selected ? <Check className="size-4" /> : null}
-                </Button>
-              );
-            })}
-          </MobileOverlayBody>
-          <MobileOverlayFooter>
-            <MobileOverlayClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="w-full"
-              >
-                Close
-              </Button>
-            </MobileOverlayClose>
-          </MobileOverlayFooter>
-        </MobileOverlayContent>
-      </MobileOverlay>
+          return (
+            <Button
+              key={option.value}
+              type="button"
+              variant={selected ? "secondary" : "ghost"}
+              size="lg"
+              className="h-12 w-full justify-between px-4 text-left"
+              onClick={() => {
+                if (proficiencyPickerIndex === null) return;
+                form.setValue(
+                  `languages.${proficiencyPickerIndex}.proficiency`,
+                  option.value,
+                  {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  }
+                );
+                setProficiencyPickerIndex(null);
+              }}
+            >
+              <span>{option.label}</span>
+              {selected ? <Check className="size-4" /> : null}
+            </Button>
+          );
+        })}
+      ></SelectorDrawer>
     </>
   );
 }

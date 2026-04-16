@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Save } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import ProfessionalSummaryAIAssistantDialog from "@/components/dialogs/professional-summary-ai-assistant-dialog";
-import StatusBedge from "@/components/status-bedge";
+import FormStatusBedge from "@/components/form-status-bedge";
+import SectionStatusBedge from "@/components/section-status-bedge";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveSummary } from "@/hooks/cv/use-summary";
 
@@ -44,13 +47,15 @@ export function SummaryForm({
   const form = useForm<SummaryFormValues>({
     resolver: zodResolver(summarySchema),
     defaultValues: {
-      professionalSummary: formData.professionalSummary || "",
+      professionalSummary: formData?.professionalSummary || "",
     },
   });
   const isComplete = form.formState.isValid;
 
   const onSubmit = (values: SummaryFormValues) => {
-    mutate(values);
+    mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
   };
 
   return (
@@ -60,15 +65,21 @@ export function SummaryForm({
       description="Write a concise, 3–5 sentence summary that highlights your key skills, experience, and target role."
       cvId={id}
       status={
-        <StatusBedge
-          isReady={isComplete}
-          readyText="Complete"
-          notReadyText="Incomplete"
-        />
+        <div className="space-x-2">
+          <FormStatusBedge isNotSaved={form.formState.isDirty} />
+          <SectionStatusBedge
+            isReady={isComplete}
+            readyText="Complete"
+            notReadyText="Incomplete"
+          />
+        </div>
       }
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-8"
+        >
           <FormField
             control={form.control}
             name="professionalSummary"
@@ -80,6 +91,7 @@ export function SummaryForm({
                 </FormLabel>
                 <FormControl>
                   <RichTextEditor
+                    key={field.name}
                     {...field}
                     placeholder="Experienced frontend developer with 5+ years..."
                   />
@@ -95,6 +107,7 @@ export function SummaryForm({
 
           <div className="cv-form-actions">
             <CVBuilderAIAssistant<CVProfessionalSummaryAIReview>
+              disabled={!isComplete || isPending}
               value={form.getValues()}
               prompt={PROFESSIONAL_SUMMARY_MODULE}
               responseSchema={cvProfessionalSummaryReviewSchema}
@@ -109,6 +122,7 @@ export function SummaryForm({
               disabled={isPending}
               className="cv-form-primary-action"
             >
+              {isPending ? <Spinner /> : <Save />}
               {isPending ? "Saving..." : "Save"}
             </Button>
           </div>

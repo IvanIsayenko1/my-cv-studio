@@ -15,7 +15,7 @@ import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 
-import { useCVData, useCVQueryData, useDownloadCV } from "@/hooks/cv/use-cv";
+import { useCVData, useDownloadCV } from "@/hooks/cv/use-cv";
 import { useStatus } from "@/hooks/cv/use-status";
 
 import RenameCVDialog from "../dialogs/rename-cv-dialog";
@@ -48,7 +48,7 @@ export default function CVDesktopActions({ id }: { id: string }) {
     <>
       <ButtonGroup>
         <Button
-          variant="outline"
+          variant="secondary"
           disabled={!isCVReady}
           onClick={() => setIsOpenShareDialog(true)}
         >
@@ -56,7 +56,7 @@ export default function CVDesktopActions({ id }: { id: string }) {
           Share
         </Button>
         <Button
-          variant="outline"
+          variant="secondary"
           onClick={() => downloadCV(id)}
           disabled={isDownloadPending || !isCVReady}
         >
@@ -65,7 +65,7 @@ export default function CVDesktopActions({ id }: { id: string }) {
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" aria-label="More Options">
+            <Button variant="secondary" size="icon" aria-label="More Options">
               <MoreHorizontalIcon />
             </Button>
           </DropdownMenuTrigger>
@@ -95,13 +95,16 @@ export default function CVDesktopActions({ id }: { id: string }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setIsOpenDeleteDialog(true)}
-                disabled={isDownloadPending}
-              >
-                <Trash />
-                Delete
+              <DropdownMenuItem asChild>
+                <Button
+                  className="w-full"
+                  variant="destructive"
+                  onClick={() => setIsOpenDeleteDialog(true)}
+                  disabled={isDownloadPending}
+                >
+                  <Trash />
+                  Delete
+                </Button>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

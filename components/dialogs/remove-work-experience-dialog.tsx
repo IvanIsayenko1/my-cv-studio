@@ -49,9 +49,9 @@ export const RemoveWorkExperienceDialog = ({
           <DrawerHeader className="text-left">
             <DrawerTitle>Remove this role?</DrawerTitle>
           </DrawerHeader>
-          <DrawerDescription className="px-4 text-left text-sm text-muted-foreground">
-            This work experience entry will be permanently removed from your
-            CV. You can add it again later if needed.
+          <DrawerDescription className="text-muted-foreground px-4 text-left text-sm">
+            This work experience entry will be permanently removed from your CV.
+            You can add it again later if needed.
           </DrawerDescription>
           <DrawerFooter className="pt-2">
             <DrawerClose asChild>
@@ -85,10 +85,7 @@ export const RemoveWorkExperienceDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={onRemove}
-          >
+          <AlertDialogAction variant="destructive" onClick={onRemove}>
             Remove
           </AlertDialogAction>
         </AlertDialogFooter>

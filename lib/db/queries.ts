@@ -175,7 +175,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
 
   // Work experience - DB ORDERED (02/2025 → 07/2019)
   const workExperience: CV["workExperience"] = (workExpRows.rows as any[]).map(
-    (row, idx) => {
+    (row) => {
       const id = row.id as string;
       return {
         jobTitle: row.job_title,

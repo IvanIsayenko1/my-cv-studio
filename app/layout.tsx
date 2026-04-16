@@ -3,8 +3,9 @@ import { Geist } from "next/font/google";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
+import { Toaster } from "sonner";
 
-import Layout from "@/components/layout/layout";
+import AppLayout from "@/components/layout/app-layout";
 import { QueryProvider } from "@/components/shared/providers/query-provider";
 import { ThemeProvider } from "@/components/shared/providers/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 import "./globals.css";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const siteUrl =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://my-cv-studio.vercel.app";
@@ -110,7 +111,8 @@ export default function RootLayout({
             >
               <QueryProvider>
                 <TooltipProvider>
-                  <Layout>{children}</Layout>
+                  <AppLayout>{children}</AppLayout>
+                  <Toaster position="top-center" richColors />
                 </TooltipProvider>
               </QueryProvider>
             </ClerkProvider>

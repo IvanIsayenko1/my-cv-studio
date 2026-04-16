@@ -49,7 +49,7 @@ export const RemoveAwardDialog = ({
           <DrawerHeader className="text-left">
             <DrawerTitle>Remove this award?</DrawerTitle>
           </DrawerHeader>
-          <DrawerDescription className="px-4 text-left text-sm text-muted-foreground">
+          <DrawerDescription className="text-muted-foreground px-4 text-left text-sm">
             This award will be permanently removed from your CV. You can add it
             again later if needed.
           </DrawerDescription>
@@ -85,10 +85,7 @@ export const RemoveAwardDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={onRemove}
-          >
+          <AlertDialogAction onClick={onRemove} variant="destructive">
             Remove
           </AlertDialogAction>
         </AlertDialogFooter>

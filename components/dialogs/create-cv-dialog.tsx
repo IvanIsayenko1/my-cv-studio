@@ -68,7 +68,7 @@ export default function CreateCVDialog({
     onSuccess: ({ id }) => {
       setIsOpenDialog(false);
       toast.success("CV has been created");
-      router.push(ROUTES.CV_DETAIL.replace(":id", id));
+      router.push(ROUTES.CV_BUILD.replace(":id", id));
     },
     onError: (error) => {
       if (error.message === "Name already in use") {

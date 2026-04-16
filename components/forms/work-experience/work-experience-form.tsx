@@ -4,13 +4,21 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronDown, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Plus, Save, Trash2 } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveWorkExperienceDialog } from "@/components/dialogs/remove-work-experience-dialog";
+import SelectorDrawer from "@/components/dialogs/selector-drawer";
 import WorkExperienceAIAssistantDialog from "@/components/dialogs/work-experience-ai-assistant-dialog";
-import StatusBedge from "@/components/status-bedge";
+import FormStatusBedge from "@/components/form-status-bedge";
+import SectionStatusBedge from "@/components/section-status-bedge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,15 +29,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "@/components/ui/mobile-overlay";
 import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
@@ -39,7 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveWorkExperience } from "@/hooks/cv/use-work-experience";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -63,6 +62,7 @@ export function WorkExperienceForm({
   formData,
 }: BuilderFormProps<WorkExperienceFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
+  const [openItems, setOpenItems] = useState<string[]>([]);
   const [employmentPickerIndex, setEmploymentPickerIndex] = useState<
     number | null
   >(null);
@@ -77,12 +77,26 @@ export function WorkExperienceForm({
   const form = useForm<WorkExperienceFormValues>({
     resolver: zodResolver(workExperienceSchema),
     defaultValues: {
-      workExperience: formData.workExperience || [],
+      workExperience:
+        formData.workExperience && formData.workExperience.length > 0
+          ? formData.workExperience
+          : [
+              {
+                jobTitle: "",
+                company: "",
+                location: "",
+                employmentType: "Full-time",
+                startDate: "",
+                endDate: "Present",
+                achievements: "",
+                toolsAndMethods: [],
+              },
+            ],
     },
   });
 
-  const { control, handleSubmit } = form;
-  const isComplete = form.formState.isValid;
+  const { control, handleSubmit, formState } = form;
+  const isComplete = formState.isValid;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -90,7 +104,9 @@ export function WorkExperienceForm({
   });
 
   const onSubmit = (values: WorkExperienceFormValues) => {
-    mutate(values);
+    mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
   };
 
   // Watch all workExperience items for "can add another role" logic
@@ -107,6 +123,15 @@ export function WorkExperienceForm({
     last.location?.trim() &&
     last.startDate?.trim() &&
     last.endDate?.trim();
+
+  const getSectionTitle = (index: number) => {
+    return watchedExperiences[index] &&
+      watchedExperiences[index].jobTitle &&
+      watchedExperiences[index].company
+      ? `${watchedExperiences[index].jobTitle} @ ${watchedExperiences[index].company}`
+      : `Role ${index + 1}`;
+  };
+
   return (
     <>
       <SectionWrapper
@@ -115,259 +140,276 @@ export function WorkExperienceForm({
         description="Add your recent roles, focusing on achievements and impact."
         cvId={id}
         status={
-          <StatusBedge
-            isReady={isComplete}
-            readyText="Complete"
-            notReadyText="Incomplete"
-          />
+          <div className="space-x-2">
+            <FormStatusBedge isNotSaved={formState.isDirty} />
+            <SectionStatusBedge
+              isReady={isComplete}
+              readyText="Complete"
+              notReadyText="Incomplete"
+            />
+          </div>
         }
       >
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-8 space-y-8"
+            className="flex flex-col gap-8"
           >
-            {fields.map((field, index) => (
-              <div key={field.id} className="mb-0 space-y-4">
-                {/* Top row with title and delete button */}
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="text-muted-foreground text-sm font-medium">
-                    Role {index + 1}
-                  </div>
-                  {fields.length > 1 && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => setRemoveIndex(index)}
-                      aria-label="Remove role"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
+            <Accordion
+              type="multiple"
+              value={openItems}
+              onValueChange={setOpenItems}
+            >
+              {fields.map((field, index) => (
+                <AccordionItem key={field.id} value={`item-${index}`}>
+                  <AccordionTrigger>{getSectionTitle(index)}</AccordionTrigger>
 
-                {/* Job title / company */}
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`workExperience.${index}.jobTitle`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Job Title <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Senior Frontend Developer"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name={`workExperience.${index}.company`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Company <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="Acme Inc." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                  <AccordionContent className="mb-0 max-h-none space-y-4">
+                    {/* Job title / company */}
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name={`workExperience.${index}.jobTitle`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Job Title{" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Senior Frontend Developer"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={control}
+                        name={`workExperience.${index}.company`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Company{" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="Acme Inc." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                {/* Location / Employment Type */}
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`workExperience.${index}.location`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Location <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Remote / City, Country"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name={`workExperience.${index}.employmentType`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Employment Type{" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          {isDesktop ? (
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="h-11 w-full justify-between px-3"
-                              onClick={() => setEmploymentPickerIndex(index)}
-                              aria-label="Choose employment type"
-                            >
-                              <span className="truncate text-left">
-                                {field.value || "Select type"}
-                              </span>
-                              <ChevronDown className="size-4 opacity-70" />
-                            </Button>
-                          )}
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Dates */}
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`workExperience.${index}.startDate`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Start Date (MM/YYYY){" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <MonthYearPicker {...field} placeholder="MM/YYYY" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name={`workExperience.${index}.endDate`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          End Date (MM/YYYY or Present){" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <MonthYearPicker
-                            {...field}
-                            placeholder="MM/YYYY"
-                            includePresentOption={true}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Achievements */}
-                <FormField
-                  control={control}
-                  name={`workExperience.${index}.achievements`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Key Achievements</FormLabel>
-                      <FormControl>
-                        <RichTextEditor
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          placeholder="Describe your key achievements and responsibilities in this role..."
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Tools / Systems / Methods */}
-                <FormField
-                  control={control}
-                  name={`workExperience.${index}.toolsAndMethods`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tools / Systems / Methods</FormLabel>
-                      <FormControl>
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap gap-2">
-                            {field.value?.map((tech, i) => (
-                              <span
-                                key={tech + i}
-                                className="inline-flex min-h-9 items-center rounded-full border px-3 py-1.5 text-sm sm:min-h-7 sm:px-2 sm:py-1 sm:text-xs"
-                              >
-                                {tech}
-                                <button
-                                  type="button"
-                                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive -mr-1 ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors sm:h-5 sm:w-5"
-                                  aria-label={`Remove tool/method ${tech}`}
-                                  onClick={() =>
-                                    field.onChange(
-                                      (field.value ?? []).filter(
-                                        (_, idx) => idx !== i
-                                      )
-                                    )
-                                  }
+                    {/* Location / Employment Type */}
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name={`workExperience.${index}.location`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Location{" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Remote / City, Country"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={control}
+                        name={`workExperience.${index}.employmentType`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Employment Type
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              {isDesktop ? (
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
                                 >
-                                  ×
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                          <Input
-                            placeholder="Type a tool, system, or method and press Enter"
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                const input = (
-                                  e.target as HTMLInputElement
-                                ).value.trim();
-                                if (!input) return;
-                                field.onChange([...(field.value ?? []), input]);
-                                (e.target as HTMLInputElement).value = "";
-                              }
-                            }}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+                                      <SelectItem key={option} value={option}>
+                                        {option}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  className="bg-input/50 w-full justify-between px-3 text-base md:text-sm"
+                                  onClick={() =>
+                                    setEmploymentPickerIndex(index)
+                                  }
+                                  aria-label="Choose employment type"
+                                >
+                                  <span className="truncate text-left">
+                                    {field.value || "Select type"}
+                                  </span>
+                                  <ChevronDown className="size-4 opacity-70" />
+                                </Button>
+                              )}
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                {index < fields.length - 1 && <Separator className="mt-8" />}
-              </div>
-            ))}
+                    {/* Dates */}
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name={`workExperience.${index}.startDate`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Start Date (MM/YYYY){" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <MonthYearPicker
+                                {...field}
+                                placeholder="MM/YYYY"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={control}
+                        name={`workExperience.${index}.endDate`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              End Date (MM/YYYY or Present){" "}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <MonthYearPicker
+                                {...field}
+                                placeholder="MM/YYYY"
+                                includePresentOption={true}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Achievements */}
+                    <FormField
+                      control={control}
+                      name={`workExperience.${index}.achievements`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Key Achievements</FormLabel>
+                          <FormControl>
+                            <RichTextEditor
+                              key={index}
+                              value={field.value || ""}
+                              onChange={field.onChange}
+                              placeholder="Describe your key achievements and responsibilities in this role..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Tools / Systems / Methods */}
+                    <FormField
+                      control={control}
+                      name={`workExperience.${index}.toolsAndMethods`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tools / Systems / Methods</FormLabel>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <div className="flex flex-wrap gap-2">
+                                {field.value?.map((tech, i) => (
+                                  <span
+                                    key={tech + i}
+                                    className="inline-flex min-h-9 items-center rounded-full border px-3 py-1.5 text-sm sm:min-h-7 sm:px-2 sm:py-1 sm:text-xs"
+                                  >
+                                    {tech}
+                                    <button
+                                      type="button"
+                                      className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive -mr-1 ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors sm:h-5 sm:w-5"
+                                      aria-label={`Remove tool/method ${tech}`}
+                                      onClick={() =>
+                                        field.onChange(
+                                          (field.value ?? []).filter(
+                                            (_, idx) => idx !== i
+                                          )
+                                        )
+                                      }
+                                    >
+                                      ×
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                              <Input
+                                placeholder="Type a tool, system, or method and press Enter"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    const input = (
+                                      e.target as HTMLInputElement
+                                    ).value.trim();
+                                    if (!input) return;
+                                    field.onChange([
+                                      ...(field.value ?? []),
+                                      input,
+                                    ]);
+                                    (e.target as HTMLInputElement).value = "";
+                                  }
+                                }}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => setRemoveIndex(index)}
+                        aria-label="Remove role"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
 
             <div className="cv-form-actions">
               <Button
@@ -375,7 +417,7 @@ export function WorkExperienceForm({
                 variant="outline"
                 className="cv-form-primary-action"
                 disabled={!requiredFilledForLast}
-                onClick={() =>
+                onClick={() => {
                   append({
                     jobTitle: "",
                     company: "",
@@ -385,11 +427,14 @@ export function WorkExperienceForm({
                     endDate: "Present",
                     achievements: "",
                     toolsAndMethods: [],
-                  })
-                }
+                  });
+                  setOpenItems((prev) => [...prev, `item-${fields.length}`]);
+                }}
               >
-                Add another role
+                <Plus />
+                {!fields.length ? "Add role" : "Add another role"}
               </Button>
+
               <CVBuilderAIAssistant<CVWorkExperienceAIReview>
                 value={form.getValues()}
                 prompt={WORK_EXPERIENCE_MODULE}
@@ -399,12 +444,14 @@ export function WorkExperienceForm({
                   setAIReview(response);
                   setIsOpenAIAssistantDialog(true);
                 }}
+                disabled={!isComplete || isPending}
               />
               <Button
                 type="submit"
-                disabled={isPending || !form.formState.isValid}
+                disabled={isPending}
                 className="cv-form-primary-action"
               >
+                {isPending ? <Spinner /> : <Save />}
                 {isPending ? "Saving..." : "Save"}
               </Button>
             </div>
@@ -447,61 +494,42 @@ export function WorkExperienceForm({
         }}
       />
 
-      <MobileOverlay
+      <SelectorDrawer
         open={employmentPickerIndex !== null}
         onOpenChange={(open) => {
           if (!open) setEmploymentPickerIndex(null);
         }}
-      >
-        <MobileOverlayContent>
-          <MobileOverlayHeader>
-            <MobileOverlayTitle>Select Employment Type</MobileOverlayTitle>
-          </MobileOverlayHeader>
-          <MobileOverlayBody className="max-h-[55vh] space-y-1">
-            {EMPLOYMENT_TYPE_OPTIONS.map((option) => {
-              const selected =
-                employmentPickerIndex !== null &&
-                form.getValues(
-                  `workExperience.${employmentPickerIndex}.employmentType`
-                ) === option;
+        title="Select Employment Type"
+        content={EMPLOYMENT_TYPE_OPTIONS.map((option) => {
+          const selected =
+            employmentPickerIndex !== null &&
+            form.getValues(
+              `workExperience.${employmentPickerIndex}.employmentType`
+            ) === option;
 
-              return (
-                <Button
-                  key={option}
-                  type="button"
-                  variant={selected ? "secondary" : "ghost"}
-                  size="lg"
-                  className="h-12 w-full justify-between px-4 text-left"
-                  onClick={() => {
-                    if (employmentPickerIndex === null) return;
-                    form.setValue(
-                      `workExperience.${employmentPickerIndex}.employmentType`,
-                      option,
-                      { shouldDirty: true, shouldTouch: true }
-                    );
-                    setEmploymentPickerIndex(null);
-                  }}
-                >
-                  <span>{option}</span>
-                  {selected ? <Check className="size-4" /> : null}
-                </Button>
-              );
-            })}
-          </MobileOverlayBody>
-          <MobileOverlayFooter>
-            <MobileOverlayClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="w-full"
-              >
-                Close
-              </Button>
-            </MobileOverlayClose>
-          </MobileOverlayFooter>
-        </MobileOverlayContent>
-      </MobileOverlay>
+          return (
+            <Button
+              key={option}
+              type="button"
+              variant={selected ? "default" : "ghost"}
+              size="lg"
+              className="h-12 w-full justify-between px-4 text-left"
+              onClick={() => {
+                if (employmentPickerIndex === null) return;
+                form.setValue(
+                  `workExperience.${employmentPickerIndex}.employmentType`,
+                  option,
+                  { shouldDirty: true, shouldTouch: true }
+                );
+                setEmploymentPickerIndex(null);
+              }}
+            >
+              <span>{option}</span>
+              {selected ? <Check className="size-4" /> : null}
+            </Button>
+          );
+        })}
+      />
     </>
   );
 }

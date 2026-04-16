@@ -4,10 +4,17 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2 } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveCertificationDialog } from "@/components/dialogs/remove-certification-dialog";
+import FormStatusBedge from "@/components/form-status-bedge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { MonthYearPicker } from "@/components/ui/month-year-picker";
-import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveCertifications } from "@/hooks/cv/use-certifications";
 
@@ -34,6 +41,7 @@ export function CertificationsForm({
   formData,
 }: BuilderFormProps<CertificationsFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
+  const [openItems, setOpenItems] = useState<string[]>([]);
 
   const { mutate, isPending } = useSaveCertifications(id);
 
@@ -44,7 +52,7 @@ export function CertificationsForm({
     },
   });
 
-  const { control, handleSubmit } = form;
+  const { control, handleSubmit, formState } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -52,7 +60,9 @@ export function CertificationsForm({
   });
 
   const onSubmit = (values: CertificationsFormValues) => {
-    mutate(values);
+    mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
   };
 
   const watchedCerts = useWatch({
@@ -68,6 +78,12 @@ export function CertificationsForm({
     last.issueDate?.trim();
   const canAddCertification = !hasAny || requiredFilledForLast;
 
+  const getSectionTitle = (index: number) => {
+    return watchedCerts[index] && watchedCerts[index].name
+      ? `${watchedCerts[index].name}`
+      : `Certification ${index + 1}`;
+  };
+
   return (
     <>
       <SectionWrapper
@@ -75,122 +91,136 @@ export function CertificationsForm({
         title="Certifications"
         description="List your relevant certifications and credentials."
         cvId={id}
+        status={<FormStatusBedge isNotSaved={formState.isDirty} />}
       >
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-8 space-y-8"
+            className="flex flex-col gap-8"
           >
-            {fields.map((field, index) => (
-              <div key={field.id} className="mb-0 space-y-4">
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="text-muted-foreground text-sm font-medium">
-                    Certification {index + 1}
-                  </div>
-                  {fields.length > 0 && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => setRemoveIndex(index)}
-                      aria-label="Remove certification"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
+            {!!fields.length && (
+              <Accordion
+                type="multiple"
+                value={openItems}
+                onValueChange={setOpenItems}
+              >
+                {fields.map((field, index) => (
+                  <AccordionItem key={field.id} value={`item-${index}`}>
+                    <AccordionTrigger>
+                      {getSectionTitle(index)}
+                    </AccordionTrigger>
+                    <AccordionContent className="mb-0 max-h-none space-y-4">
+                      {/* Name / Issuing organization */}
+                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        <FormField
+                          control={control}
+                          name={`certifications.${index}.name`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Certification name{" "}
+                                <span className="text-destructive">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="AWS Certified Solutions Architect"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={control}
+                          name={`certifications.${index}.issuingOrg`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Issuing organization{" "}
+                                <span className="text-destructive">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Amazon Web Services"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                {/* Name / Issuing organization */}
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`certifications.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Certification name{" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="AWS Certified Solutions Architect"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name={`certifications.${index}.issuingOrg`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Issuing organization{" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="Amazon Web Services" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      {/* Issue date / Expiration date */}
+                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        <FormField
+                          control={control}
+                          name={`certifications.${index}.issueDate`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Issue date (MM/YYYY){" "}
+                                <span className="text-destructive">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <MonthYearPicker
+                                  {...field}
+                                  placeholder="MM/YYYY"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={control}
+                          name={`certifications.${index}.expirationDate`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Expiration date (optional)</FormLabel>
+                              <FormControl>
+                                <MonthYearPicker
+                                  {...field}
+                                  placeholder="MM/YYYY"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                {/* Issue date / Expiration date */}
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <FormField
-                    control={control}
-                    name={`certifications.${index}.issueDate`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Issue date (MM/YYYY){" "}
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <MonthYearPicker {...field} placeholder="MM/YYYY" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name={`certifications.${index}.expirationDate`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Expiration date (optional)</FormLabel>
-                        <FormControl>
-                          <MonthYearPicker {...field} placeholder="MM/YYYY" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      {/* Credential ID */}
+                      <FormField
+                        control={control}
+                        name={`certifications.${index}.credentialId`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Credential ID (optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. ABCD-1234" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                {/* Credential ID */}
-                <FormField
-                  control={control}
-                  name={`certifications.${index}.credentialId`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Credential ID (optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. ABCD-1234" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {index < fields.length - 1 && <Separator className="mt-8" />}
-              </div>
-            ))}
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => setRemoveIndex(index)}
+                        aria-label="Remove certification"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
 
             <div className="cv-form-actions">
               <Button
@@ -198,27 +228,26 @@ export function CertificationsForm({
                 variant="outline"
                 className="cv-form-primary-action"
                 disabled={!canAddCertification}
-                onClick={() =>
+                onClick={() => {
                   append({
                     name: "",
                     issuingOrg: "",
                     issueDate: "",
                     expirationDate: "",
                     credentialId: "",
-                  })
-                }
+                  });
+                  setOpenItems((prev) => [...prev, `item-${fields.length}`]);
+                }}
               >
+                <Plus />
                 {hasAny ? "Add another certification" : "Add certification"}
               </Button>
               <Button
                 type="submit"
-                disabled={
-                  isPending ||
-                  !form.formState.isValid ||
-                  form.formState.isDirty === false
-                }
+                disabled={isPending}
                 className="cv-form-primary-action"
               >
+                {isPending ? <Spinner /> : <Save />}
                 {isPending ? "Saving..." : "Save"}
               </Button>
             </div>

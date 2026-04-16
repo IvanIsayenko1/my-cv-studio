@@ -4,13 +4,20 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2 } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveSkillsDialog } from "@/components/dialogs/remove-skills-dialog";
 import SkillsAIAssistantDialog from "@/components/dialogs/skills-ai-assistant-dialog";
-import StatusBedge from "@/components/status-bedge";
+import FormStatusBedge from "@/components/form-status-bedge";
+import SectionStatusBedge from "@/components/section-status-bedge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,7 +29,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveSkills } from "@/hooks/cv/use-skills";
 
@@ -47,6 +54,7 @@ export function SkillsForm({
   const [removeCategoryIndex, setRemoveCategoryIndex] = useState<number | null>(
     null
   );
+  const [openItems, setOpenItems] = useState<string[]>([]);
   const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
   const [aiReview, setAIReview] = useState<CVSkillsAIReview | null>(null);
 
@@ -55,7 +63,10 @@ export function SkillsForm({
   const form = useForm<SkillsFormValues>({
     resolver: zodResolver(skillsSchema),
     defaultValues: {
-      categories: formData.categories || [createEmptyCategory()],
+      categories:
+        formData.categories && formData.categories.length > 0
+          ? formData.categories
+          : [createEmptyCategory()],
     },
   });
 
@@ -72,7 +83,9 @@ export function SkillsForm({
   });
 
   const onSubmit = (values: SkillsFormValues) => {
-    mutate(values);
+    mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
   };
 
   const watchedCategories = useWatch({
@@ -85,6 +98,12 @@ export function SkillsForm({
     !lastCategory ||
     (!!lastCategory.name?.trim() && !!lastCategory.items?.trim());
 
+  const getSectionTitle = (index: number) => {
+    return watchedCategories[index] && watchedCategories[index].name
+      ? `${watchedCategories[index].name}`
+      : `Category ${index + 1}`;
+  };
+
   return (
     <>
       <SectionWrapper
@@ -93,84 +112,87 @@ export function SkillsForm({
         description="Add custom skill categories that match your profession."
         cvId={id}
         status={
-          <StatusBedge
-            isReady={isComplete}
-            readyText="Complete"
-            notReadyText="Incomplete"
-          />
+          <div className="space-x-2">
+            <FormStatusBedge isNotSaved={formState.isDirty} />
+            <SectionStatusBedge
+              isReady={isComplete}
+              readyText="Complete"
+              notReadyText="Incomplete"
+            />
+          </div>
         }
       >
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-8 space-y-8"
+            className="flex flex-col gap-8"
           >
-            {categoryFields.map((field, index) => (
-              <div key={field.id} className="mb-0 space-y-4">
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="text-muted-foreground text-sm font-medium">
-                    Category {index + 1}
-                  </div>
-                  {categoryFields.length > 1 && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setRemoveCategoryIndex(index)}
-                      aria-label="Remove category"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
+            <Accordion
+              type="multiple"
+              value={openItems}
+              onValueChange={setOpenItems}
+            >
+              {categoryFields.map((field, index) => (
+                <AccordionItem key={field.id} value={`item-${index}`}>
+                  <AccordionTrigger>{getSectionTitle(index)}</AccordionTrigger>
 
-                <FormField
-                  control={control}
-                  name={`categories.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Category name{" "}
-                        <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., Clinical Skills, Sales Skills, Laboratory Skills"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <AccordionContent className="mb-0 max-h-none space-y-4">
+                    <FormField
+                      control={control}
+                      name={`categories.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Category name{" "}
+                            <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Clinical Skills, Sales Skills, Laboratory Skills"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={control}
-                  name={`categories.${index}.items`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Items <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <RichTextEditor
-                          placeholder="Use one line per item"
-                          value={field.value}
-                          onChange={field.onChange}
-                          mode="list-only"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {index < categoryFields.length - 1 && (
-                  <Separator className="mt-8" />
-                )}
-              </div>
-            ))}
+                    <FormField
+                      control={control}
+                      name={`categories.${index}.items`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Items <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <RichTextEditor
+                              placeholder="Use one line per item"
+                              value={field.value}
+                              onChange={field.onChange}
+                              mode="list-only"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {categoryFields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => setRemoveCategoryIndex(index)}
+                        aria-label="Remove caregory"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
 
             <div className="cv-form-actions">
               <Button
@@ -178,10 +200,20 @@ export function SkillsForm({
                 variant="outline"
                 disabled={!canAddCategory}
                 className="cv-form-primary-action"
-                onClick={() => appendCategory(createEmptyCategory())}
+                onClick={() => {
+                  appendCategory(createEmptyCategory());
+                  setOpenItems((prev) => [
+                    ...prev,
+                    `item-${categoryFields.length}`,
+                  ]);
+                }}
               >
-                Add another category
+                <Plus />
+                {!categoryFields.length
+                  ? "Add category"
+                  : "Add another category"}
               </Button>
+
               <CVBuilderAIAssistant<CVSkillsAIReview>
                 value={form.getValues()}
                 prompt={SKILLS_MODULE}
@@ -191,12 +223,15 @@ export function SkillsForm({
                   setAIReview(response);
                   setIsOpenAIAssistantDialog(true);
                 }}
+                disabled={!isComplete || isPending}
               />
+
               <Button
                 type="submit"
-                disabled={isPending || !form.formState.isValid}
+                disabled={isPending}
                 className="cv-form-primary-action"
               >
+                {isPending ? <Spinner /> : <Save />}
                 {isPending ? "Saving..." : "Save"}
               </Button>
             </div>

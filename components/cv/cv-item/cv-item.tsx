@@ -41,7 +41,7 @@ export default function CVItem({
     >
       <div className="flex h-full flex-col gap-2">
         <Link
-          href={ROUTES.CV_DETAIL.replace(":id", cv.id)}
+          href={ROUTES.CV_BUILD.replace(":id", cv.id)}
           className="group/card border-border/70 hover:border-foreground/25 flex h-full flex-col overflow-hidden rounded-2xl border transition-colors duration-300"
         >
           <div className="flex h-full flex-col p-4 sm:p-4">

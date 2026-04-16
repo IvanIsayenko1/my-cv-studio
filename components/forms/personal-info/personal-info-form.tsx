@@ -4,13 +4,22 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2 } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import PersonalInfoAIAssistantDialog from "@/components/dialogs/personal-info-ai-assitant-dialog";
-import StatusBedge from "@/components/status-bedge";
+import FormStatusBedge from "@/components/form-status-bedge";
+import SectionStatusBedge from "@/components/section-status-bedge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -49,6 +58,7 @@ export function PersonalInfoForm({
 
   const form = useForm<PersonalInfoFormValues>({
     resolver: zodResolver(personalInfoSchema),
+    mode: "onTouched",
     defaultValues: {
       firstName: formData?.firstName || "",
       lastName: formData?.lastName || "",
@@ -78,7 +88,9 @@ export function PersonalInfoForm({
     : true;
 
   const onSubmit = async (values: PersonalInfoFormValues) => {
-    mutate(values);
+    mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
   };
 
   return (
@@ -88,15 +100,21 @@ export function PersonalInfoForm({
       description="Enter your basic contact information. This will appear at the top of your CV"
       cvId={id}
       status={
-        <StatusBedge
-          isReady={isComplete}
-          readyText="Complete"
-          notReadyText="Incomplete"
-        />
+        <div className="space-x-2">
+          <FormStatusBedge isNotSaved={form.formState.isDirty} />
+          <SectionStatusBedge
+            isReady={isComplete}
+            readyText="Complete"
+            notReadyText="Incomplete"
+          />
+        </div>
       }
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-8"
+        >
           {/* Name Section */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <FormField
@@ -252,78 +270,83 @@ export function PersonalInfoForm({
           </div>
 
           {/* Optional Links */}
-          <div className="border-border/70 bg-muted/20 space-y-4 rounded-lg border p-4">
-            <h3 className="text-foreground text-sm font-medium">
-              Professional Links
-            </h3>
-            <FormDescription>
-              Add any relevant links (LinkedIn, portfolio, Dribbble, Behance,
-              publications, etc.).
-            </FormDescription>
-            {fields.map((field, index) => (
-              <div
-                key={field.id}
-                className="border-border/70 space-y-3 rounded-md border p-3"
+          <Card>
+            <CardHeader>
+              <CardTitle> Professional Links</CardTitle>
+              <CardDescription>
+                Add any relevant links (LinkedIn, portfolio, Dribbble, Behance,
+                publications, etc.).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+              {fields.map((field, index) => (
+                <Card key={field.id}>
+                  <CardContent>
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_2fr_auto] lg:items-end">
+                      <FormField
+                        control={form.control}
+                        name={`professionalLinks.${index}.label`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Label</FormLabel>
+                            <FormControl>
+                              <Input placeholder="LinkedIn" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`professionalLinks.${index}.url`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="https://example.com/profile"
+                                autoComplete="url"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex items-end">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => remove(index)}
+                          aria-label="Remove link"
+                          disabled={fields.length === 0}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </CardContent>
+            <CardFooter className="cv-form-actions">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!isLastProfessionaLinkFilled}
+                onClick={() => append({ label: "", url: "" })}
+                className="cv-form-primary-action"
               >
-                <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_2fr_auto]">
-                  <FormField
-                    control={form.control}
-                    name={`professionalLinks.${index}.label`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Label</FormLabel>
-                        <FormControl>
-                          <Input placeholder="LinkedIn" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`professionalLinks.${index}.url`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>URL</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="https://example.com/profile"
-                            autoComplete="url"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex items-end">
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => remove(index)}
-                      aria-label="Remove link"
-                      disabled={fields.length === 0}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!isLastProfessionaLinkFilled}
-              onClick={() => append({ label: "", url: "" })}
-            >
-              Add another link
-            </Button>
-          </div>
+                {!fields.length ? "Add link" : "Add another link"}
+              </Button>
+            </CardFooter>
+          </Card>
 
           <div className="cv-form-actions">
             <CVBuilderAIAssistant<CVPersonalInformationAIReview>
+              disabled={!isComplete || isPending}
               value={form.getValues()}
               prompt={PROFESSIONAL_INFORMATION_MODULE}
               responseSchema={cvPersonalInformationAIReviewSchema}
@@ -337,7 +360,7 @@ export function PersonalInfoForm({
               disabled={isPending}
               className="cv-form-primary-action"
             >
-              {isPending && <Spinner />}
+              {isPending ? <Spinner /> : <Save />}
               {isPending ? "Saving..." : "Save"}
             </Button>
           </div>

@@ -5,8 +5,10 @@ import { useForm } from "react-hook-form";
 import Image from "next/image";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Save } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
+import FormStatusBedge from "@/components/form-status-bedge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +24,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveTemplate } from "@/hooks/cv/use-template";
 
@@ -47,10 +50,10 @@ export function TemplateForm({
       id: formData?.id || TemplateId.ATS_FRIENDLY_SIMPLE,
     },
   });
-  const { control, handleSubmit } = form;
+  const { control, handleSubmit, formState } = form;
 
   const onSubmit = (values: TemplateFormValues) => {
-    mutate(values);
+    mutate(values, { onSuccess: () => form.reset(values) });
   };
 
   return (
@@ -59,12 +62,10 @@ export function TemplateForm({
       title="Template"
       description="Choose a template for your CV. You can change this anytime."
       cvId={id}
+      status={<FormStatusBedge isNotSaved={formState.isDirty} />}
     >
       <Form {...form}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 sm:space-y-6"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={control}
             name="id"
@@ -95,7 +96,7 @@ export function TemplateForm({
                               alt={`Preview of ${template.name} template`}
                               width={400}
                               height={500}
-                              className="h-auto w-full rounded-md object-cover"
+                              className="h-auto w-full rounded-2xl object-cover"
                             />
                           </CardContent>
                         </Card>
@@ -114,6 +115,7 @@ export function TemplateForm({
               className="cv-form-primary-action"
               disabled={isPending}
             >
+              {isPending ? <Spinner /> : <Save />}
               {isPending ? "Saving..." : "Save"}
             </Button>
           </div>

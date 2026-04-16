@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
 import { db } from "@/lib/db/client";
-import { getCompleteCV } from "@/lib/db/queries";
 
 export async function GET(
   _req: NextRequest,
@@ -32,10 +31,7 @@ export async function GET(
   return NextResponse.json(row);
 }
 
-export async function DELETE(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(context: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

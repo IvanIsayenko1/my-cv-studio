@@ -21,7 +21,7 @@ export const ExternalLoginButtons = ({
       await authMethod.authenticateWithRedirect({
         strategy: "oauth_google",
         redirectUrl: ROUTES.SSO_CALLBACK,
-        redirectUrlComplete: ROUTES.MAKER,
+        redirectUrlComplete: ROUTES.CV_LIST,
       });
     } catch (error) {
       console.error("Google OAuth error:", error);
@@ -36,7 +36,7 @@ export const ExternalLoginButtons = ({
       await authMethod.authenticateWithRedirect({
         strategy: "oauth_apple",
         redirectUrl: ROUTES.SSO_CALLBACK,
-        redirectUrlComplete: ROUTES.MAKER,
+        redirectUrlComplete: ROUTES.CV_LIST,
       });
     } catch (error) {
       console.error("Apple OAuth error:", error);
@@ -51,7 +51,7 @@ export const ExternalLoginButtons = ({
       await authMethod.authenticateWithRedirect({
         strategy: "oauth_github",
         redirectUrl: ROUTES.SSO_CALLBACK,
-        redirectUrlComplete: ROUTES.MAKER,
+        redirectUrlComplete: ROUTES.CV_LIST,
       });
     } catch (error) {
       console.error("GitHub OAuth error:", error);

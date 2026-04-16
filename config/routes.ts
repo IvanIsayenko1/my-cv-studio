@@ -1,11 +1,14 @@
 export const ROUTES = {
+  // HOME
   HOME: "/",
+  // RELATED WITH CV
+  CV_LIST: "/cv-list",
+  CV_BUILD: "/build/:id",
+  CHECKER: "/checker",
+
+  // AUTH
   SIGN_UP: "/signup",
   SIGN_IN: "/login",
-  MAKER: "/maker",
-  CHECKER: "/checker",
   SSO_CALLBACK: "/sso-callback",
   FORGOT_PASSWORD: "/forgot-password",
-  CV_CREATE: "/maker/create/:id",
-  CV_DETAIL: "/maker/detail/:id",
 } as const;

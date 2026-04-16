@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CVPreviewSkeleton() {
   return (
-    <Card className="mx-auto w-full max-w-[210mm] py-4">
+    <Card className="mx-auto h-full w-full max-w-[210mm] py-4">
       <CardHeader className="px-4 pb-3">
         <CardTitle className="text-base">Live Preview</CardTitle>
       </CardHeader>
