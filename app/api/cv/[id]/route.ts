@@ -31,7 +31,10 @@ export async function GET(
   return NextResponse.json(row);
 }
 
-export async function DELETE(context: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  _req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

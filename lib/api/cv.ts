@@ -55,7 +55,7 @@ export function useUpdateCVTitle() {
       if (!res.ok) throw new Error("Failed to update title");
       return res.json();
     },
-    onSuccess: (data, { id, title }) => {
+    onSuccess: (_, { id, title }) => {
       queryClient.setQueryData(
         [QUERY_KEYS.CV_DATA, id],
         (old: CV | undefined) =>
