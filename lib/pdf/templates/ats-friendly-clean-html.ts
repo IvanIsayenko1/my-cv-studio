@@ -15,12 +15,10 @@ export function renderATSCleanPreviewHTML(
   const {
     awardItems,
     certificationItems,
-    contactLine,
     contactLineHTML,
     educationItems,
     fullName,
     languageItems,
-    linksLine,
     linksLineHTML,
     locationLine,
     projectItems,
@@ -428,11 +426,7 @@ export function renderATSCleanPreviewHTML(
                 ? `<p class="title">${escapeHtml(cv.personalInfo.professionalTitle)}</p>`
                 : ""
             }
-            ${
-              contactLineHTML
-                ? `<p class="meta">${contactLineHTML}</p>`
-                : ""
-            }
+            ${contactLineHTML ? `<p class="meta">${contactLineHTML}</p>` : ""}
             ${
               locationLine
                 ? `<p class="meta">${escapeHtml(locationLine)}</p>`
