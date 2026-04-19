@@ -1,4 +1,4 @@
-import { BadgeCheckIcon, Pencil } from "lucide-react";
+import { CheckIcon, Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 
@@ -9,18 +9,12 @@ export default function CVStatus({ id }: { id: string }) {
   const isCVReady = data?.isReady;
 
   return isCVReady ? (
-    <Badge
-      variant="secondary"
-      className="shrink-0 whitespace-nowrap bg-emerald-600 text-white dark:bg-emerald-500"
-    >
-      <BadgeCheckIcon aria-hidden="true" />
-      Ready
+    <Badge variant="default">
+      <CheckIcon aria-hidden="true" />
+      Complete
     </Badge>
   ) : (
-    <Badge
-      variant="secondary"
-      className="shrink-0 whitespace-nowrap bg-amber-200 text-amber-900 dark:bg-amber-500/30 dark:text-amber-200"
-    >
+    <Badge variant="secondary">
       <Pencil aria-hidden="true" />
       Draft
     </Badge>

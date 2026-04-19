@@ -5,5 +5,5 @@ export default function FormStatusBedge({
 }: {
   isNotSaved: boolean;
 }) {
-  return isNotSaved && <Badge variant="destructive">Not saved</Badge>;
+  return isNotSaved && <Badge variant="outline">Not saved</Badge>;
 }

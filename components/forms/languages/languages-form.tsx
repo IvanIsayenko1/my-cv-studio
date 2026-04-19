@@ -10,7 +10,7 @@ import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveSkillsDialog } from "@/components/dialogs/remove-skills-dialog";
 import SelectorDrawer from "@/components/dialogs/selector-drawer";
 import FormStatusBedge from "@/components/form-status-bedge";
-import SectionStatusBedge from "@/components/section-status-bedge";
+import SectionRequieredsBedge from "@/components/section-requiered-bedge";
 import {
   Accordion,
   AccordionContent,
@@ -120,11 +120,7 @@ export function LanguagesForm({
         status={
           <div className="space-x-2">
             <FormStatusBedge isNotSaved={formState.isDirty} />
-            <SectionStatusBedge
-              isReady={isComplete}
-              readyText="Complete"
-              notReadyText="Incomplete"
-            />
+            <SectionRequieredsBedge isReady={isComplete} />
           </div>
         }
       >

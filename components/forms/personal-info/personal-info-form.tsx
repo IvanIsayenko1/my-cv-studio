@@ -10,7 +10,7 @@ import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-bui
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import PersonalInfoAIAssistantDialog from "@/components/dialogs/personal-info-ai-assitant-dialog";
 import FormStatusBedge from "@/components/form-status-bedge";
-import SectionStatusBedge from "@/components/section-status-bedge";
+import SectionRequieredsBedge from "@/components/section-requiered-bedge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -102,11 +102,7 @@ export function PersonalInfoForm({
       status={
         <div className="space-x-2">
           <FormStatusBedge isNotSaved={form.formState.isDirty} />
-          <SectionStatusBedge
-            isReady={isComplete}
-            readyText="Complete"
-            notReadyText="Incomplete"
-          />
+          <SectionRequieredsBedge isReady={isComplete} />
         </div>
       }
     >
