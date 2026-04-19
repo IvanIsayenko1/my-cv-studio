@@ -17,7 +17,7 @@ import {
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
-export default function LoginSignupButton() {
+export default function LoginButton() {
   const { isSignedIn, user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
@@ -72,11 +72,11 @@ export default function LoginSignupButton() {
   return (
     <Button
       variant="outline"
-      aria-label="Submit"
+      aria-label="Login"
       onClick={() => router.push("/login")}
     >
       <User />
-      <span>Login/Signup</span>
+      <span>Login</span>
     </Button>
   );
 }

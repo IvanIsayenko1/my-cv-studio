@@ -5,7 +5,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import { useIsURLActive } from "@/lib/utils/url-helper";
 
-import LoginSignupButton from "../auth/login-signup-button";
+import LoginButton from "../auth/login-button";
 import { ThemeSwitcher } from "../layout/theme-switcher";
 import {
   NavigationMenu,
@@ -46,7 +46,7 @@ export default function HeaderDesktop() {
       </NavigationMenu>
 
       <div className="flex shrink-0 items-center gap-2">
-        <LoginSignupButton />
+        <LoginButton />
         <ThemeSwitcher />
       </div>
     </div>

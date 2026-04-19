@@ -1,7 +1,6 @@
 import { useSignIn, useSignUp } from "@clerk/nextjs";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 import { ROUTES } from "@/config/routes";
 
@@ -59,14 +58,13 @@ export const ExternalLoginButtons = ({
   };
   return (
     <>
-      <Separator />
-      <Button variant="outline" type="button" onClick={handleGoogleAuth}>
+      <Button type="button" onClick={handleGoogleAuth}>
         Login with Google
       </Button>
-      <Button variant="outline" type="button" onClick={handleGitHubAuth}>
+      <Button type="button" onClick={handleGitHubAuth}>
         Login with GitHub
       </Button>
-      <Button variant="outline" type="button" onClick={handleAppleAuth}>
+      <Button type="button" onClick={handleAppleAuth}>
         Login with Apple
       </Button>
     </>

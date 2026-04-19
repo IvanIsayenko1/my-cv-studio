@@ -7,7 +7,6 @@ export const ROUTES = {
   CHECKER: "/checker",
 
   // AUTH
-  SIGN_UP: "/signup",
   SIGN_IN: "/login",
   SSO_CALLBACK: "/sso-callback",
   FORGOT_PASSWORD: "/forgot-password",
