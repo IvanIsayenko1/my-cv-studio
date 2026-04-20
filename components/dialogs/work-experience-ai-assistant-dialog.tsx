@@ -48,7 +48,6 @@ export default function WorkExperienceAIAssistantDialog({
   currentValues: WorkExperienceFormValues;
   onLocalApplySuggestion: (roleIndex: number, achievements: string) => void;
 }) {
-  console.log(currentValues);
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
   const queryClient = useQueryClient();
   const { mutate, isPending } = useSaveWorkExperience(formId);

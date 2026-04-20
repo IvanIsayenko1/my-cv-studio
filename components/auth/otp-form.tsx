@@ -52,7 +52,6 @@ export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
       const attempt = await signUp.attemptEmailAddressVerification({
         code: otp,
       });
-      console.log("verification attempt", attempt);
 
       if (attempt.status === "complete") {
         await setActive({ session: attempt.createdSessionId });
