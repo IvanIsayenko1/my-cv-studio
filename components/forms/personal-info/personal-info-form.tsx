@@ -9,6 +9,7 @@ import { Save, Trash2, X } from "lucide-react";
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import PersonalInfoAIAssistantDialog from "@/components/dialogs/personal-info-ai-assitant-dialog";
+import { RemoveLinkDialog } from "@/components/dialogs/remove-link-dialog";
 import FormStatusBedge from "@/components/form-status-bedge";
 import SectionRequieredsBedge from "@/components/section-requiered-bedge";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,9 @@ export function PersonalInfoForm({
   const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
   const [aiReview, setAIReview] =
     useState<CVPersonalInformationAIReview | null>(null);
+  const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(
+    null
+  );
 
   const form = useForm<PersonalInfoFormValues>({
     resolver: zodResolver(personalInfoSchema),
@@ -316,12 +320,11 @@ export function PersonalInfoForm({
                       <div className="flex items-end">
                         <Button
                           type="button"
-                          size="icon"
-                          variant="ghost"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => remove(index)}
+                          variant="destructive"
+                          onClick={() => setPendingDeleteIndex(index)}
                           aria-label="Remove link"
                           disabled={fields.length === 0}
+                          className="w-full"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -382,6 +385,26 @@ export function PersonalInfoForm({
         setIsOpenDialog={setIsOpenAIAssistantDialog}
         aiReview={aiReview}
         formId={id}
+      />
+
+      {/* Remove Link Dialog */}
+      <RemoveLinkDialog
+        open={pendingDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteIndex(null);
+        }}
+        onCancel={() => setPendingDeleteIndex(null)}
+        onRemove={() => {
+          if (pendingDeleteIndex !== null) {
+            remove(pendingDeleteIndex);
+            setPendingDeleteIndex(null);
+          }
+        }}
+        linkLabel={
+          pendingDeleteIndex !== null
+            ? fields[pendingDeleteIndex]?.label || "this link"
+            : "this link"
+        }
       />
     </SectionWrapper>
   );

@@ -3,11 +3,11 @@ import { Geist } from "next/font/google";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
-import { Toaster } from "sonner";
 
 import AppLayout from "@/components/layout/app-layout";
 import { QueryProvider } from "@/components/shared/providers/query-provider";
 import { ThemeProvider } from "@/components/shared/providers/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { cn } from "@/lib/utils";
