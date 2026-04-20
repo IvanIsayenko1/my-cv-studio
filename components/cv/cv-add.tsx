@@ -4,7 +4,6 @@ import { CSSProperties, useState } from "react";
 
 import { Plus } from "lucide-react";
 
-import { A4 } from "@/components/shared/a4";
 import { Button } from "@/components/ui/button";
 
 import CreateCVDialog from "../dialogs/create-cv-dialog";
@@ -14,16 +13,20 @@ export default function CVAdd() {
 
   return (
     <>
-      <A4 className="load-stagger" style={{ "--stagger": 0 } as CSSProperties}>
+      <div
+        className="load-stagger flex min-h-32 items-center justify-center overflow-hidden rounded-4xl border border-border/50 bg-muted/30 transition-all duration-300 hover:border-border hover:bg-muted/50 cursor-pointer group/add"
+        style={{ "--stagger": 0 } as CSSProperties}
+        onClick={() => setIsOpenDialog(true)}
+      >
         <Button
-          className="w-full h-full flex justify-center items-center transition-transform duration-300 group-hover:scale-[1.02]"
+          className="flex items-center gap-2 transition-transform duration-300 group-hover/add:scale-[1.05]"
           variant="ghost"
           onClick={() => setIsOpenDialog(true)}
         >
-          <Plus />
-          Create
+          <Plus className="h-5 w-5" />
+          <span>Create CV</span>
         </Button>
-      </A4>
+      </div>
 
       <CreateCVDialog
         isOpenDialog={isOpenDialog}

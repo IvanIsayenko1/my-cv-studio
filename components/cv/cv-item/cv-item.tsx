@@ -1,8 +1,6 @@
 import { CSSProperties, Suspense } from "react";
 
-import Link from "next/link";
-
-import { A4 } from "@/components/shared/a4";
+import { useRouter } from "next/navigation";
 
 import { CV } from "@/types/cv";
 import { TemplateName } from "@/types/template";
@@ -20,6 +18,7 @@ export default function CVItem({
   cv: CV["cvData"] & { templateId: string | null };
   index: number;
 }) {
+  const router = useRouter();
   const templateKey = cv.templateId ?? "ats-friendly-clean";
   const templateLabel =
     TemplateName[templateKey as keyof typeof TemplateName] ??
@@ -33,49 +32,39 @@ export default function CVItem({
         day: "2-digit",
       }).format(createdDate);
 
+  const handleCardClick = () => {
+    router.push(ROUTES.CV_BUILD.replace(":id", cv.id));
+  };
+
   return (
-    <A4
+    <div
       key={cv.id}
       className="load-stagger"
       style={{ "--stagger": index } as CSSProperties}
     >
-      <div className="flex h-full flex-col gap-2">
-        <Link
-          href={ROUTES.CV_BUILD.replace(":id", cv.id)}
-          className="group/card border-border/70 hover:border-foreground/25 flex h-full flex-col overflow-hidden rounded-2xl border transition-colors duration-300"
-        >
-          <div className="flex h-full flex-col p-4 sm:p-4">
-            <div>
-              <h4 className="mt-2 line-clamp-3 text-xl leading-tight font-semibold tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5 sm:text-base sm:font-medium">
-                {cv.title}
-              </h4>
-            </div>
+      <div
+        onClick={handleCardClick}
+        className="group/card border-border/70 hover:border-foreground/25 bg-card flex h-full cursor-pointer flex-col gap-3 overflow-hidden rounded-4xl border p-4 transition-all duration-300 hover:shadow-md"
+      >
+        {/* Title */}
+        <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5">
+          {cv.title}
+        </h4>
 
-            <div className="mt-2 flex items-center gap-2">
-              <CVStatus id={cv.id} />
-            </div>
+        {/* Info Row: Status | Date | Template */}
+        <div className="flex flex-wrap items-center gap-2">
+          <CVStatus id={cv.id} />
+          <span className="text-muted-foreground text-xs">{createdLabel}</span>
+          <span className="text-muted-foreground text-xs">{templateLabel}</span>
+        </div>
 
-            <div className="scroll-reveal text-muted-foreground mt-4 space-y-1 text-sm sm:mt-3 sm:text-xs">
-              <p>{createdLabel}</p>
-              <p>{templateLabel}</p>
-            </div>
-
-            <div className="mt-4 space-y-2 opacity-35 sm:mt-3 sm:space-y-1.5 sm:opacity-30">
-              <div className="bg-border/80 h-2 w-full" />
-              <div className="bg-border/90 h-2 w-[92%]" />
-              <div className="bg-border/90 h-2 w-[86%]" />
-              <div className="bg-border/90 h-2 w-[94%]" />
-              <div className="bg-border/90 h-2 w-[78%]" />
-            </div>
-          </div>
-        </Link>
-
-        <div className="flex justify-end sm:justify-center">
+        {/* Action Menu */}
+        <div className="mt-auto flex justify-end pt-2">
           <Suspense fallback={<CVBuilderMenuSkeleton />}>
             <CVBuilderMenu id={cv.id} />
           </Suspense>
         </div>
       </div>
-    </A4>
+    </div>
   );
 }

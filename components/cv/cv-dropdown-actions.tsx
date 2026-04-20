@@ -65,7 +65,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             <Button
               size={"lg"}
               variant="ghost"
-              className="font-normal h-14 flex flex-row justify-between"
+              className="flex h-14 flex-row justify-between font-normal"
               disabled={!isCVReady}
               onClick={() => {
                 setOpenedMenu(false);
@@ -78,7 +78,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             <Button
               size={"lg"}
               variant="ghost"
-              className="font-normal h-14 flex flex-row justify-between"
+              className="flex h-14 flex-row justify-between font-normal"
               disabled={!isCVReady}
               onClick={() => {
                 setOpenedMenu(false);
@@ -91,7 +91,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             <Button
               size={"lg"}
               variant="ghost"
-              className="font-normal h-14 flex flex-row justify-between"
+              className="flex h-14 flex-row justify-between font-normal"
               disabled={!isCVReady || isDownloadPending}
               onClick={() => {
                 setOpenedMenu(false);
@@ -104,7 +104,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             <Button
               size={"lg"}
               variant="ghost"
-              className="font-normal h-14 flex flex-row justify-between"
+              className="flex h-14 flex-row justify-between font-normal"
               disabled={isDownloadPending}
               onClick={() => {
                 setOpenedMenu(false);
@@ -117,7 +117,7 @@ export default function CVDropdownActions({ id }: { id: string }) {
             <Button
               size={"lg"}
               variant="ghost"
-              className="font-normal h-14 text-destructive flex flex-row justify-between"
+              className="text-destructive flex h-14 flex-row justify-between font-normal"
               onClick={() => {
                 setOpenedMenu(false);
                 setOpenendDelete(true);
