@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronDown, Plus, Save, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Plus, Save, Trash2, X } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveSkillsDialog } from "@/components/dialogs/remove-skills-dialog";
@@ -246,6 +246,15 @@ export function LanguagesForm({
               >
                 <Plus />
                 Add another language
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!form.formState.isDirty || isPending}
+                onClick={() => form.reset()}
+              >
+                <X className="h-4 w-4" />
+                Discard changes
               </Button>
               <Button
                 type="submit"

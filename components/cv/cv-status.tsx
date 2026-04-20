@@ -11,7 +11,7 @@ export default function CVStatus({ id }: { id: string }) {
   return isCVReady ? (
     <Badge variant="default">
       <CheckIcon aria-hidden="true" />
-      Complete
+      Ready
     </Badge>
   ) : (
     <Badge variant="secondary">

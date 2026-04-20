@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import Image from "next/image";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Save } from "lucide-react";
+import { Save, X } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import FormStatusBedge from "@/components/form-status-bedge";
@@ -114,6 +114,15 @@ export function TemplateForm({
           />
 
           <div className="cv-form-actions">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!form.formState.isDirty || isPending}
+              onClick={() => form.reset()}
+            >
+              <X className="h-4 w-4" />
+              Discard changes
+            </Button>
             <Button
               type="submit"
               className="cv-form-primary-action"

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Save, Trash2 } from "lucide-react";
+import { Save, Trash2, X } from "lucide-react";
 
 import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-builder-ai-assistant";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
@@ -355,6 +355,15 @@ export function PersonalInfoForm({
                 setIsOpenAIAssistantDialog(true);
               }}
             />
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!form.formState.isDirty || isPending}
+              onClick={() => form.reset()}
+            >
+              <X className="h-4 w-4" />
+              Discard changes
+            </Button>
             <Button
               type="submit"
               disabled={isPending}

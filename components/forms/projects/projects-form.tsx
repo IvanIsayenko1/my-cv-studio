@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { Plus, Save, Trash2, X } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveProjectDialog } from "@/components/dialogs/remove-project-dialog";
@@ -275,6 +275,15 @@ export function ProjectsForm({
               >
                 <Plus />
                 {hasAny ? "Add another project" : "Add project"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!form.formState.isDirty || isPending}
+                onClick={() => form.reset()}
+              >
+                <X className="h-4 w-4" />
+                Discard changes
               </Button>
               <Button
                 type="submit"
