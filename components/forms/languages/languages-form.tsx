@@ -37,6 +37,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveLanguages } from "@/hooks/cv/use-languages";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
@@ -75,6 +76,9 @@ export function LanguagesForm({
           : [createEmptyLanguage()],
     },
   });
+
+  // Track unsaved changes
+  useFormDirtyState("languages", form.formState.isDirty);
 
   const { control, formState, handleSubmit } = form;
   const isComplete = formState.isValid;

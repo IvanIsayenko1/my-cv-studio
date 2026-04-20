@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSavePersonalInfo } from "@/hooks/cv/use-personal-info";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { PROFESSIONAL_INFORMATION_MODULE } from "@/lib/constants/ai-prompts";
 
@@ -75,6 +76,9 @@ export function PersonalInfoForm({
     control: form.control,
     name: "professionalLinks",
   });
+
+  // Track unsaved changes
+  useFormDirtyState("personal-info", form.formState.isDirty);
 
   const isComplete = form.formState.isValid;
 

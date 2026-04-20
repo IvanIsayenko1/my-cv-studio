@@ -25,6 +25,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveSummary } from "@/hooks/cv/use-summary";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { PROFESSIONAL_SUMMARY_MODULE } from "@/lib/constants/ai-prompts";
 
@@ -50,6 +51,8 @@ export function SummaryForm({
       professionalSummary: formData?.professionalSummary || "",
     },
   });
+  // Track unsaved changes
+  useFormDirtyState("summary", form.formState.isDirty);
   const isComplete = form.formState.isValid;
 
   const onSubmit = (values: SummaryFormValues) => {

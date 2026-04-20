@@ -30,6 +30,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveProjects } from "@/hooks/cv/use-projects";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { BuilderFormProps } from "@/types/builder-form";
 import { ProjectsFormValues, projectsSchema } from "@/types/projects";
@@ -49,6 +50,9 @@ export function ProjectsForm({
       projects: formData?.projects || [], // allow having no projects
     },
   });
+
+  // Track unsaved changes
+  useFormDirtyState("projects", form.formState.isDirty);
 
   const { control, handleSubmit, formState } = form;
 

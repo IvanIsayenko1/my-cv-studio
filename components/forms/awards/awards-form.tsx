@@ -30,6 +30,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveAwards } from "@/hooks/cv/use-awards";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { AwardsFormValues, awardsSchema } from "@/types/awards";
 
@@ -50,6 +51,9 @@ export function AwardsForm({ id, formData }: AwardsFormProps) {
       awards: formData.awards || [],
     },
   });
+  // Track unsaved changes
+  useFormDirtyState("awards", form.formState.isDirty);
+
   const { control, handleSubmit, formState } = form;
 
   const { fields, append, remove } = useFieldArray({

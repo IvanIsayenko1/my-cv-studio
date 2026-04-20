@@ -41,6 +41,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveWorkExperience } from "@/hooks/cv/use-work-experience";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { WORK_EXPERIENCE_MODULE } from "@/lib/constants/ai-prompts";
@@ -94,6 +95,9 @@ export function WorkExperienceForm({
             ],
     },
   });
+
+  // Track unsaved changes
+  useFormDirtyState("work-experience", form.formState.isDirty);
 
   const { control, handleSubmit, formState } = form;
   const isComplete = formState.isValid;

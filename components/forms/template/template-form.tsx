@@ -27,6 +27,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveTemplate } from "@/hooks/cv/use-template";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -50,6 +51,9 @@ export function TemplateForm({
       id: formData?.id || TemplateId.ATS_FRIENDLY_SIMPLE,
     },
   });
+  // Track unsaved changes
+  useFormDirtyState("template", form.formState.isDirty);
+
   const { control, handleSubmit, formState } = form;
 
   const onSubmit = (values: TemplateFormValues) => {

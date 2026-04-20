@@ -29,6 +29,7 @@ import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveCertifications } from "@/hooks/cv/use-certifications";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { BuilderFormProps } from "@/types/builder-form";
 import {
@@ -51,6 +52,9 @@ export function CertificationsForm({
       certifications: formData.certifications || [],
     },
   });
+
+  // Track unsaved changes
+  useFormDirtyState("certifications", form.formState.isDirty);
 
   const { control, handleSubmit, formState } = form;
 

@@ -30,6 +30,7 @@ import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveEducation } from "@/hooks/cv/use-education";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { BuilderFormProps } from "@/types/builder-form";
 import { EducationFormValues, educationSchema } from "@/types/education";
@@ -63,6 +64,9 @@ export function EducationForm({
             ],
     },
   });
+
+  // Track unsaved changes
+  useFormDirtyState("education", form.formState.isDirty);
 
   const { control, handleSubmit } = form;
   const isComplete = form.formState.isValid;

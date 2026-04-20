@@ -32,6 +32,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveSkills } from "@/hooks/cv/use-skills";
+import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
 import { SKILLS_MODULE } from "@/lib/constants/ai-prompts";
 
@@ -69,6 +70,9 @@ export function SkillsForm({
           : [createEmptyCategory()],
     },
   });
+
+  // Track unsaved changes
+  useFormDirtyState("skills", form.formState.isDirty);
 
   const { control, formState, handleSubmit } = form;
   const isComplete = formState.isValid;
