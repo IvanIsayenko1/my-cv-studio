@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 
-import MakerPageSeleton from "@/components/maker-page-skeleton";
+import CVListPageSeleton from "@/components/cv-list-page-skeleton";
 
 const CVList = dynamic(() => import("@/components/cv/cv-list"), {
   ssr: false,
-  loading: () => <MakerPageSeleton />,
+  loading: () => <CVListPageSeleton />,
 });
 
 export default function MakerPage() {

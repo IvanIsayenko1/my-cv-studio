@@ -25,14 +25,14 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import {
-  MobileOverlay,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayDescription,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "../ui/mobile-overlay";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../ui/drawer";
 
 export default function DeleteCVDialog({
   id,
@@ -102,18 +102,18 @@ export default function DeleteCVDialog({
   }
 
   return (
-    <MobileOverlay open={open} onOpenChange={setOpen}>
-      <MobileOverlayContent onPointerDownOutside={() => setOpen(false)}>
-        <MobileOverlayHeader>
-          <MobileOverlayTitle>Delete CV</MobileOverlayTitle>
-          <MobileOverlayDescription>
-            You are about to delete this CV. This action cannot be undone. Are
-            you sure you want to continue?
-          </MobileOverlayDescription>
-        </MobileOverlayHeader>
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerContent onPointerDownOutside={() => setOpen(false)}>
+        <DrawerHeader>
+          <DrawerTitle>Delete CV</DrawerTitle>
+        </DrawerHeader>
+        <DrawerDescription className="px-4">
+          You are about to delete this CV. This action cannot be undone. Are you
+          sure you want to continue?
+        </DrawerDescription>
 
-        <MobileOverlayFooter className="space-y-2">
-          <MobileOverlayClose asChild>
+        <DrawerFooter>
+          <DrawerClose asChild>
             <Button
               variant="outline"
               disabled={isDeletePending}
@@ -123,7 +123,7 @@ export default function DeleteCVDialog({
             >
               Keep the CV
             </Button>
-          </MobileOverlayClose>
+          </DrawerClose>
           <Button
             type="button"
             onClick={handleDelete}
@@ -135,8 +135,8 @@ export default function DeleteCVDialog({
             {isDeletePending && <Spinner />}
             {isDeletePending ? "Deleting..." : "Delete"}
           </Button>
-        </MobileOverlayFooter>
-      </MobileOverlayContent>
-    </MobileOverlay>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

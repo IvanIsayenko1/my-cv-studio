@@ -19,6 +19,15 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../ui/drawer";
+import {
   Form,
   FormControl,
   FormField,
@@ -27,15 +36,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "../ui/mobile-overlay";
 import { Spinner } from "../ui/spinner";
 
 const FormSchema = z.object({
@@ -92,7 +92,7 @@ export default function RenameCVDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-        <DialogContent>
+        <DialogContent onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>Rename CV</DialogTitle>
           </DialogHeader>
@@ -111,7 +111,7 @@ export default function RenameCVDialog({
                   {isUpdatePending ? "Updating..." : "Update"}
                 </Button>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline">
+                  <Button type="button" variant="outline" onClick={(e) => e.stopPropagation()}>
                     Cancel
                   </Button>
                 </DialogClose>
@@ -124,23 +124,25 @@ export default function RenameCVDialog({
   }
 
   return (
-    <MobileOverlay open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-      <MobileOverlayContent onPointerDownOutside={() => setIsOpenDialog(false)}>
-        <MobileOverlayHeader>
-          <MobileOverlayTitle>Rename CV</MobileOverlayTitle>
-        </MobileOverlayHeader>
-        <MobileOverlayBody>
-          <Form {...form}>
-            <form
-              id={formId}
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4"
-            >
-              {formField}
-            </form>
-          </Form>
-        </MobileOverlayBody>
-        <MobileOverlayFooter className="space-y-2">
+    <Drawer open={isOpenDialog} onOpenChange={setIsOpenDialog}>
+      <DrawerContent onPointerDownOutside={() => setIsOpenDialog(false)}>
+        <DrawerHeader>
+          <DrawerTitle>Rename CV</DrawerTitle>
+        </DrawerHeader>
+        <DrawerDescription asChild>
+          <div className="px-4">
+            <Form {...form}>
+              <form
+                id={formId}
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                {formField}
+              </form>
+            </Form>
+          </div>
+        </DrawerDescription>
+        <DrawerFooter>
           <Button
             type="submit"
             form={formId}
@@ -151,7 +153,7 @@ export default function RenameCVDialog({
             {isUpdatePending && <Spinner />}
             {isUpdatePending ? "Updating..." : "Update"}
           </Button>
-          <MobileOverlayClose asChild>
+          <DrawerClose asChild>
             <Button
               variant="outline"
               disabled={isUpdatePending}
@@ -161,9 +163,9 @@ export default function RenameCVDialog({
             >
               Cancel
             </Button>
-          </MobileOverlayClose>
-        </MobileOverlayFooter>
-      </MobileOverlayContent>
-    </MobileOverlay>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

@@ -27,6 +27,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -101,7 +102,7 @@ export default function CreateCVDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-        <DialogContent>
+        <DialogContent onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>Create CV</DialogTitle>
           </DialogHeader>
@@ -120,7 +121,7 @@ export default function CreateCVDialog({
                   {isCreatePending ? "Creating..." : "Create"}
                 </Button>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline">
+                  <Button type="button" variant="outline" onClick={(e) => e.stopPropagation()}>
                     Cancel
                   </Button>
                 </DialogClose>
@@ -142,16 +143,18 @@ export default function CreateCVDialog({
         <DrawerHeader className="text-left">
           <DrawerTitle>Create CV</DrawerTitle>
         </DrawerHeader>
-        <Form {...form}>
-          <form
-            id={formId}
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="m-4 space-y-4"
-          >
-            {formInput}
-          </form>
-        </Form>
-        <DrawerFooter className="pt-2">
+        <DrawerDescription asChild>
+          <Form {...form}>
+            <form
+              id={formId}
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 px-4"
+            >
+              {formInput}
+            </form>
+          </Form>
+        </DrawerDescription>
+        <DrawerFooter>
           <Button
             type="submit"
             form={formId}

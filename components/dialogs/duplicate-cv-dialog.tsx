@@ -33,14 +33,14 @@ import { RESOLUTIONS } from "@/lib/constants/resolutions";
 import { CVNameFormValues, cvNameSchema } from "@/schemas/cv-name";
 
 import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "../ui/mobile-overlay";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../ui/drawer";
 
 export default function DuplicateCVDialog({
   id,
@@ -120,7 +120,7 @@ export default function DuplicateCVDialog({
     // Desktop presentation
     return (
       <Dialog open={open} onOpenChange={onHandleOpenChange}>
-        <DialogContent>
+        <DialogContent onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>Duplicate existing CV</DialogTitle>
           </DialogHeader>
@@ -157,24 +157,26 @@ export default function DuplicateCVDialog({
 
   // Mobile presentation
   return (
-    <MobileOverlay open={open} onOpenChange={onHandleOpenChange}>
-      <MobileOverlayContent onPointerDownOutside={() => setOpen(false)}>
-        <MobileOverlayHeader>
-          <MobileOverlayTitle>Duplicate existing CV</MobileOverlayTitle>
-        </MobileOverlayHeader>
-        <MobileOverlayBody>
-          <Form {...form}>
-            <form
-              id={formId}
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4"
-            >
-              {nameField}
-            </form>
-          </Form>
-        </MobileOverlayBody>
-        <MobileOverlayFooter className="space-y-2">
-          <MobileOverlayClose asChild>
+    <Drawer open={open} onOpenChange={onHandleOpenChange}>
+      <DrawerContent onPointerDownOutside={() => setOpen(false)}>
+        <DrawerHeader>
+          <DrawerTitle>Duplicate existing CV</DrawerTitle>
+        </DrawerHeader>
+        <DrawerDescription asChild>
+          <div className="px-4">
+            <Form {...form}>
+              <form
+                id={formId}
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                {nameField}
+              </form>
+            </Form>
+          </div>
+        </DrawerDescription>
+        <DrawerFooter>
+          <DrawerClose asChild>
             <Button
               variant="outline"
               disabled={isDuplicatePending}
@@ -184,7 +186,7 @@ export default function DuplicateCVDialog({
             >
               Cancel
             </Button>
-          </MobileOverlayClose>
+          </DrawerClose>
           <Button
             type="submit"
             form={formId}
@@ -195,8 +197,8 @@ export default function DuplicateCVDialog({
             {isDuplicatePending && <Spinner />}
             {isDuplicatePending ? "Duplicating..." : "Duplicate"}
           </Button>
-        </MobileOverlayFooter>
-      </MobileOverlayContent>
-    </MobileOverlay>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

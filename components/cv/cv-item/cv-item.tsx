@@ -59,7 +59,7 @@ export default function CVItem({
         </div>
 
         {/* Action Menu */}
-        <div className="mt-auto flex justify-end pt-2">
+        <div className="mt-auto flex justify-end pt-2" onClick={(e) => e.stopPropagation()}>
           <Suspense fallback={<CVBuilderMenuSkeleton />}>
             <CVBuilderMenu id={cv.id} />
           </Suspense>

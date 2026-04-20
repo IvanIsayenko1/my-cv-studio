@@ -13,19 +13,19 @@ import DeleteCVDialog from "@/components/dialogs/delete-cv-dialog";
 import DuplicateCVDialog from "@/components/dialogs/duplicate-cv-dialog";
 import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayContent,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-  MobileOverlayTrigger,
-} from "@/components/ui/mobile-overlay";
 
 import { useCVQueryData, useDownloadCV } from "@/hooks/cv/use-cv";
 import { useStatus } from "@/hooks/cv/use-status";
 
 import RenameCVDialog from "../dialogs/rename-cv-dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../ui/drawer";
 
 export default function CVDropdownActions({ id }: { id: string }) {
   const cv = useCVQueryData({ id });
@@ -44,8 +44,8 @@ export default function CVDropdownActions({ id }: { id: string }) {
 
   const getMenu = () => {
     return (
-      <MobileOverlay open={openedMenu} onOpenChange={setOpenedMenu}>
-        <MobileOverlayTrigger asChild>
+      <Drawer open={openedMenu} onOpenChange={setOpenedMenu}>
+        <DrawerTrigger asChild>
           <Button
             variant={"outline"}
             aria-label="Open menu"
@@ -54,14 +54,17 @@ export default function CVDropdownActions({ id }: { id: string }) {
           >
             <MoreVerticalIcon />
           </Button>
-        </MobileOverlayTrigger>
+        </DrawerTrigger>
 
-        <MobileOverlayContent onPointerDownOutside={() => setOpenedMenu(false)}>
-          <MobileOverlayHeader>
-            <MobileOverlayTitle>CV actions</MobileOverlayTitle>
-          </MobileOverlayHeader>
+        <DrawerContent
+          className="mb-4"
+          onPointerDownOutside={() => setOpenedMenu(false)}
+        >
+          <DrawerHeader>
+            <DrawerTitle>CV actions</DrawerTitle>
+          </DrawerHeader>
 
-          <MobileOverlayBody className="flex max-h-[70dvh] flex-col gap-2 p-3">
+          <DrawerDescription className="flex max-h-[70dvh] flex-col gap-2 p-3">
             <Button
               size={"lg"}
               variant="ghost"
@@ -127,9 +130,9 @@ export default function CVDropdownActions({ id }: { id: string }) {
               <span>Delete</span>
               <Trash />
             </Button>
-          </MobileOverlayBody>
-        </MobileOverlayContent>
-      </MobileOverlay>
+          </DrawerDescription>
+        </DrawerContent>
+      </Drawer>
     );
   };
 

@@ -45,19 +45,25 @@ export default function CVDesktopActions({ id }: { id: string }) {
   const [isOpenShareDialog, setIsOpenShareDialog] = useState(false);
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()}>
       <ButtonGroup>
         <Button
-          variant="secondary"
+          variant="outline"
           disabled={!isCVReady}
-          onClick={() => setIsOpenShareDialog(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpenShareDialog(true);
+          }}
         >
           <Share />
           Share
         </Button>
         <Button
-          variant="secondary"
-          onClick={() => downloadCV(id)}
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            downloadCV(id);
+          }}
           disabled={isDownloadPending || !isCVReady}
         >
           <Download />
@@ -65,7 +71,12 @@ export default function CVDesktopActions({ id }: { id: string }) {
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" aria-label="More Options">
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="More Options"
+              onClick={(e) => e.stopPropagation()}
+            >
               <MoreHorizontalIcon />
             </Button>
           </DropdownMenuTrigger>
@@ -99,7 +110,10 @@ export default function CVDesktopActions({ id }: { id: string }) {
                 <Button
                   className="w-full"
                   variant="destructive"
-                  onClick={() => setIsOpenDeleteDialog(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpenDeleteDialog(true);
+                  }}
                   disabled={isDownloadPending}
                 >
                   <Trash />
@@ -134,6 +148,6 @@ export default function CVDesktopActions({ id }: { id: string }) {
         open={isOpenShareDialog}
         setOpen={setIsOpenShareDialog}
       />
-    </>
+    </div>
   );
 }

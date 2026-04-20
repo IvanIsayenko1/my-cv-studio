@@ -31,15 +31,14 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
 import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayDescription,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "../ui/mobile-overlay";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../ui/drawer";
 
 export default function ShareCVDialog({
   id,
@@ -113,7 +112,7 @@ export default function ShareCVDialog({
           No editing actions are available.
         </p>
 
-        <div className="flex gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs leading-5 text-amber-900 dark:text-amber-200">
+        <div className="flex gap-2 rounded-4xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs leading-5 text-amber-900 dark:text-amber-200">
           <TriangleAlert className="mt-0.5 size-4 shrink-0" />
           <p>
             This is a live share link. Any update you make to this CV will also
@@ -181,7 +180,7 @@ export default function ShareCVDialog({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>Share CV</DialogTitle>
             <DialogDescription>
@@ -192,7 +191,7 @@ export default function ShareCVDialog({
           {content}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={(e) => { e.stopPropagation(); setOpen(false); }}>
               Close
             </Button>
           </DialogFooter>
@@ -202,25 +201,23 @@ export default function ShareCVDialog({
   }
 
   return (
-    <MobileOverlay open={open} onOpenChange={setOpen}>
-      <MobileOverlayContent onPointerDownOutside={() => setOpen(false)}>
-        <MobileOverlayHeader>
-          <MobileOverlayTitle>Share CV</MobileOverlayTitle>
-          <MobileOverlayDescription>
-            Generate a public read-only link for recruiters.
-          </MobileOverlayDescription>
-        </MobileOverlayHeader>
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerContent onPointerDownOutside={() => setOpen(false)}>
+        <DrawerHeader>
+          <DrawerTitle>Share CV</DrawerTitle>
+        </DrawerHeader>
+        <DrawerDescription asChild>
+          <div className="space-y-4 px-4">{content}</div>
+        </DrawerDescription>
 
-        <MobileOverlayBody className="space-y-4">{content}</MobileOverlayBody>
-
-        <MobileOverlayFooter>
-          <MobileOverlayClose asChild>
+        <DrawerFooter>
+          <DrawerClose asChild>
             <Button variant="outline" size="lg" className="w-full">
               Close
             </Button>
-          </MobileOverlayClose>
-        </MobileOverlayFooter>
-      </MobileOverlayContent>
-    </MobileOverlay>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

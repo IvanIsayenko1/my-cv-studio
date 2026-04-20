@@ -21,16 +21,16 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Field, FieldDescription, FieldLabel } from "../ui/field";
 import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "../ui/mobile-overlay";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../ui/drawer";
+import { Field, FieldDescription, FieldLabel } from "../ui/field";
 import { RichTextEditor } from "../ui/rich-text-editor";
 
 export default function WorkExperienceAIAssistantDialog({
@@ -218,27 +218,27 @@ export default function WorkExperienceAIAssistantDialog({
   }
 
   return (
-    <MobileOverlay open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-      <MobileOverlayContent
+    <Drawer open={isOpenDialog} onOpenChange={setIsOpenDialog}>
+      <DrawerContent
         className="flex max-h-[calc(100%-1rem)] flex-col"
         onPointerDownOutside={() => setIsOpenDialog(false)}
       >
-        <MobileOverlayHeader>
-          <MobileOverlayTitle>Review the AI Suggestions 2</MobileOverlayTitle>
-        </MobileOverlayHeader>
+        <DrawerHeader>
+          <DrawerTitle>Review the AI Suggestions</DrawerTitle>
+        </DrawerHeader>
 
-        <MobileOverlayBody className="min-h-0 flex-1 space-y-4">
-          {dialogContent}
-        </MobileOverlayBody>
+        <DrawerDescription asChild>
+          <div className="min-h-0 flex-1 space-y-4 px-4">{dialogContent}</div>
+        </DrawerDescription>
 
-        <MobileOverlayFooter>
-          <MobileOverlayClose asChild>
+        <DrawerFooter>
+          <DrawerClose asChild>
             <Button variant="outline" size="lg" className="w-full">
               Close
             </Button>
-          </MobileOverlayClose>
-        </MobileOverlayFooter>
-      </MobileOverlayContent>
-    </MobileOverlay>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

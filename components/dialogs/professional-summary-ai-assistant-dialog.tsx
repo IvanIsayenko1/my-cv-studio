@@ -17,16 +17,16 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Field, FieldDescription, FieldLabel } from "../ui/field";
 import {
-  MobileOverlay,
-  MobileOverlayBody,
-  MobileOverlayClose,
-  MobileOverlayContent,
-  MobileOverlayFooter,
-  MobileOverlayHeader,
-  MobileOverlayTitle,
-} from "../ui/mobile-overlay";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../ui/drawer";
+import { Field, FieldDescription, FieldLabel } from "../ui/field";
 import { Textarea } from "../ui/textarea";
 
 export default function ProfessionalSummaryAIAssistantDialog({
@@ -66,13 +66,13 @@ export default function ProfessionalSummaryAIAssistantDialog({
   const dialogContent =
     reviewNeedsAttention && aiReview ? (
       <AIContentSuggestionCard
-      cardKey={aiReview.field}
-      title="Professional Summary"
-      summary={aiReview.summary}
-      issues={aiReview.issues}
-      typos={aiReview.typos}
-      onAccept={handleAcceptSuggestion}
-      isPending={isPending && isApplyingSuggestion}
+        cardKey={aiReview.field}
+        title="Professional Summary"
+        summary={aiReview.summary}
+        issues={aiReview.issues}
+        typos={aiReview.typos}
+        onAccept={handleAcceptSuggestion}
+        isPending={isPending && isApplyingSuggestion}
       >
         <CardContent>
           <Field className="gap-2">
@@ -118,27 +118,29 @@ export default function ProfessionalSummaryAIAssistantDialog({
   }
 
   return (
-    <MobileOverlay open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-      <MobileOverlayContent
+    <Drawer open={isOpenDialog} onOpenChange={setIsOpenDialog}>
+      <DrawerContent
         className="flex max-h-[calc(100%-1rem)] flex-col"
         onPointerDownOutside={() => setIsOpenDialog(false)}
       >
-        <MobileOverlayHeader>
-          <MobileOverlayTitle>Review the AI Suggestions</MobileOverlayTitle>
-        </MobileOverlayHeader>
+        <DrawerHeader>
+          <DrawerTitle>Review the AI Suggestions</DrawerTitle>
+        </DrawerHeader>
 
-        <MobileOverlayBody className="min-h-0 flex-1">
-          {dialogContent}
-        </MobileOverlayBody>
+        <DrawerDescription asChild>
+          <div className="min-h-0 flex-1 overflow-y-auto px-4">
+            {dialogContent}
+          </div>
+        </DrawerDescription>
 
-        <MobileOverlayFooter>
-          <MobileOverlayClose asChild>
+        <DrawerFooter>
+          <DrawerClose asChild>
             <Button variant="outline" size="lg" className="w-full">
               Close
             </Button>
-          </MobileOverlayClose>
-        </MobileOverlayFooter>
-      </MobileOverlayContent>
-    </MobileOverlay>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
