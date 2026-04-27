@@ -6,6 +6,7 @@ import { Check, ChevronDown, Save, X } from "lucide-react";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import SelectorDrawer from "@/components/dialogs/selector-drawer";
+import FormStatusBedge from "@/components/form-status-bedge";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -68,6 +69,11 @@ export default function AccentColorForm({
         title="Accent color"
         description="Change the accent color of the template"
         cvId="accent-color"
+        status={
+          <div className="space-x-2">
+            <FormStatusBedge isNotSaved={form.formState.isDirty} />
+          </div>
+        }
       >
         <Form {...form}>
           <form
