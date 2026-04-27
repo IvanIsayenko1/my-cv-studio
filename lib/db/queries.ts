@@ -123,8 +123,11 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     ),
     db.execute(
       `SELECT accent_color, custom_accent_color FROM cv_template_config
-       WHERE cv_id = ? LIMIT 1`,
-      [cvId]
+       WHERE cv_id = ? AND template_id = (
+      SELECT template_id FROM cv_template WHERE cv_id = ? LIMIT 1
+    )
+    LIMIT 1`,
+      [cvId, cvId]
     ),
   ]);
 

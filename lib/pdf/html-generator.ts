@@ -46,10 +46,12 @@ export async function generateHTMLCVPDF(cv: CV): Promise<Buffer> {
       deviceScaleFactor: 1,
     });
 
+    const accentColor = cv.customAccentColor || cv.accentColor || "#0066CC";
+
     await page.setContent(
       renderPreviewHTML(cv, {
         fontSource: CV_FONT_DATA_URI,
-        accentColor: cv.accentColor,
+        accentColor,
       }),
       {
         waitUntil: "domcontentloaded",

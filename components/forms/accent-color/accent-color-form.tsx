@@ -53,7 +53,7 @@ export default function AccentColorForm({
     resolver: zodResolver(templateConfigSchema),
     mode: "onTouched",
     defaultValues: {
-      accentColor: configData?.accentColor,
+      accentColor: configData?.accentColor || "#0066CC",
       customAccentColor: configData?.customAccentColor || undefined,
     },
   });
