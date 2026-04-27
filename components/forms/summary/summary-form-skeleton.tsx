@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function SummaryFormSkeleton({
+export default function SummaryFormSkeleton({
   collapsed = false,
 }: {
   collapsed?: boolean;

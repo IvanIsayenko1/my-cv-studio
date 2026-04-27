@@ -13,6 +13,7 @@ import { useSkillsSuspenseQuery } from "@/hooks/cv/use-skills";
 import { useStatus } from "@/hooks/cv/use-status";
 import { useSummarySuspenseQuery } from "@/hooks/cv/use-summary";
 import { useTemplateSuspenseQuery } from "@/hooks/cv/use-template";
+import { useTemplateConfigSuspenseQuery } from "@/hooks/cv/use-template-config";
 import { useWorkExperienceSuspenseQuery } from "@/hooks/cv/use-work-experience";
 
 import { renderPreviewHTML } from "@/lib/pdf/templates/render-preview-html";
@@ -186,6 +187,7 @@ export default function CVPreview({
   const { data: projects } = useProjectsSuspenseQuery(id);
   const { data: certifications } = useCertificationsSuspenseQuery(id);
   const { data: awards } = useAwardsSuspenseQuery(id);
+  const { data: templateConfigData } = useTemplateConfigSuspenseQuery(id);
 
   const fullCV = useMemo<CV | null>(() => {
     if (!cvData) return null;
@@ -267,8 +269,18 @@ export default function CVPreview({
 
   const htmlPreview = useMemo(() => {
     if (!fullCV) return "";
-    return renderPreviewHTML(fullCV, { fontSource: fontDataUri });
-  }, [fullCV, fontDataUri]);
+    return renderPreviewHTML(fullCV, {
+      fontSource: fontDataUri,
+      accentColor:
+        templateConfigData?.customAccentColor ||
+        templateConfigData?.accentColor,
+    });
+  }, [
+    fullCV,
+    fontDataUri,
+    templateConfigData?.accentColor,
+    templateConfigData?.customAccentColor,
+  ]);
 
   useEffect(() => {
     const element = containerRef.current;

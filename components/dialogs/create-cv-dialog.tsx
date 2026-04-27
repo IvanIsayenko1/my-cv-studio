@@ -102,7 +102,10 @@ export default function CreateCVDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-        <DialogContent onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
+        <DialogContent
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           <DialogHeader>
             <DialogTitle>Create CV</DialogTitle>
           </DialogHeader>
@@ -121,7 +124,11 @@ export default function CreateCVDialog({
                   {isCreatePending ? "Creating..." : "Create"}
                 </Button>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     Cancel
                   </Button>
                 </DialogClose>

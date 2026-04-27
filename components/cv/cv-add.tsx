@@ -19,7 +19,7 @@ export default function CVAdd() {
         onClick={() => setIsOpenDialog(true)}
       >
         <Button
-          className="flex items-center gap-2 transition-transform duration-300 group-hover/add:scale-[1.05]"
+          className="flex items-center gap-2 transition-transform duration-300 group-hover/add:scale-[1.05] active:scale-[0.96]"
           variant="ghost"
           onClick={() => setIsOpenDialog(true)}
         >

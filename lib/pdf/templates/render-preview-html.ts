@@ -7,7 +7,7 @@ import { renderVisualClearPreviewHTML } from "./visual-clear-html";
 
 export function renderPreviewHTML(
   cv: CV,
-  options?: PreviewRenderOptions
+  options?: PreviewRenderOptions & { accentColor?: string }
 ): string {
   switch (cv.templateId) {
     case TemplateId.DESIGN_MINIMALIST:

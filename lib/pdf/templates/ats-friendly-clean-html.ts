@@ -10,8 +10,9 @@ import type { PreviewRenderOptions } from "./shared";
 
 export function renderATSCleanPreviewHTML(
   cv: CV,
-  options?: PreviewRenderOptions
+  options?: PreviewRenderOptions & { accentColor?: string }
 ): string {
+  const accentColor = options?.accentColor || "#0066CC";
   const {
     awardItems,
     certificationItems,
@@ -245,6 +246,7 @@ export function renderATSCleanPreviewHTML(
             color-scheme: light;
             --text-primary: #0a0a0a;
             --text-secondary: #525252;
+            --accent-color: ${accentColor};
           }
 
           * {
@@ -281,7 +283,7 @@ export function renderATSCleanPreviewHTML(
           }
 
           .header {
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 2px solid var(--accent-color);
             padding-bottom: 12px;
             margin-bottom: 12px;
           }
@@ -306,7 +308,7 @@ export function renderATSCleanPreviewHTML(
           }
 
           a {
-            color: inherit;
+            color: var(--accent-color);
             text-decoration: underline;
           }
 
@@ -350,7 +352,7 @@ export function renderATSCleanPreviewHTML(
             font-size: 11px;
             letter-spacing: 0.04em;
             text-transform: uppercase;
-            color: var(--text-secondary);
+            color: var(--accent-color);
             font-weight: 600;
           }
 

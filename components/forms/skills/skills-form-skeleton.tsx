@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function SkillsFormSkeleton({
+export default function SkillsFormSkeleton({
   collapsed = false,
 }: {
   collapsed?: boolean;

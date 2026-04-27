@@ -35,7 +35,7 @@ export default function CVList() {
         {searchQuery && (
           <button
             onClick={() => setSearchQuery("")}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1 -translate-y-1/2 h-10 w-10 flex items-center justify-center transition-colors active:scale-[0.96]"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />

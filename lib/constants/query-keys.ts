@@ -1,6 +1,7 @@
 export const QUERY_KEYS = {
   PROJECTS: "projects",
   TEMPLATE: "template",
+  TEMPLATE_CONFIG: "template-config",
   SUMMARY: "summary",
   PERSONAL_INFO: "personal-info",
   AWARDS: "awards",

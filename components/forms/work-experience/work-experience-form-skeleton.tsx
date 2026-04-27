@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function WorkExperienceFormSkeleton({
+export default function WorkExperienceFormSkeleton({
   collapsed = false,
 }: {
   collapsed?: boolean;

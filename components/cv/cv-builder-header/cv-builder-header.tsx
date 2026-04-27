@@ -7,8 +7,8 @@ import { useParams } from "next/navigation";
 import { ROUTES } from "@/config/routes";
 
 import { Skeleton } from "../../ui/skeleton";
+import CVBuilderTitle from "../cv-builder/cv-builder-title";
 import { CVProtectedBackButton } from "../cv-protected-back-button";
-import CVBuilderTitle from "../cv-builder-title";
 import CVStatus from "../cv-status";
 import CVBuilderMenu from "./cv-builder-menu";
 import CVBuilderMenuSkeleton from "./cv-builder-menu-skeleton";

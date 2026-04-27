@@ -2,16 +2,16 @@ import { CSSProperties } from "react";
 
 import { useParams } from "next/navigation";
 
-import AwardsFormSkeleton from "../forms/awards/awards-form-skeleton";
-import { CertificationsFormSkeleton } from "../forms/certifications/certifications-form-skeleton";
-import { EducationFormSkeleton } from "../forms/education/education-form-skeleton";
-import { LanguagesFormSkeleton } from "../forms/languages/languages-form-skeleton";
-import { PersonalInfoFormSkeleton } from "../forms/personal-info/personal-info-form-skeleton";
-import ProjectsFormSkeleton from "../forms/projects/projects-form-skeleton";
-import { SkillsFormSkeleton } from "../forms/skills/skills-form-skeleton";
-import { SummaryFormSkeleton } from "../forms/summary/summary-form-skeleton";
-import TemplateFormSkeleton from "../forms/template/template-form-skeleton";
-import { WorkExperienceFormSkeleton } from "../forms/work-experience/work-experience-form-skeleton";
+import AwardsFormSkeleton from "@/components/forms/awards/awards-form-skeleton";
+import CertificationsFormSkeleton from "@/components/forms/certifications/certifications-form-skeleton";
+import EducationFormSkeleton from "@/components/forms/education/education-form-skeleton";
+import LanguagesFormSkeleton from "@/components/forms/languages/languages-form-skeleton";
+import PersonalInfoFormSkeleton from "@/components/forms/personal-info/personal-info-form-skeleton";
+import ProjectsFormSkeleton from "@/components/forms/projects/projects-form-skeleton";
+import SkillsFormSkeleton from "@/components/forms/skills/skills-form-skeleton";
+import SummaryFormSkeleton from "@/components/forms/summary/summary-form-skeleton";
+import TemplateFormSkeleton from "@/components/forms/template/template-form-skeleton";
+import WorkExperienceFormSkeleton from "@/components/forms/work-experience/work-experience-form-skeleton";
 
 export default function CVBuilderFormSkeleton() {
   const params = useParams();

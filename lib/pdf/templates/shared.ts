@@ -92,11 +92,11 @@ function renderLinksLineHTML(
   const links = linkItems.length
     ? linkItems.map(
         (item) =>
-          `<a href="${escapeHtml(item.url.trim())}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.label.trim())}</a>`
+          `<span>${escapeHtml(item.label.trim())}: <a href="${escapeHtml(item.url.trim())}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.url.trim())}</a></span>`
       )
     : [
-        linkedIn ? `<a href="${escapeHtml(linkedIn)}" target="_blank" rel="noopener noreferrer">LinkedIn</a>` : null,
-        portfolio ? `<a href="${escapeHtml(portfolio)}" target="_blank" rel="noopener noreferrer">Portfolio</a>` : null,
+        linkedIn ? `<span>LinkedIn: <a href="${escapeHtml(linkedIn)}" target="_blank" rel="noopener noreferrer">${escapeHtml(linkedIn)}</a></span>` : null,
+        portfolio ? `<span>Portfolio: <a href="${escapeHtml(portfolio)}" target="_blank" rel="noopener noreferrer">${escapeHtml(portfolio)}</a></span>` : null,
       ].filter(Boolean);
 
   return links.join(" | ");

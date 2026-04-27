@@ -7,7 +7,6 @@ import { PersonalInfoForm } from "@/components/forms/personal-info/personal-info
 import { ProjectsForm } from "@/components/forms/projects/projects-form";
 import { SkillsForm } from "@/components/forms/skills/skills-form";
 import { SummaryForm } from "@/components/forms/summary/summary-form";
-import { TemplateForm } from "@/components/forms/template/template-form";
 import { WorkExperienceForm } from "@/components/forms/work-experience/work-experience-form";
 
 import { useAwardsSuspenseQuery } from "@/hooks/cv/use-awards";
@@ -18,12 +17,11 @@ import { usePersonalInfoSuspenseQuery } from "@/hooks/cv/use-personal-info";
 import { useProjectsSuspenseQuery } from "@/hooks/cv/use-projects";
 import { useSkillsSuspenseQuery } from "@/hooks/cv/use-skills";
 import { useSummarySuspenseQuery } from "@/hooks/cv/use-summary";
-import { useTemplateSuspenseQuery } from "@/hooks/cv/use-template";
 import { useWorkExperienceSuspenseQuery } from "@/hooks/cv/use-work-experience";
 
 import { LanguagesForm } from "../forms/languages/languages-form";
 
-export default function CVBuilderForm() {
+export default function CVDataForm() {
   const params = useParams();
   const id = params.id as string;
 
@@ -36,7 +34,6 @@ export default function CVBuilderForm() {
   const { data: languagesData } = useLanguagesSuspenseQuery(id);
   const { data: certificationsData } = useCertificationsSuspenseQuery(id);
   const { data: projectsData } = useProjectsSuspenseQuery(id);
-  const { data: templateData } = useTemplateSuspenseQuery(id);
 
   return (
     <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto pb-4">
@@ -49,7 +46,6 @@ export default function CVBuilderForm() {
       <CertificationsForm id={id} formData={certificationsData} />
       <ProjectsForm id={id} formData={projectsData} />
       <AwardsForm id={id} formData={awardsData} />
-      <TemplateForm id={id} formData={templateData} />
     </div>
   );
 }

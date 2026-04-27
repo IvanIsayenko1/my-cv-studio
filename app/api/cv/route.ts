@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
 
+import { PRESET_COLORS } from "@/lib/constants/template-accent-colors";
 import { db } from "@/lib/db/client";
+
+import { TemplateId } from "@/types/template";
 
 export async function GET(_req: NextRequest) {
   const { userId } = await auth();
@@ -63,12 +66,31 @@ export async function POST(req: NextRequest) {
   // 2) Insert if free
   const id = randomUUID();
 
+  // Insert the new CV into the database
   await db.execute({
     sql: `
       INSERT INTO cvs (id, user_id, title)
       VALUES (?, ?, ?)
     `,
     args: [id, userId, title || "Untitled CV"],
+  });
+
+  // Insert the default template association for the new CV
+  await db.execute({
+    sql: `
+      INSERT INTO cv_template (cv_id, template_id)
+      VALUES (?, ?)
+    `,
+    args: [id, TemplateId.ATS_FRIENDLY_SIMPLE],
+  });
+
+  // Insert the default template config for the new CV
+  await db.execute({
+    sql: `
+       INSERT INTO cv_template_config (cv_id, accent_color, custom_accent_color, template_id)
+       VALUES (?, ?, ?, ?)
+     `,
+    args: [id, "#000000", null, TemplateId.ATS_FRIENDLY_SIMPLE],
   });
 
   return NextResponse.json({

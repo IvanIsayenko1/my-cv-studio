@@ -103,4 +103,6 @@ export interface CV {
   }>;
 
   templateId: TemplateId;
+  accentColor?: string;
+  customAccentColor?: string;
 }

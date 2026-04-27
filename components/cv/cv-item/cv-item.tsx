@@ -44,10 +44,10 @@ export default function CVItem({
     >
       <div
         onClick={handleCardClick}
-        className="group/card border-border/70 hover:border-foreground/25 bg-card flex h-full cursor-pointer flex-col gap-3 overflow-hidden rounded-4xl border p-4 transition-all duration-300 hover:shadow-md"
+        className="group/card bg-card flex h-full cursor-pointer flex-col gap-3 overflow-hidden rounded-4xl p-4 shadow-sm transition-[box-shadow] duration-300 hover:shadow-md"
       >
         {/* Title */}
-        <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5">
+        <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5 active:scale-[0.96]">
           {cv.title}
         </h4>
 

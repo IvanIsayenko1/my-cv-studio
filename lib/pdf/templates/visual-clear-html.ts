@@ -26,8 +26,9 @@ function renderBadgeSection(
 
 export function renderVisualClearPreviewHTML(
   cv: CV,
-  options?: PreviewRenderOptions
+  options?: PreviewRenderOptions & { accentColor?: string }
 ): string {
+  const accentColor = options?.accentColor || "#0066CC";
   const {
     awardItems,
     certificationItems,
@@ -299,7 +300,7 @@ export function renderVisualClearPreviewHTML(
             --hero-text: #121826;
             --body-text: #313a47;
             --muted-text: #586171;
-            --section-accent: #171c26;
+            --section-accent: ${accentColor};
             --section-border: rgba(18, 24, 38, 0.1);
             --font-body: "CVInter", "Aptos", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
             --font-heading: "CVInter", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -348,7 +349,7 @@ export function renderVisualClearPreviewHTML(
             gap: 18px;
             padding: 12px;
             margin-bottom: 18px;
-            color: var(--hero-bg);
+            color: var(--section-accent);
             align-items: center;
           }
 
@@ -429,7 +430,7 @@ export function renderVisualClearPreviewHTML(
           .section-kicker span {
             display: inline-block;
             padding: 4px 10px 3px;
-            background: var(--hero-bg);
+            background: var(--section-accent);
           }
 
           .section-body {

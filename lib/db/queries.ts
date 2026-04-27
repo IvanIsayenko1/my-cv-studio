@@ -30,6 +30,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     achievementRows,
     technologyRows,
     templateRows,
+    templateConfigRows,
   ] = await Promise.all([
     db.execute("SELECT * FROM cv_personal_info WHERE cv_id = ? LIMIT 1", [
       cvId,
@@ -117,6 +118,11 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     ),
     db.execute(
       `SELECT template_id FROM cv_template
+       WHERE cv_id = ? LIMIT 1`,
+      [cvId]
+    ),
+    db.execute(
+      `SELECT accent_color, custom_accent_color FROM cv_template_config
        WHERE cv_id = ? LIMIT 1`,
       [cvId]
     ),
@@ -232,6 +238,7 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
   }));
 
   const templateId = (templateRows.rows[0]?.template_id as TemplateId) || "";
+  const templateConfig = templateConfigRows.rows[0] as any;
 
   return {
     cvData: {
@@ -251,6 +258,8 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     projects,
     awards,
     templateId,
+    accentColor: templateConfig?.accent_color,
+    customAccentColor: templateConfig?.custom_accent_color,
   };
 }
 
