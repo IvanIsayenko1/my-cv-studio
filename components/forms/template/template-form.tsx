@@ -49,7 +49,6 @@ export function TemplateForm({
     resolver: zodResolver(templateSchema),
     defaultValues: {
       id: formData?.id || TemplateId.ATS_FRIENDLY_SIMPLE,
-      accentColor: formData?.accentColor || "#3B82F6",
     },
   });
   // Track unsaved changes

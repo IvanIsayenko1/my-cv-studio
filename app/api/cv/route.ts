@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
 
-import { PRESET_COLORS } from "@/lib/constants/template-accent-colors";
 import { db } from "@/lib/db/client";
 
 import { TemplateId } from "@/types/template";

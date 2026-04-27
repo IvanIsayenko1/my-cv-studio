@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { TEMPLATE_OPTIONS } from "@/types/template";
 
 import PageContent from "../layout/page-content";
-import { Button } from "../ui/button";
 import {
   Card,
   CardContent,

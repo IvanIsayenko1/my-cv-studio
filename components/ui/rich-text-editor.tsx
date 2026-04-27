@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils/cn";
 
 import { Button } from "./button";
 
-const controls = ["bold", "italic", "unordered", "ordered"] as const;
-type RichTextControl = (typeof controls)[number];
+const _controls = ["bold", "italic", "unordered", "ordered"] as const;
+type RichTextControl = (typeof _controls)[number];
 type RichTextMode = "full" | "list-only";
 type RichTextEditorProps = {
   value: string;

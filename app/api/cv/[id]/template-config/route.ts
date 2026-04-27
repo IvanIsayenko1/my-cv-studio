@@ -2,11 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@clerk/nextjs/server";
-import { z } from "zod";
 
 import { db } from "@/lib/db/client";
-
-import type { TemplateFormValues } from "@/types/template";
 
 import { TemplateConfigFormValues } from "@/schemas/template-config";
 
