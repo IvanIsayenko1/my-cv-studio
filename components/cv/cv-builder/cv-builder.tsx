@@ -36,7 +36,7 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
                 <TabsTrigger value="data">Data</TabsTrigger>
                 <TabsTrigger value="template">Template</TabsTrigger>
                 <TabsTrigger value="config">Config</TabsTrigger>
-                <TabsTrigger value="preview" className="block lg:hidden">
+                <TabsTrigger value="preview" className="lg:hidden">
                   Preview
                 </TabsTrigger>
               </TabsList>
@@ -55,7 +55,7 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
 
               <TabsContent
                 value="template"
-                className="w-full overflow-y-auto p-1"
+                className="load-stagger w-full overflow-y-auto p-1"
               >
                 {/* TEMPLATE FORM */}
                 <CVTemplateForm id={id} />
