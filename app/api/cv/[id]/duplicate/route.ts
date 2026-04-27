@@ -55,6 +55,9 @@ export async function POST(
       certifications,
       projects,
       awards,
+      templateId,
+      accentColor,
+      customAccentColor,
     } = existingCV;
     const personalLinksStorage = serializeProfessionalLinksForStorage({
       professionalLinks: personalInfo.professionalLinks ?? [],
@@ -309,6 +312,32 @@ export async function POST(
           award.date,
           award.description,
         ],
+      });
+    }
+
+    // Duplicate template if it exists
+    if (templateId) {
+      await tx.execute({
+        sql: `
+        INSERT INTO cv_template (cv_id, template_id)
+        VALUES (?, ?)
+        `,
+        args: [newRandomId, templateId],
+      });
+    }
+
+    // Duplicate template config if it exists
+    if (templateId && (accentColor || customAccentColor)) {
+      await tx.execute({
+        sql: `
+        INSERT INTO cv_template_config (
+          cv_id,
+          template_id,
+          accent_color,
+          custom_accent_color
+        ) VALUES (?, ?, ?, ?)
+        `,
+        args: [newRandomId, templateId, accentColor ?? null, customAccentColor ?? null],
       });
     }
 
