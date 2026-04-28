@@ -1,5 +1,7 @@
 import { CV } from "@/types/cv";
 
+import { SectionConfig } from "@/schemas/template-config";
+
 import {
   escapeHtml,
   getSharedTemplateData,
@@ -8,11 +10,28 @@ import {
 } from "./shared";
 import type { PreviewRenderOptions } from "./shared";
 
+const DEFAULT_SECTIONS = [
+  { id: "summary", label: "Summary", order: 0, visible: true },
+  { id: "experience", label: "Experience", order: 1, visible: true },
+  { id: "skills", label: "Skills", order: 2, visible: true },
+  { id: "education", label: "Education", order: 3, visible: true },
+  { id: "languages", label: "Languages", order: 4, visible: true },
+  { id: "projects", label: "Projects", order: 5, visible: true },
+  { id: "certifications", label: "Certifications", order: 6, visible: true },
+  { id: "awards", label: "Awards", order: 7, visible: true },
+];
+
 export function renderATSCleanPreviewHTML(
   cv: CV,
-  options?: PreviewRenderOptions & { accentColor?: string }
+  options?: PreviewRenderOptions & {
+    accentColor?: string;
+    sections?: SectionConfig[];
+  }
 ): string {
   const accentColor = options?.accentColor || "#0066CC";
+  const sectionConfig = options?.sections || DEFAULT_SECTIONS;
+  const sectionMap = new Map(sectionConfig.map((s) => [s.id, s]));
+
   const {
     awardItems,
     certificationItems,
@@ -27,21 +46,22 @@ export function renderATSCleanPreviewHTML(
     workItems,
   } = getSharedTemplateData(cv);
 
-  const sections: string[] = [];
+  // Build section content map
+  const sectionContent: Record<string, string> = {};
 
   if (cv.professionalSummary) {
-    sections.push(`
+    sectionContent.summary = `
       <section class="preview-section">
-        <h3 class="section-title">Summary</h3>
+        <h3 class="section-title">${escapeHtml(sectionMap.get("summary")?.label || "Summary")}</h3>
         ${renderRichTextBlock(cv.professionalSummary.trim())}
       </section>
-    `);
+    `;
   }
 
   if (workItems.length > 0) {
-    sections.push(`
+    sectionContent.experience = `
       <section class="preview-section">
-        <h3 class="section-title">Experience</h3>
+        <h3 class="section-title">${escapeHtml(sectionMap.get("experience")?.label || "Experience")}</h3>
         <div class="entry-list">
           ${workItems
             .map(
@@ -73,14 +93,14 @@ export function renderATSCleanPreviewHTML(
             .join("")}
         </div>
       </section>
-    `);
+    `;
   }
 
   if (skillCategories.length > 0) {
-    sections.push(`
+    sectionContent.skills = `
       <section class="preview-section">
-        <h3 class="section-title">Skills</h3>
-        
+        <h3 class="section-title">${escapeHtml(sectionMap.get("skills")?.label || "Skills")}</h3>
+
         <div class="stack-sm">
           ${skillCategories
             .map(
@@ -90,13 +110,13 @@ export function renderATSCleanPreviewHTML(
             .join("")}
         </div>
       </section>
-    `);
+    `;
   }
 
   if (educationItems.length > 0) {
-    sections.push(`
+    sectionContent.education = `
       <section class="preview-section">
-        <h3 class="section-title">Education</h3>
+        <h3 class="section-title">${escapeHtml(sectionMap.get("education")?.label || "Education")}</h3>
         <div class="entry-list">
           ${educationItems
             .map(
@@ -120,13 +140,13 @@ export function renderATSCleanPreviewHTML(
             .join("")}
         </div>
       </section>
-    `);
+    `;
   }
 
   if (languageItems.length > 0) {
-    sections.push(`
+    sectionContent.languages = `
       <section class="preview-section">
-        <h3 class="section-title">Languages</h3>
+        <h3 class="section-title">${escapeHtml(sectionMap.get("languages")?.label || "Languages")}</h3>
         <div>
           ${languageItems
             .map(
@@ -142,13 +162,13 @@ export function renderATSCleanPreviewHTML(
             .join("")}
         </div>
       </section>
-    `);
+    `;
   }
 
   if (projectItems.length > 0) {
-    sections.push(`
+    sectionContent.projects = `
       <section class="preview-section">
-        <h3 class="section-title">Projects</h3>
+        <h3 class="section-title">${escapeHtml(sectionMap.get("projects")?.label || "Projects")}</h3>
         <div class="entry-list">
           ${projectItems
             .map(
@@ -172,13 +192,13 @@ export function renderATSCleanPreviewHTML(
             .join("")}
         </div>
       </section>
-    `);
+    `;
   }
 
   if (certificationItems.length > 0) {
-    sections.push(`
+    sectionContent.certifications = `
       <section class="preview-section">
-        <h3 class="section-title">Certifications</h3>
+        <h3 class="section-title">${escapeHtml(sectionMap.get("certifications")?.label || "Certifications")}</h3>
         <div class="entry-list">
           ${certificationItems
             .map(
@@ -203,13 +223,13 @@ export function renderATSCleanPreviewHTML(
             .join("")}
         </div>
       </section>
-    `);
+    `;
   }
 
   if (awardItems.length > 0) {
-    sections.push(`
+    sectionContent.awards = `
       <section class="preview-section">
-        <h3 class="section-title">Awards</h3>
+        <h3 class="section-title">${escapeHtml(sectionMap.get("awards")?.label || "Awards")}</h3>
         <div class="entry-list">
           ${awardItems
             .map(
@@ -229,8 +249,15 @@ export function renderATSCleanPreviewHTML(
             .join("")}
         </div>
       </section>
-    `);
+    `;
   }
+
+  // Render sections in configured order, filtering out hidden sections
+  const orderedSections = sectionConfig
+    .filter((section) => section.visible !== false)
+    .sort((a, b) => a.order - b.order)
+    .map((section) => sectionContent[section.id])
+    .filter(Boolean);
 
   return `
     <!doctype html>
@@ -438,7 +465,7 @@ export function renderATSCleanPreviewHTML(
           </section>
 
           <section class="content">
-            ${sections.join("")}
+            ${orderedSections.join("")}
           </section>
         </main>
       </body>

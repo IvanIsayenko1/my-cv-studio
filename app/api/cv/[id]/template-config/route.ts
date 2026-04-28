@@ -28,17 +28,33 @@ export async function GET(
     return NextResponse.json({ error: "CV not found" }, { status: 404 });
   }
 
-  const result = await db.execute(
-    `
-    SELECT accent_color, custom_accent_color
-    FROM cv_template_config
-    WHERE cv_id = ? AND template_id = (
-      SELECT template_id FROM cv_template WHERE cv_id = ? LIMIT 1
-    )
-    LIMIT 1
-    `,
-    [cvId, cvId]
-  );
+  let result;
+  try {
+    result = await db.execute(
+      `
+      SELECT accent_color, custom_accent_color, sections_config
+      FROM cv_template_config
+      WHERE cv_id = ? AND template_id = (
+        SELECT template_id FROM cv_template WHERE cv_id = ? LIMIT 1
+      )
+      LIMIT 1
+      `,
+      [cvId, cvId]
+    );
+  } catch {
+    // Fallback if sections_config column doesn't exist yet
+    result = await db.execute(
+      `
+      SELECT accent_color, custom_accent_color
+      FROM cv_template_config
+      WHERE cv_id = ? AND template_id = (
+        SELECT template_id FROM cv_template WHERE cv_id = ? LIMIT 1
+      )
+      LIMIT 1
+      `,
+      [cvId, cvId]
+    );
+  }
 
   if (result.rows.length === 0) {
     // fetchTemplate expects null when nothing stored
@@ -50,6 +66,9 @@ export async function GET(
   const template: TemplateConfigFormValues = {
     accentColor: row.accent_color as string | undefined,
     customAccentColor: row.custom_accent_color as string | undefined,
+    sections: row.sections_config
+      ? JSON.parse(row.sections_config)
+      : undefined,
   };
 
   return NextResponse.json(template, { status: 200 });
@@ -77,6 +96,7 @@ export async function POST(
     cvId,
     accentColor: body.accentColor,
     customAccentColor: body.customAccentColor,
+    sections: body.sections,
   });
 
   // Ensure CV belongs to user
@@ -104,17 +124,46 @@ export async function POST(
     [cvId, activeTemplateId]
   );
 
-  await db.execute(
-    `
-    INSERT INTO cv_template_config (
-      cv_id,
-      template_id,
-      accent_color,
-      custom_accent_color
-    ) VALUES (?, ?, ?, ?)
-    `,
-    [cvId, activeTemplateId, body.accentColor, body.customAccentColor ?? null]
-  );
+  const sectionsJson = body.sections ? JSON.stringify(body.sections) : null;
+
+  try {
+    await db.execute(
+      `
+      INSERT INTO cv_template_config (
+        cv_id,
+        template_id,
+        accent_color,
+        custom_accent_color,
+        sections_config
+      ) VALUES (?, ?, ?, ?, ?)
+      `,
+      [
+        cvId,
+        activeTemplateId,
+        body.accentColor,
+        body.customAccentColor ?? null,
+        sectionsJson,
+      ]
+    );
+  } catch {
+    // Fallback if sections_config column doesn't exist yet
+    await db.execute(
+      `
+      INSERT INTO cv_template_config (
+        cv_id,
+        template_id,
+        accent_color,
+        custom_accent_color
+      ) VALUES (?, ?, ?, ?)
+      `,
+      [
+        cvId,
+        activeTemplateId,
+        body.accentColor,
+        body.customAccentColor ?? null,
+      ]
+    );
+  }
 
   return NextResponse.json({ success: true }, { status: 200 });
 }

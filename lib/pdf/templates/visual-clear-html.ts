@@ -1,5 +1,7 @@
 import { CV } from "@/types/cv";
 
+import { SectionConfig } from "@/schemas/template-config";
+
 import {
   escapeHtml,
   getSharedTemplateData,
@@ -26,7 +28,10 @@ function renderBadgeSection(
 
 export function renderVisualClearPreviewHTML(
   cv: CV,
-  options?: PreviewRenderOptions & { accentColor?: string }
+  options?: PreviewRenderOptions & {
+    accentColor?: string;
+    sections?: SectionConfig[];
+  }
 ): string {
   const accentColor = options?.accentColor || "#0066CC";
   const {

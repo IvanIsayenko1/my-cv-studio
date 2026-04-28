@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronDown, Save, X } from "lucide-react";
+import { z } from "zod";
 
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import SelectorDrawer from "@/components/dialogs/selector-drawer";
@@ -37,6 +38,13 @@ import {
   templateConfigSchema,
 } from "@/schemas/template-config";
 
+const accentColorFormSchema = templateConfigSchema.pick({
+  accentColor: true,
+  customAccentColor: true,
+});
+
+type AccentColorFormValues = z.infer<typeof accentColorFormSchema>;
+
 export default function AccentColorForm({
   id,
   configData,
@@ -49,8 +57,8 @@ export default function AccentColorForm({
 
   const { mutate, isPending } = useSaveTemplateConfig(id);
 
-  const form = useForm<TemplateConfigFormValues>({
-    resolver: zodResolver(templateConfigSchema),
+  const form = useForm<AccentColorFormValues>({
+    resolver: zodResolver(accentColorFormSchema),
     mode: "onTouched",
     defaultValues: {
       accentColor: configData?.accentColor || "#0066CC",
@@ -59,7 +67,18 @@ export default function AccentColorForm({
   });
 
   const onSubmit = async (values: TemplateConfigFormValues) => {
-    mutate(values);
+    mutate(
+      {
+        ...configData,
+        accentColor: values.accentColor,
+        customAccentColor: values.customAccentColor,
+      },
+      {
+        onSuccess: () => {
+          form.reset(values);
+        },
+      }
+    );
   };
 
   return (

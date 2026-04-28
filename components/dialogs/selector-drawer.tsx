@@ -23,7 +23,7 @@ export default function SelectorDrawer({
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
         </DrawerHeader>
-        <DrawerDescription className="max-h-[55vh] space-y-1">
+        <DrawerDescription className="max-h-[55vh] space-y-1 overflow-auto">
           {content}
         </DrawerDescription>
       </DrawerContent>

@@ -52,6 +52,7 @@ export async function generateHTMLCVPDF(cv: CV): Promise<Buffer> {
       renderPreviewHTML(cv, {
         fontSource: CV_FONT_DATA_URI,
         accentColor,
+        sections: (cv as any).sections,
       }),
       {
         waitUntil: "domcontentloaded",

@@ -274,12 +274,14 @@ export default function CVPreview({
       accentColor:
         templateConfigData?.customAccentColor ||
         templateConfigData?.accentColor,
+      sections: templateConfigData?.sections,
     });
   }, [
     fullCV,
     fontDataUri,
     templateConfigData?.accentColor,
     templateConfigData?.customAccentColor,
+    templateConfigData?.sections,
   ]);
 
   useEffect(() => {

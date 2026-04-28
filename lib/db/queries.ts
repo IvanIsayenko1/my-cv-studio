@@ -121,14 +121,28 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
        WHERE cv_id = ? LIMIT 1`,
       [cvId]
     ),
-    db.execute(
-      `SELECT accent_color, custom_accent_color FROM cv_template_config
-       WHERE cv_id = ? AND template_id = (
-      SELECT template_id FROM cv_template WHERE cv_id = ? LIMIT 1
-    )
-    LIMIT 1`,
-      [cvId, cvId]
-    ),
+    (async () => {
+      try {
+        return await db.execute(
+          `SELECT accent_color, custom_accent_color, sections_config FROM cv_template_config
+           WHERE cv_id = ? AND template_id = (
+          SELECT template_id FROM cv_template WHERE cv_id = ? LIMIT 1
+        )
+        LIMIT 1`,
+          [cvId, cvId]
+        );
+      } catch {
+        // Fallback if sections_config column doesn't exist yet
+        return await db.execute(
+          `SELECT accent_color, custom_accent_color FROM cv_template_config
+           WHERE cv_id = ? AND template_id = (
+          SELECT template_id FROM cv_template WHERE cv_id = ? LIMIT 1
+        )
+        LIMIT 1`,
+          [cvId, cvId]
+        );
+      }
+    })(),
   ]);
 
   // Personal info, summary, skills, achievementsByWorkId, technologiesByWorkId
@@ -263,6 +277,9 @@ export async function getCompleteCV(cvId: string): Promise<CV | null> {
     templateId,
     accentColor: templateConfig?.accent_color,
     customAccentColor: templateConfig?.custom_accent_color,
+    sections: templateConfig?.sections_config
+      ? JSON.parse(templateConfig.sections_config)
+      : undefined,
   };
 }
 

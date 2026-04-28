@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const sectionConfigSchema = z.object({
+  id: z.string(),
+  label: z.string().min(1, "Section name cannot be empty"),
+  order: z.number().int(),
+  visible: z.boolean(),
+});
+
 export const templateConfigSchema = z.object({
   accentColor: z
     .string()
@@ -12,6 +19,8 @@ export const templateConfigSchema = z.object({
       "Invalid color format"
     )
     .optional(),
+  sections: z.array(sectionConfigSchema).optional(),
 });
 
 export type TemplateConfigFormValues = z.infer<typeof templateConfigSchema>;
+export type SectionConfig = z.infer<typeof sectionConfigSchema>;

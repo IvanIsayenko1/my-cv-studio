@@ -105,4 +105,9 @@ export interface CV {
   templateId: TemplateId;
   accentColor?: string;
   customAccentColor?: string;
+  sections?: Array<{
+    id: string;
+    label: string;
+    order: number;
+  }>;
 }

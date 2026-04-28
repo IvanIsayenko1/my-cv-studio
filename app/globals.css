@@ -189,7 +189,7 @@
   }
 
   .cv-form-actions {
-    @apply flex flex-col justify-end pt-2 gap-2 sm:flex-row;
+    @apply flex flex-col flex-wrap justify-end gap-2 pt-2 sm:flex-row;
   }
 
   .cv-form-primary-action {
