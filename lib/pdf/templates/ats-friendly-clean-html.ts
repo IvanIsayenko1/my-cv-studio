@@ -1,3 +1,5 @@
+import { DEFAULT_CV_SECTIONS } from "@/lib/constants/cv-sections";
+
 import { CV } from "@/types/cv";
 
 import { SectionConfig } from "@/schemas/template-config";
@@ -10,17 +12,6 @@ import {
 } from "./shared";
 import type { PreviewRenderOptions } from "./shared";
 
-const DEFAULT_SECTIONS = [
-  { id: "summary", label: "Summary", order: 0, visible: true },
-  { id: "experience", label: "Experience", order: 1, visible: true },
-  { id: "skills", label: "Skills", order: 2, visible: true },
-  { id: "education", label: "Education", order: 3, visible: true },
-  { id: "languages", label: "Languages", order: 4, visible: true },
-  { id: "projects", label: "Projects", order: 5, visible: true },
-  { id: "certifications", label: "Certifications", order: 6, visible: true },
-  { id: "awards", label: "Awards", order: 7, visible: true },
-];
-
 export function renderATSCleanPreviewHTML(
   cv: CV,
   options?: PreviewRenderOptions & {
@@ -29,7 +20,7 @@ export function renderATSCleanPreviewHTML(
   }
 ): string {
   const accentColor = options?.accentColor || "#0066CC";
-  const sectionConfig = options?.sections || DEFAULT_SECTIONS;
+  const sectionConfig = options?.sections || DEFAULT_CV_SECTIONS;
   const sectionMap = new Map(sectionConfig.map((s) => [s.id, s]));
 
   const {

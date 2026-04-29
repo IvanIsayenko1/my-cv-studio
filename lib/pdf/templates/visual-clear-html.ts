@@ -1,3 +1,5 @@
+import { DEFAULT_CV_SECTIONS } from "@/lib/constants/cv-sections";
+
 import { CV } from "@/types/cv";
 
 import { SectionConfig } from "@/schemas/template-config";
@@ -34,6 +36,9 @@ export function renderVisualClearPreviewHTML(
   }
 ): string {
   const accentColor = options?.accentColor || "#0066CC";
+  const sectionConfig = options?.sections || DEFAULT_CV_SECTIONS;
+  const sectionMap = new Map(sectionConfig.map((s) => [s.id, s]));
+
   const {
     awardItems,
     certificationItems,
@@ -55,237 +60,166 @@ export function renderVisualClearPreviewHTML(
     { text: linksLineHTML, isHtml: true },
   ].filter((item) => item.text);
 
-  const sections: string[] = [];
+  // Build section content map
+  const sectionContent: Record<string, string> = {};
 
   if (cv.professionalSummary) {
-    sections.push(
-      renderBadgeSection(
-        "Profile",
-        `<div class="lead-copy">${renderRichTextBlock(cv.professionalSummary)}</div>`
-      )
+    sectionContent.summary = renderBadgeSection(
+      sectionMap.get("summary")?.label || "Summary",
+      `<div class="lead-copy">${renderRichTextBlock(cv.professionalSummary)}</div>`
     );
   }
 
   if (workItems.length > 0) {
-    sections.push(
-      renderBadgeSection(
-        "Employment History",
-        `<div class="timeline-list">${workItems
-          .map(
-            (item) => `
-              <article class="timeline-entry">
-                <div class="entry-header">
-                  <div>
-                    <h3 class="entry-title">${escapeHtml(item.jobTitle)}${item.company ? `, ${escapeHtml(item.company)}` : ""}</h3>
-                    ${
-                      item.location
-                        ? `<p class="entry-subtitle">${escapeHtml(item.location)}</p>`
-                        : ""
-                    }
-                  </div>
-                  <p class="entry-date">${escapeHtml(item.startDate)}${item.endDate ? ` - ${escapeHtml(item.endDate)}` : ""}</p>
+    sectionContent.experience = renderBadgeSection(
+      sectionMap.get("experience")?.label || "Experience",
+      `<div class="timeline-list">${workItems
+        .map(
+          (item) => `
+            <article class="timeline-entry">
+              <div class="entry-header">
+                <div>
+                  <h3 class="entry-title">${escapeHtml(item.jobTitle)}${item.company ? `, ${escapeHtml(item.company)}` : ""}</h3>
+                  ${item.location ? `<p class="entry-subtitle">${escapeHtml(item.location)}</p>` : ""}
                 </div>
-                ${
-                  item.toolsAndMethods?.length
-                    ? `<p class="entry-tools">${escapeHtml(item.toolsAndMethods.join(" • "))}</p>`
-                    : ""
-                }
-                ${
-                  item.achievements
-                    ? renderRichTextBlock(
-                        item.achievements,
-                        "entry-copy rich-text"
-                      )
-                    : ""
-                }
-              </article>
-            `
-          )
-          .join("")}</div>`
-      )
+                <p class="entry-date">${escapeHtml(item.startDate)}${item.endDate ? ` - ${escapeHtml(item.endDate)}` : ""}</p>
+              </div>
+              ${item.toolsAndMethods?.length ? `<p class="entry-tools">${escapeHtml(item.toolsAndMethods.join(" • "))}</p>` : ""}
+              ${item.achievements ? renderRichTextBlock(item.achievements, "entry-copy rich-text") : ""}
+            </article>
+          `
+        )
+        .join("")}</div>`
     );
   }
-
-  if (projectItems.length > 0) {
-    sections.push(
-      renderBadgeSection(
-        "Projects",
-        `<div class="timeline-list">${projectItems
-          .map(
-            (project) => `
-              <article class="timeline-entry compact">
-                <div class="entry-header">
-                  <div>
-                    <h3 class="entry-title">${escapeHtml(project.name)}${project.role ? `, ${escapeHtml(project.role)}` : ""}</h3>
-                    ${
-                      project.url
-                        ? `<p class="entry-subtitle"><a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(project.url)}</a></p>`
-                        : ""
-                    }
-                  </div>
-                  <p class="entry-date">${escapeHtml(project.startDate)}${project.endDate ? ` - ${escapeHtml(project.endDate)}` : ""}</p>
-                </div>
-                ${
-                  project.description
-                    ? renderRichTextBlock(
-                        project.description,
-                        "entry-copy rich-text"
-                      )
-                    : ""
-                }
-              </article>
-            `
-          )
-          .join("")}</div>`
-      )
-    );
-  }
-
-  const sideSections: string[] = [];
 
   if (skillCategories.length > 0) {
-    sideSections.push(
-      renderBadgeSection(
-        "Skills",
-        `<div class="skills-grid">${skillCategories
-          .map(
-            (category) => `
-              <article class="mini-block">
-                <div class="mini-title">${escapeHtml(category.name)}</div>
-                <div class="mini-copy">${escapeHtml(category.items.join(", "))}</div>
-              </article>
-            `
-          )
-          .join("")}</div>`
-      )
+    sectionContent.skills = renderBadgeSection(
+      sectionMap.get("skills")?.label || "Skills",
+      `<div class="skills-grid">${skillCategories
+        .map(
+          (category) => `
+            <article class="mini-block">
+              <div class="mini-title">${escapeHtml(category.name)}</div>
+              <div class="mini-copy">${escapeHtml(category.items.join(", "))}</div>
+            </article>
+          `
+        )
+        .join("")}</div>`
     );
   }
 
   if (educationItems.length > 0) {
-    sideSections.push(
-      renderBadgeSection(
-        "Education",
-        `<div class="timeline-list timeline-grid timeline-grid-2">${educationItems
-          .map(
-            (item) => `
-              <article class="timeline-entry compact">
-                <div class="entry-header">
-                  <div>
-                    <h3 class="entry-title">${escapeHtml(item.degree)}${item.fieldOfStudy ? `, ${escapeHtml(item.fieldOfStudy)}` : ""}</h3>
-                    <p class="entry-subtitle">${escapeHtml(item.institution)}${item.location ? `, ${escapeHtml(item.location)}` : ""}</p>
-                  </div>
-                  ${
-                    item.graduationDate
-                      ? `<p class="entry-date">${escapeHtml(item.graduationDate)}</p>`
-                      : ""
-                  }
+    sectionContent.education = renderBadgeSection(
+      sectionMap.get("education")?.label || "Education",
+      `<div class="timeline-list timeline-grid timeline-grid-2">${educationItems
+        .map(
+          (item) => `
+            <article class="timeline-entry compact">
+              <div class="entry-header">
+                <div>
+                  <h3 class="entry-title">${escapeHtml(item.degree)}${item.fieldOfStudy ? `, ${escapeHtml(item.fieldOfStudy)}` : ""}</h3>
+                  <p class="entry-subtitle">${escapeHtml(item.institution)}${item.location ? `, ${escapeHtml(item.location)}` : ""}</p>
                 </div>
-                ${
-                  item.honors
-                    ? `<p class="entry-tools">${escapeHtml(item.honors)}</p>`
-                    : ""
-                }
-                ${
-                  item.grade
-                    ? `<p class="entry-tools">Grade: ${escapeHtml(item.grade)}${item.gradingScale ? ` (${escapeHtml(item.gradingScale)})` : ""}</p>`
-                    : ""
-                }
-              </article>
-            `
-          )
-          .join("")}</div>`
-      )
+                ${item.graduationDate ? `<p class="entry-date">${escapeHtml(item.graduationDate)}</p>` : ""}
+              </div>
+              ${item.honors ? `<p class="entry-tools">${escapeHtml(item.honors)}</p>` : ""}
+              ${item.grade ? `<p class="entry-tools">Grade: ${escapeHtml(item.grade)}${item.gradingScale ? ` (${escapeHtml(item.gradingScale)})` : ""}</p>` : ""}
+            </article>
+          `
+        )
+        .join("")}</div>`
     );
   }
 
   if (languageItems.length > 0) {
-    sideSections.push(
-      renderBadgeSection(
-        "Languages",
-        `<div class="language-list">${languageItems
-          .map(
-            (item) => `
-              <div>
-                <p class="mini-title">${escapeHtml(item.language)}${item.proficiency ? `<span class="language-level"> - ${escapeHtml(item.proficiency)}</span>` : ""}</p>
+    sectionContent.languages = renderBadgeSection(
+      sectionMap.get("languages")?.label || "Languages",
+      `<div class="language-list">${languageItems
+        .map(
+          (item) => `
+            <div>
+              <p class="mini-title">${escapeHtml(item.language)}${item.proficiency ? `<span class="language-level"> - ${escapeHtml(item.proficiency)}</span>` : ""}</p>
+            </div>
+          `
+        )
+        .join("")}</div>`,
+      "section-compact"
+    );
+  }
+
+  if (projectItems.length > 0) {
+    sectionContent.projects = renderBadgeSection(
+      sectionMap.get("projects")?.label || "Projects",
+      `<div class="timeline-list">${projectItems
+        .map(
+          (project) => `
+            <article class="timeline-entry compact">
+              <div class="entry-header">
+                <div>
+                  <h3 class="entry-title">${escapeHtml(project.name)}${project.role ? `, ${escapeHtml(project.role)}` : ""}</h3>
+                  ${project.url ? `<p class="entry-subtitle"><a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(project.url)}</a></p>` : ""}
+                </div>
+                <p class="entry-date">${escapeHtml(project.startDate)}${project.endDate ? ` - ${escapeHtml(project.endDate)}` : ""}</p>
               </div>
-            `
-          )
-          .join("")}</div>`,
-        "section-compact"
-      )
+              ${project.description ? renderRichTextBlock(project.description, "entry-copy rich-text") : ""}
+            </article>
+          `
+        )
+        .join("")}</div>`
     );
   }
 
   if (certificationItems.length > 0) {
-    sideSections.push(
-      renderBadgeSection(
-        "Certifications",
-        `<div class="timeline-list timeline-grid timeline-grid-2">${certificationItems
-          .map(
-            (item) => `
-              <article class="timeline-entry compact">
-                <div class="entry-header">
-                  <div>
-                    <h3 class="entry-title">${escapeHtml(item.name)}</h3>
-                    ${
-                      item.issuingOrg
-                        ? `<p class="entry-subtitle">${escapeHtml(item.issuingOrg)}</p>`
-                        : ""
-                    }
-                  </div>
-                  <p class="entry-date">${escapeHtml(item.issueDate)}${item.expirationDate ? ` - ${escapeHtml(item.expirationDate)}` : ""}</p>
+    sectionContent.certifications = renderBadgeSection(
+      sectionMap.get("certifications")?.label || "Certifications",
+      `<div class="timeline-list timeline-grid timeline-grid-2">${certificationItems
+        .map(
+          (item) => `
+            <article class="timeline-entry compact">
+              <div class="entry-header">
+                <div>
+                  <h3 class="entry-title">${escapeHtml(item.name)}</h3>
+                  ${item.issuingOrg ? `<p class="entry-subtitle">${escapeHtml(item.issuingOrg)}</p>` : ""}
                 </div>
-                ${
-                  item.credentialId
-                    ? `<p class="entry-tools">Credential ID: ${escapeHtml(item.credentialId)}</p>`
-                    : ""
-                }
-              </article>
-            `
-          )
-          .join("")}</div>`
-      )
+                <p class="entry-date">${escapeHtml(item.issueDate)}${item.expirationDate ? ` - ${escapeHtml(item.expirationDate)}` : ""}</p>
+              </div>
+              ${item.credentialId ? `<p class="entry-tools">Credential ID: ${escapeHtml(item.credentialId)}</p>` : ""}
+            </article>
+          `
+        )
+        .join("")}</div>`
     );
   }
 
   if (awardItems.length > 0) {
-    sideSections.push(
-      renderBadgeSection(
-        "Awards",
-        `<div class="timeline-list">${awardItems
-          .map(
-            (item) => `
-              <article class="timeline-entry compact">
-                <div class="entry-header">
-                  <div>
-                    <h3 class="entry-title">${escapeHtml(item.name)}</h3>
-                    ${
-                      item.issuer
-                        ? `<p class="entry-subtitle">${escapeHtml(item.issuer)}</p>`
-                        : ""
-                    }
-                  </div>
-                  ${
-                    item.date
-                      ? `<p class="entry-date">${escapeHtml(item.date)}</p>`
-                      : ""
-                  }
+    sectionContent.awards = renderBadgeSection(
+      sectionMap.get("awards")?.label || "Awards",
+      `<div class="timeline-list">${awardItems
+        .map(
+          (item) => `
+            <article class="timeline-entry compact">
+              <div class="entry-header">
+                <div>
+                  <h3 class="entry-title">${escapeHtml(item.name)}</h3>
+                  ${item.issuer ? `<p class="entry-subtitle">${escapeHtml(item.issuer)}</p>` : ""}
                 </div>
-                ${
-                  item.description
-                    ? renderRichTextBlock(
-                        item.description,
-                        "entry-copy rich-text"
-                      )
-                    : ""
-                }
-              </article>
-            `
-          )
-          .join("")}</div>`
-      )
+                ${item.date ? `<p class="entry-date">${escapeHtml(item.date)}</p>` : ""}
+              </div>
+              ${item.description ? renderRichTextBlock(item.description, "entry-copy rich-text") : ""}
+            </article>
+          `
+        )
+        .join("")}</div>`
     );
   }
+
+  // Render sections in configured order, filtering hidden ones
+  const orderedSections = sectionConfig
+    .filter((s) => s.visible !== false)
+    .sort((a, b) => a.order - b.order)
+    .map((s) => sectionContent[s.id])
+    .filter(Boolean);
 
   return `
     <!doctype html>
@@ -662,7 +596,7 @@ export function renderVisualClearPreviewHTML(
           </section>
 
           <section class="main">
-            <div class="layout">${sections.concat(sideSections).join("")}</div>
+            <div class="layout">${orderedSections.join("")}</div>
           </section>
         </main>
       </body>

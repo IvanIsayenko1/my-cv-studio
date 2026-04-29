@@ -38,21 +38,12 @@ import { Spinner } from "@/components/ui/spinner";
 
 import { useSaveTemplateConfig } from "@/hooks/cv/use-template-config";
 
+import { DEFAULT_CV_SECTIONS } from "@/lib/constants/cv-sections";
+
 import {
   TemplateConfigFormValues,
   templateConfigSchema,
 } from "@/schemas/template-config";
-
-const DEFAULT_SECTIONS = [
-  { id: "summary", label: "Summary", order: 0, visible: true },
-  { id: "experience", label: "Experience", order: 1, visible: true },
-  { id: "skills", label: "Skills", order: 2, visible: true },
-  { id: "education", label: "Education", order: 3, visible: true },
-  { id: "languages", label: "Languages", order: 4, visible: true },
-  { id: "projects", label: "Projects", order: 5, visible: true },
-  { id: "certifications", label: "Certifications", order: 6, visible: true },
-  { id: "awards", label: "Awards", order: 7, visible: true },
-];
 
 const sectionConfigFormSchema = templateConfigSchema
   .pick({ sections: true })
@@ -144,7 +135,7 @@ export default function SectionConfigForm({
 
   const sections = configData?.sections?.length
     ? configData.sections
-    : DEFAULT_SECTIONS;
+    : DEFAULT_CV_SECTIONS;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(sectionConfigFormSchema),
@@ -179,7 +170,7 @@ export default function SectionConfigForm({
 
   const resetOrder = () => {
     const current = form.getValues("sections");
-    const sorted = [...DEFAULT_SECTIONS].map((def) => {
+    const sorted = [...DEFAULT_CV_SECTIONS].map((def) => {
       const existing = current.find((s) => s.id === def.id);
       return existing ? { ...existing, order: def.order } : { ...def };
     });
@@ -192,7 +183,7 @@ export default function SectionConfigForm({
   const resetNames = () => {
     const current = form.getValues("sections");
     const renamed = current.map((s) => {
-      const def = DEFAULT_SECTIONS.find((d) => d.id === s.id);
+      const def = DEFAULT_CV_SECTIONS.find((d) => d.id === s.id);
       return def ? { ...s, label: def.label } : s;
     });
     form.setValue("sections", renamed, {

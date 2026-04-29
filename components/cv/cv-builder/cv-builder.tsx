@@ -35,7 +35,7 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
               <TabsList>
                 <TabsTrigger value="data">Data</TabsTrigger>
                 <TabsTrigger value="template">Template</TabsTrigger>
-                <TabsTrigger value="config">Personalize</TabsTrigger>
+                <TabsTrigger value="config">Personalization</TabsTrigger>
                 <TabsTrigger value="preview" className="lg:hidden">
                   Preview
                 </TabsTrigger>
