@@ -51,6 +51,8 @@ const createEmptyCategory = () => ({
 export function SkillsForm({
   id,
   formData,
+  sectionLabel,
+  sectionVisible,
 }: BuilderFormProps<SkillsFormValues>) {
   const [removeCategoryIndex, setRemoveCategoryIndex] = useState<number | null>(
     null
@@ -112,7 +114,8 @@ export function SkillsForm({
     <>
       <SectionWrapper
         sectionId="skills"
-        title="Skills"
+        title={sectionLabel || "Skills"}
+        hiddenInPreview={sectionVisible === false}
         description="Add custom skill categories that match your profession."
         cvId={id}
         status={

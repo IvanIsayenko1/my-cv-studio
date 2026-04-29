@@ -38,6 +38,8 @@ import { EducationFormValues, educationSchema } from "@/types/education";
 export function EducationForm({
   id,
   formData,
+  sectionLabel,
+  sectionVisible,
 }: BuilderFormProps<EducationFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const [openItems, setOpenItems] = useState<string[]>([]);
@@ -107,7 +109,8 @@ export function EducationForm({
     <>
       <SectionWrapper
         sectionId="education"
-        title="Education"
+        title={sectionLabel || "Education"}
+        hiddenInPreview={sectionVisible === false}
         description="Add your degrees and relevant academic qualifications."
         cvId={id}
         status={

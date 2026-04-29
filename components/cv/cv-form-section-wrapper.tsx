@@ -1,5 +1,7 @@
+import { EyeOff } from "lucide-react";
 import { ReactNode } from "react";
 
+import { Badge } from "../ui/badge";
 import { CollapsibleCard } from "../ui/collapsible-card";
 
 export default function SectionWrapper({
@@ -9,6 +11,7 @@ export default function SectionWrapper({
   children,
   description,
   cvId,
+  hiddenInPreview,
 }: {
   status?: ReactNode;
   sectionId: string;
@@ -16,6 +19,7 @@ export default function SectionWrapper({
   title: string;
   children: ReactNode;
   description?: string;
+  hiddenInPreview?: boolean;
 }) {
   const localStorageKey = `cv-form-closed-sections-${cvId}`;
   const getClosedSections = () => {
@@ -50,7 +54,15 @@ export default function SectionWrapper({
           <h4 className="font-display scroll-m-20 text-xl font-semibold tracking-tight">
             {title}
           </h4>
-          <span className="flex hover:no-underline"> {status}</span>
+          <span className="flex items-center gap-2 hover:no-underline">
+            {hiddenInPreview && (
+              <Badge variant="outline" className="gap-1 text-muted-foreground">
+                <EyeOff className="h-3 w-3" />
+                Hidden
+              </Badge>
+            )}
+            {status}
+          </span>
         </div>
       }
       description={description}

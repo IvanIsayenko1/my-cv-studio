@@ -40,6 +40,8 @@ import {
 export function CertificationsForm({
   id,
   formData,
+  sectionLabel,
+  sectionVisible,
 }: BuilderFormProps<CertificationsFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const [openItems, setOpenItems] = useState<string[]>([]);
@@ -92,7 +94,8 @@ export function CertificationsForm({
     <>
       <SectionWrapper
         sectionId="certifications"
-        title="Certifications"
+        title={sectionLabel || "Certifications"}
+        hiddenInPreview={sectionVisible === false}
         description="List your relevant certifications and credentials."
         cvId={id}
         status={<FormStatusBedge isNotSaved={formState.isDirty} />}

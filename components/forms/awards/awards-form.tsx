@@ -32,14 +32,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { useSaveAwards } from "@/hooks/cv/use-awards";
 import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
+import { BuilderFormProps } from "@/types/builder-form";
 import { AwardsFormValues, awardsSchema } from "@/types/awards";
 
-interface AwardsFormProps {
-  id: string;
-  formData: AwardsFormValues;
-}
-
-export function AwardsForm({ id, formData }: AwardsFormProps) {
+export function AwardsForm({
+  id,
+  formData,
+  sectionLabel,
+  sectionVisible,
+}: BuilderFormProps<AwardsFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const [openItems, setOpenItems] = useState<string[]>([]);
 
@@ -89,7 +90,8 @@ export function AwardsForm({ id, formData }: AwardsFormProps) {
     <>
       <SectionWrapper
         sectionId="awards"
-        title="Awards"
+        title={sectionLabel || "Awards"}
+        hiddenInPreview={sectionVisible === false}
         description="Add notable awards or recognitions relevant to your career."
         cvId={id}
         status={<FormStatusBedge isNotSaved={formState.isDirty} />}

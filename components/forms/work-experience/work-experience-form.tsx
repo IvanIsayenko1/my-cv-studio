@@ -61,6 +61,8 @@ import {
 export function WorkExperienceForm({
   id,
   formData,
+  sectionLabel,
+  sectionVisible,
 }: BuilderFormProps<WorkExperienceFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const [openItems, setOpenItems] = useState<string[]>([]);
@@ -140,7 +142,8 @@ export function WorkExperienceForm({
     <>
       <SectionWrapper
         sectionId="work-experience"
-        title="Work Experience"
+        title={sectionLabel || "Work Experience"}
+        hiddenInPreview={sectionVisible === false}
         description="Add your recent roles, focusing on achievements and impact."
         cvId={id}
         status={

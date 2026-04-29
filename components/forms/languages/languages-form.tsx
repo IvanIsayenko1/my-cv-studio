@@ -55,6 +55,8 @@ const createEmptyLanguage = () => ({
 export function LanguagesForm({
   id,
   formData,
+  sectionLabel,
+  sectionVisible,
 }: BuilderFormProps<LanguagesFormValues>) {
   const [removeLanguageIndex, setRemoveLanguageIndex] = useState<number | null>(
     null
@@ -118,7 +120,8 @@ export function LanguagesForm({
     <>
       <SectionWrapper
         sectionId="languages"
-        title="Languages"
+        title={sectionLabel || "Languages"}
+        hiddenInPreview={sectionVisible === false}
         description="Add languages you speak and your proficiency level."
         cvId={id}
         status={

@@ -39,6 +39,8 @@ import { SummaryFormValues, summarySchema } from "@/types/summary";
 export function SummaryForm({
   id,
   formData,
+  sectionLabel,
+  sectionVisible,
 }: BuilderFormProps<SummaryFormValues>) {
   const { mutate, isPending } = useSaveSummary(id);
   const [isOpenAIAssistantDialog, setIsOpenAIAssistantDialog] = useState(false);
@@ -64,7 +66,8 @@ export function SummaryForm({
   return (
     <SectionWrapper
       sectionId="summary"
-      title="Professional Summary"
+      title={sectionLabel || "Professional Summary"}
+      hiddenInPreview={sectionVisible === false}
       description="Write a concise, 3–5 sentence summary that highlights your key skills, experience, and target role."
       cvId={id}
       status={

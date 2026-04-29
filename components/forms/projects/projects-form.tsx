@@ -38,6 +38,8 @@ import { ProjectsFormValues, projectsSchema } from "@/types/projects";
 export function ProjectsForm({
   id,
   formData,
+  sectionLabel,
+  sectionVisible,
 }: BuilderFormProps<ProjectsFormValues>) {
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const [openItems, setOpenItems] = useState<string[]>([]);
@@ -93,7 +95,8 @@ export function ProjectsForm({
     <>
       <SectionWrapper
         sectionId="projects"
-        title="Projects"
+        title={sectionLabel || "Projects"}
+        hiddenInPreview={sectionVisible === false}
         description="Add notable projects that showcase your skills and impact."
         cvId={id}
         status={<FormStatusBedge isNotSaved={formState.isDirty} />}
