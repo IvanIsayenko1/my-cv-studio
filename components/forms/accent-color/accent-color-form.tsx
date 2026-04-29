@@ -135,7 +135,7 @@ export default function AccentColorForm({
                     ) : (
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="secondary"
                         className="h-11 w-full justify-between px-3"
                         onClick={() => setShowColorPicker(true)}
                         aria-label="Choose accent color"
@@ -177,7 +177,7 @@ export default function AccentColorForm({
                       {field.value && (
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="secondary"
                           size="icon"
                           onClick={() => {
                             form.setValue("customAccentColor", "", {
@@ -199,7 +199,7 @@ export default function AccentColorForm({
             <div className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!form.formState.isDirty || isPending}
                 onClick={() => form.reset()}
               >
@@ -234,9 +234,8 @@ export default function AccentColorForm({
             <Button
               key={option.value}
               type="button"
-              variant={selected ? "default" : "ghost"}
-              size="lg"
-              className="h-12 w-full justify-between px-4 text-left"
+              variant={selected ? "default" : "secondary"}
+              className="w-full justify-between"
               onClick={() => {
                 if (form.getValues("accentColor") === null) return;
                 form.setValue("accentColor", option.value, {

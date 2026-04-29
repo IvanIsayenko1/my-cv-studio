@@ -337,7 +337,7 @@ export function PersonalInfoForm({
             <CardFooter className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!isLastProfessionaLinkFilled}
                 onClick={() => append({ label: "", url: "" })}
                 className="cv-form-primary-action"
@@ -360,7 +360,7 @@ export function PersonalInfoForm({
             />
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               disabled={!form.formState.isDirty || isPending}
               onClick={() => form.reset()}
             >

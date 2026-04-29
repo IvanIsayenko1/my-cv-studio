@@ -121,7 +121,7 @@ export function SummaryForm({
             />
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               disabled={!form.formState.isDirty || isPending}
               onClick={() => form.reset()}
             >

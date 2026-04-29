@@ -302,7 +302,7 @@ export function EducationForm({
             <div className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!requiredFilledForLast}
                 className="cv-form-primary-action"
                 onClick={() => {
@@ -324,7 +324,7 @@ export function EducationForm({
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!form.formState.isDirty || isPending}
                 onClick={() => form.reset()}
               >

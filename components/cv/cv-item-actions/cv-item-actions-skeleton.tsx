@@ -7,6 +7,7 @@ export default function CVItemActionsSkeleton() {
       <Skeleton className="size-10 rounded-full" />
       <Skeleton className="size-10 rounded-full" />
       <Skeleton className="size-10 rounded-full" />
+      <Skeleton className="size-10 rounded-full" />
     </div>
   );
 }

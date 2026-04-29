@@ -200,7 +200,7 @@ export function SkillsForm({
             <div className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!canAddCategory}
                 className="cv-form-primary-action"
                 onClick={() => {
@@ -231,7 +231,7 @@ export function SkillsForm({
 
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!form.formState.isDirty || isPending}
                 onClick={() => form.reset()}
               >

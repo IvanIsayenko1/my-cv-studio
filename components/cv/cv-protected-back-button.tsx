@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUnsavedChangesContext } from "@/lib/contexts/unsaved-changes-context";
-import { Button } from "@/components/ui/button";
+
 import { ArrowLeftIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+
+import { useUnsavedChangesContext } from "@/lib/contexts/unsaved-changes-context";
 
 interface CVProtectedBackButtonProps {
   href: string;
@@ -31,13 +34,7 @@ export function CVProtectedBackButton({
   };
 
   return (
-    <Button
-      asChild
-      variant="outline"
-      size="icon-lg"
-      className={`!p-0 ${className || ""}`}
-      aria-label="Go Back"
-    >
+    <Button asChild variant="outline" size="icon-lg" aria-label="Go Back">
       <Link href={href} onClick={handleClick}>
         <ArrowLeftIcon aria-hidden="true" />
       </Link>

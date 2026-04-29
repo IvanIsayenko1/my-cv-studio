@@ -47,10 +47,10 @@ export default function CVDropdownActions({ id }: { id: string }) {
       <Drawer open={openedMenu} onOpenChange={setOpenedMenu}>
         <DrawerTrigger asChild>
           <Button
-            variant={"outline"}
+            variant="outline"
             aria-label="Open menu"
-            size={"icon-lg"}
             onClick={(e) => e.stopPropagation()}
+            size="icon-lg"
           >
             <MoreVerticalIcon />
           </Button>
@@ -66,69 +66,59 @@ export default function CVDropdownActions({ id }: { id: string }) {
 
           <DrawerDescription className="flex max-h-[70dvh] flex-col gap-2 p-3">
             <Button
-              size={"lg"}
-              variant="ghost"
-              className="flex h-14 flex-row justify-between font-normal"
+              variant="secondary"
               disabled={!isCVReady}
               onClick={() => {
                 setOpenedMenu(false);
                 setOpenedShare(true);
               }}
             >
-              <span>Share</span>
               <Share />
+              <span>Share</span>
             </Button>
             <Button
-              size={"lg"}
-              variant="ghost"
-              className="flex h-14 flex-row justify-between font-normal"
+              variant="secondary"
               disabled={!isCVReady}
               onClick={() => {
                 setOpenedMenu(false);
                 setOpenendDuplicate(true);
               }}
             >
-              <span>Duplicate</span>
               <Copy />
+              <span>Duplicate</span>
             </Button>
             <Button
-              size={"lg"}
-              variant="ghost"
-              className="flex h-14 flex-row justify-between font-normal"
+              variant="secondary"
               disabled={!isCVReady || isDownloadPending}
               onClick={() => {
                 setOpenedMenu(false);
                 downloadCV(id);
               }}
             >
-              <span>Download</span>
               <Download />
+              <span>Download</span>
             </Button>
             <Button
-              size={"lg"}
-              variant="ghost"
-              className="flex h-14 flex-row justify-between font-normal"
+              variant="secondary"
               disabled={isDownloadPending}
               onClick={() => {
                 setOpenedMenu(false);
                 setOpenedRename(true);
               }}
             >
-              <span>Rename</span>
               <EditIcon />
+              <span>Rename</span>
             </Button>
             <Button
-              size={"lg"}
-              variant="ghost"
-              className="text-destructive flex h-14 flex-row justify-between font-normal"
+              variant="destructive"
               onClick={() => {
                 setOpenedMenu(false);
                 setOpenendDelete(true);
               }}
               disabled={isDownloadPending}
             >
-              <span>Delete</span>
               <Trash />
+              <span>Delete</span>
             </Button>
           </DrawerDescription>
         </DrawerContent>

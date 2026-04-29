@@ -1,6 +1,12 @@
 import { useState } from "react";
 
-import { CopyIcon, DownloadIcon, EditIcon, Share2Icon } from "lucide-react";
+import {
+  CopyIcon,
+  DownloadIcon,
+  EditIcon,
+  Share2Icon,
+  TrashIcon,
+} from "lucide-react";
 
 import DeleteCVDialog from "@/components/dialogs/delete-cv-dialog";
 import DuplicateCVDialog from "@/components/dialogs/duplicate-cv-dialog";
@@ -67,6 +73,15 @@ export default function CVItemActions({ id }: { id: string }) {
           disabled={!isCVReady}
         >
           <EditIcon />
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            setIsOpenDeleteDialog(true);
+          }}
+          disabled={isDownloadPending}
+        >
+          <TrashIcon />
         </Button>
       </div>
 

@@ -99,7 +99,7 @@ function SortableSection({
         />
         <Button
           type="button"
-          variant="outline"
+          variant="secondary"
           size="icon-lg"
           onClick={onToggleVisible}
           className="flex-shrink-0"
@@ -256,17 +256,17 @@ export default function SectionConfigForm({
           />
 
           <div className="cv-form-actions">
-            <Button type="button" variant="outline" onClick={resetOrder}>
+            <Button type="button" variant="secondary" onClick={resetOrder}>
               <RotateCcw className="h-3.5 w-3.5" />
               Reset order
             </Button>
-            <Button type="button" variant="outline" onClick={resetNames}>
+            <Button type="button" variant="secondary" onClick={resetNames}>
               <RotateCcw className="h-3.5 w-3.5" />
               Reset names
             </Button>
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               disabled={!form.formState.isDirty || isPending}
               onClick={() => form.reset()}
             >

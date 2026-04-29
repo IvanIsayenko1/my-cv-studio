@@ -32,8 +32,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { useSaveAwards } from "@/hooks/cv/use-awards";
 import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
 
-import { BuilderFormProps } from "@/types/builder-form";
 import { AwardsFormValues, awardsSchema } from "@/types/awards";
+import { BuilderFormProps } from "@/types/builder-form";
 
 export function AwardsForm({
   id,
@@ -218,7 +218,7 @@ export function AwardsForm({
             <div className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 className="cv-form-primary-action"
                 disabled={!canAddAward}
                 onClick={() => {
@@ -236,7 +236,7 @@ export function AwardsForm({
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!form.formState.isDirty || isPending}
                 onClick={() => form.reset()}
               >

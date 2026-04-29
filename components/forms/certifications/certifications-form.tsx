@@ -232,7 +232,7 @@ export function CertificationsForm({
             <div className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 className="cv-form-primary-action"
                 disabled={!canAddCertification}
                 onClick={() => {
@@ -251,7 +251,7 @@ export function CertificationsForm({
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!form.formState.isDirty || isPending}
                 onClick={() => form.reset()}
               >

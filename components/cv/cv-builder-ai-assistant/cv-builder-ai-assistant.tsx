@@ -27,7 +27,7 @@ export default function CVBuilderAIAssistant<T>({
 
   return (
     <Button
-      variant="outline"
+      variant="secondary"
       type="button"
       onClick={async () => {
         setLoading(true);

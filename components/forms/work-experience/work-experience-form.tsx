@@ -258,7 +258,7 @@ export function WorkExperienceForm({
                                 <Button
                                   type="button"
                                   variant="secondary"
-                                  className="bg-input/50 w-full justify-between px-3 text-base md:text-sm"
+                                  className="bg-input/50 w-full justify-between px-3 text-base"
                                   onClick={() =>
                                     setEmploymentPickerIndex(index)
                                   }
@@ -417,7 +417,7 @@ export function WorkExperienceForm({
             <div className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 className="cv-form-primary-action"
                 disabled={!requiredFilledForLast}
                 onClick={() => {
@@ -451,7 +451,7 @@ export function WorkExperienceForm({
               />
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!form.formState.isDirty || isPending}
                 onClick={() => form.reset()}
               >
@@ -523,9 +523,8 @@ export function WorkExperienceForm({
             <Button
               key={option}
               type="button"
-              variant={selected ? "default" : "ghost"}
-              size="lg"
-              className="h-12 w-full justify-between px-4 text-left"
+              variant={selected ? "default" : "secondary"}
+              className="w-full justify-between"
               onClick={() => {
                 if (employmentPickerIndex === null) return;
                 form.setValue(

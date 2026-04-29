@@ -195,8 +195,8 @@ export function LanguagesForm({
                               ) : (
                                 <Button
                                   type="button"
-                                  variant="outline"
-                                  className="h-11 w-full justify-between px-3"
+                                  variant="secondary"
+                                  className="bg-input/50 w-full justify-between px-3 text-base"
                                   onClick={() =>
                                     setProficiencyPickerIndex(index)
                                   }
@@ -236,7 +236,7 @@ export function LanguagesForm({
             <div className="cv-form-actions">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!canAddLanguage}
                 className="cv-form-primary-action"
                 onClick={() => {
@@ -252,7 +252,7 @@ export function LanguagesForm({
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 disabled={!form.formState.isDirty || isPending}
                 onClick={() => form.reset()}
               >
@@ -305,9 +305,8 @@ export function LanguagesForm({
             <Button
               key={option.value}
               type="button"
-              variant={selected ? "secondary" : "ghost"}
-              size="lg"
-              className="h-12 w-full justify-between px-4 text-left"
+              variant={selected ? "default" : "secondary"}
+              className="w-full justify-between"
               onClick={() => {
                 if (proficiencyPickerIndex === null) return;
                 form.setValue(

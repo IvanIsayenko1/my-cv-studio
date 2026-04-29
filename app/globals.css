@@ -141,6 +141,65 @@
     letter-spacing: 0;
   }
 
+  /* Mobile-first typography scale
+   * Labels and body text stay readable across breakpoints.
+   * Only large headings scale down on bigger screens.
+   */
+  .text-mobile-xs {
+    @apply text-xs;
+  }
+
+  .text-mobile-sm {
+    @apply text-sm;
+  }
+
+  .text-mobile-base {
+    @apply text-base sm:text-sm;
+  }
+
+  .text-mobile-lg {
+    @apply text-lg sm:text-base;
+  }
+
+  .text-mobile-xl {
+    @apply text-xl sm:text-lg;
+  }
+
+  .text-mobile-2xl {
+    @apply text-2xl sm:text-xl;
+  }
+
+  /* Mobile-first height scale for touch targets */
+  .h-touch-sm {
+    @apply h-10 sm:h-9 md:h-9;
+  }
+
+  .h-touch {
+    @apply h-11 sm:h-10 md:h-10;
+  }
+
+  .h-touch-lg {
+    @apply h-12 sm:h-11 md:h-11;
+  }
+
+  /* Mobile-optimized form field heights */
+  .h-field {
+    @apply h-11 sm:h-10;
+  }
+
+  .h-field-lg {
+    @apply h-12 sm:h-11;
+  }
+
+  /* Mobile gesture utilities */
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+
+  .gesture-hint {
+    @apply text-xs text-muted-foreground animate-pulse;
+  }
+
   .load-stagger {
     animation: rise-in var(--motion-slow) var(--motion-ease-emphasis) both;
     animation-delay: calc(var(--stagger, 0) * 90ms + var(--base-delay, 0ms));

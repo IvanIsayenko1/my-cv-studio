@@ -54,11 +54,13 @@ export default function CVDesktopActions({ id }: { id: string }) {
             e.stopPropagation();
             setIsOpenShareDialog(true);
           }}
+          size="sm"
         >
           <Share />
           Share
         </Button>
         <Button
+          size="sm"
           variant="outline"
           onClick={(e) => {
             e.stopPropagation();
