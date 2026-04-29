@@ -74,7 +74,7 @@ export default function ProfessionalSummaryAIAssistantDialog({
         onAccept={handleAcceptSuggestion}
         isPending={isPending && isApplyingSuggestion}
       >
-        <CardContent>
+        <CardContent className="m-[1px]">
           <Field className="gap-2">
             <FieldLabel htmlFor="professional-summary-ai-suggestion">
               Suggested Professional Summary
@@ -93,7 +93,7 @@ export default function ProfessionalSummaryAIAssistantDialog({
         </CardContent>
       </AIContentSuggestionCard>
     ) : (
-      <Card>
+      <Card className="m-[1px]">
         <CardHeader>
           <CardTitle>All good!</CardTitle>
           <CardDescription>

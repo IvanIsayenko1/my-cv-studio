@@ -50,7 +50,7 @@ export default function CVItem({
       <div className="group/card bg-card flex h-full flex-col overflow-hidden rounded-4xl border">
         {/* Template preview thumbnail */}
         {template?.previewSrc && (
-          <div className="bg-muted relative h-36 w-full overflow-hidden">
+          <div className="bg-muted relative h-36 w-full overflow-hidden outline outline-1 outline-black/10 dark:outline-white/10 -outline-offset-1">
             <Image
               src={template.previewSrc}
               alt={templateLabel}
@@ -64,14 +64,14 @@ export default function CVItem({
         {/* Card body */}
         <div className="flex flex-1 flex-col gap-3 p-4">
           {/* Title */}
-          <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight">
+          <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight text-balance">
             {cv.title}
           </h4>
 
           {/* Info Row: Status | Date | Template */}
           <div className="flex flex-wrap items-center gap-2">
             <CVStatus id={cv.id} />
-            <span className="text-muted-foreground text-xs">
+            <span className="text-muted-foreground text-xs tabular-nums">
               {createdLabel}
             </span>
             <span className="text-muted-foreground text-xs">
