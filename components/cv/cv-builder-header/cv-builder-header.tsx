@@ -1,6 +1,6 @@
 "use client";
 
-import { CSSProperties, Suspense } from "react";
+import { Suspense } from "react";
 
 import { useParams } from "next/navigation";
 
@@ -16,7 +16,6 @@ import CVBuilderMenuSkeleton from "./cv-builder-menu-skeleton";
 export default function CVBuilderHeader() {
   const params = useParams();
   const id = params.id as string;
-  const stagger = (value: number) => ({ "--stagger": value }) as CSSProperties;
 
   return (
     <header
@@ -26,10 +25,7 @@ export default function CVBuilderHeader() {
       <div className="mx-auto px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
         <div className="flex items-center justify-between gap-4 sm:gap-6">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4 md:flex">
-            <CVProtectedBackButton
-              href={ROUTES.CV_LIST}
-              className={`${stagger(0)}`}
-            />
+            <CVProtectedBackButton href={ROUTES.CV_LIST} />
             <Suspense fallback={<Skeleton className="h-9 w-32" />}>
               <CVBuilderTitle id={id} />
             </Suspense>

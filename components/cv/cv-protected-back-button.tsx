@@ -11,13 +11,9 @@ import { useUnsavedChangesContext } from "@/lib/contexts/unsaved-changes-context
 
 interface CVProtectedBackButtonProps {
   href: string;
-  className?: string;
 }
 
-export function CVProtectedBackButton({
-  href,
-  className,
-}: CVProtectedBackButtonProps) {
+export function CVProtectedBackButton({ href }: CVProtectedBackButtonProps) {
   const router = useRouter();
   const { hasUnsavedChanges, setDialogOpen, setPendingNavigation } =
     useUnsavedChangesContext();
