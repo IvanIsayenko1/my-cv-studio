@@ -150,7 +150,7 @@ export default async function Home() {
                   priority
                 />
               </div>
-              <div className="bg-primary text-primary-foreground dark:bg-primary absolute -right-4 -bottom-4 rounded-3xl px-4 py-2 text-sm font-medium shadow-lg">
+              <div className="bg-primary text-primary-foreground dark:bg-primary absolute -right-4 -bottom-4 rounded-3xl px-4 py-2 text-sm font-medium shadow-sm">
                 ATS Optimized
               </div>
             </div>
@@ -173,7 +173,7 @@ export default async function Home() {
 
           <div className="grid gap-2 sm:grid-cols-3">
             {/* Forms Feature */}
-            <article className="bg-background border-border/70 hover:border-accent/30 rounded-3xl border p-8 transition-all hover:shadow-lg">
+            <article className="bg-background border-border/70 hover:border-accent/30 rounded-3xl border p-8 transition-all hover:shadow-sm">
               <div className="space-y-4">
                 <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-3xl">
                   <FileText className="text-primary-foreground h-6 w-6" />
@@ -190,7 +190,7 @@ export default async function Home() {
             </article>
 
             {/* AI Assistance Feature */}
-            <article className="bg-background border-border/70 hover:border-accent/30 rounded-3xl border p-8 transition-all hover:shadow-lg">
+            <article className="bg-background border-border/70 hover:border-accent/30 rounded-3xl border p-8 transition-all hover:shadow-sm">
               <div className="space-y-4">
                 <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-3xl">
                   <Wand2 className="text-primary-foreground h-6 w-6" />
@@ -207,7 +207,7 @@ export default async function Home() {
             </article>
 
             {/* Templates Feature */}
-            <article className="bg-background border-border/70 hover:border-accent/30 rounded-3xl border p-8 transition-all hover:shadow-lg">
+            <article className="bg-background border-border/70 hover:border-accent/30 rounded-3xl border p-8 transition-all hover:shadow-sm">
               <div className="space-y-4">
                 <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-3xl">
                   <Layout className="text-primary-foreground h-6 w-6" />

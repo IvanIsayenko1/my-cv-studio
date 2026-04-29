@@ -112,7 +112,7 @@ function PreviewPage({
 
   return (
     <article
-      className="border-border relative w-full overflow-hidden rounded-3xl border bg-white shadow-lg"
+      className="border-border relative w-full overflow-hidden rounded-3xl border bg-white shadow-sm"
       style={{ aspectRatio: `${PAGE_WIDTH_MM} / ${PAGE_HEIGHT_MM}` }}
     >
       <div

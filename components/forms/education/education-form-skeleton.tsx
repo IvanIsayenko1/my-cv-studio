@@ -13,7 +13,7 @@ export default function EducationFormSkeleton({
   collapsed?: boolean;
 }) {
   return (
-    <Card className="gap-0 p-0">
+    <Card className="m-[1px] gap-0 p-0">
       <CardHeader className="gap-2 p-6">
         <CardTitle className="flex items-center gap-2">
           <Skeleton className="h-7 w-28" />

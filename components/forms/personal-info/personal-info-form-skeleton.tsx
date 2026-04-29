@@ -14,7 +14,7 @@ export default function PersonalInfoFormSkeleton({
   collapsed?: boolean;
 }) {
   return (
-    <Card className="m-1 gap-0 py-0">
+    <Card className="m-[1px] gap-0 py-0">
       <CardHeader className="gap-2 px-4 py-6 sm:px-6">
         <CardTitle className="flex items-center gap-2">
           <Skeleton className="h-7 w-52" />

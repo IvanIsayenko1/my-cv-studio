@@ -32,15 +32,15 @@ export default function CVTemplateForm({ id }: { id: string }) {
           className={cn(
             "w-72 cursor-pointer py-2 transition-all duration-200",
             isSelected
-              ? "border-primary ring-primary/20 border-2 shadow-lg"
-              : "hover:ring-primary/10 hover:shadow-lg"
+              ? "border-primary ring-primary/20 border-2 shadow-sm"
+              : "hover:ring-primary/10 hover:shadow-sm"
           )}
           onClick={() => {
             if (!isPending && !isSelected) mutate({ id: template.id });
           }}
         >
           {isSelected && (
-            <div className="bg-primary text-primary-foreground absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full shadow-md">
+            <div className="bg-primary text-primary-foreground absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full shadow-sm">
               <Check size={18} />
             </div>
           )}

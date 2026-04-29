@@ -5,9 +5,9 @@ import { CSSProperties, Suspense } from "react";
 import { useParams } from "next/navigation";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
-import CVConfigForm from "../cv-config/cv-config-form";
-import CVConfigFormSkeleton from "../cv-config/cv-config-form-skeleton";
 import CVDataForm from "../cv-data-form";
+import CVPersonalizationForm from "../cv-personalization/cv-personalization-form";
+import CVPersonalizationFormSkeleton from "../cv-personalization/cv-personalization-form-skeleton";
 import CVPreview from "../cv-preview";
 import CVPreviewSkeleton from "../cv-preview-skeleton";
 import CVTemplateForm from "../cv-template-form";
@@ -41,7 +41,7 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="data" className="w-full overflow-y-auto p-1">
+              <TabsContent value="data" className="w-full overflow-y-auto pt-1">
                 <div
                   className="no-scrollbar load-stagger min-h-0 w-full flex-1 overflow-y-auto"
                   style={stagger(2)}
@@ -55,7 +55,7 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
 
               <TabsContent
                 value="template"
-                className="load-stagger w-full overflow-y-auto p-1"
+                className="load-stagger w-full overflow-y-auto pt-1"
               >
                 {/* TEMPLATE FORM */}
                 <CVTemplateForm id={id} />
@@ -63,15 +63,15 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
 
               <TabsContent
                 value="config"
-                className="flex w-full overflow-y-auto p-1"
+                className="flex w-full overflow-y-auto pt-1"
               >
                 <div
                   className="no-scrollbar load-stagger min-h-0 w-full flex-1 overflow-y-auto"
                   style={stagger(2)}
                 >
                   {/* CONFIG FORM */}
-                  <Suspense fallback={<CVConfigFormSkeleton />}>
-                    <CVConfigForm />
+                  <Suspense fallback={<CVPersonalizationFormSkeleton />}>
+                    <CVPersonalizationForm />
                   </Suspense>
                 </div>
               </TabsContent>
@@ -95,7 +95,7 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
 
           {/* Preview panel — desktop (lg+) only */}
           <aside
-            className="no-scrollbar load-stagger hidden min-h-0 flex-1 overflow-y-auto pb-4 lg:block"
+            className="no-scrollbar load-stagger hidden min-h-0 flex-1 overflow-y-auto p-[1px] pb-4 lg:block"
             style={stagger(6)}
           >
             <Suspense fallback={<CVPreviewSkeleton />}>

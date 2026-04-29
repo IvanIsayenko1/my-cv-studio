@@ -44,7 +44,7 @@ export default function CVItem({
     >
       <div
         onClick={handleCardClick}
-        className="group/card bg-card flex h-full cursor-pointer flex-col gap-3 overflow-hidden rounded-4xl p-4 shadow-sm transition-[box-shadow] duration-300 hover:shadow-md"
+        className="group/card bg-card flex h-full cursor-pointer flex-col gap-3 overflow-hidden rounded-4xl border p-4 shadow-sm transition-[box-shadow] duration-300 hover:shadow-sm"
       >
         {/* Title */}
         <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5 active:scale-[0.96]">
@@ -59,7 +59,10 @@ export default function CVItem({
         </div>
 
         {/* Action Menu */}
-        <div className="mt-auto flex justify-end pt-2" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="mt-auto flex justify-end pt-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Suspense fallback={<CVBuilderMenuSkeleton />}>
             <CVBuilderMenu id={cv.id} />
           </Suspense>

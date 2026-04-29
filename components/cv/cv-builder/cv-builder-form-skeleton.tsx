@@ -74,12 +74,6 @@ export default function CVBuilderFormSkeleton() {
       <div className="load-stagger" style={stagger(11)}>
         <AwardsFormSkeleton collapsed={collapsedSections.includes("awards")} />
       </div>
-
-      <div className="load-stagger" style={stagger(12)}>
-        <TemplateFormSkeleton
-          collapsed={collapsedSections.includes("template")}
-        />
-      </div>
     </div>
   );
 }

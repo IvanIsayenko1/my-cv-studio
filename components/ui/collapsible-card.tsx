@@ -47,7 +47,7 @@ export function CollapsibleCard({
   return (
     <section
       className={cn(
-        "bg-card text-card-foreground rounded-4xl border shadow-md",
+        "bg-card text-card-foreground rounded-4xl border shadow-sm",
         className
       )}
     >

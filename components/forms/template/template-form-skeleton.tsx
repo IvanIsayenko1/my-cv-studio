@@ -13,8 +13,8 @@ export default function TemplateFormSkeleton({
   collapsed?: boolean;
 }) {
   return (
-    <Card className="w-full p-0 gap-0">
-      <CardHeader className="p-6 gap-2">
+    <Card className="m-[1px] w-full gap-0 p-0">
+      <CardHeader className="gap-2 p-6">
         <CardTitle className="flex items-center gap-2">
           <Skeleton className="h-7 w-32" />
           <Skeleton className="h-7 w-24 rounded-full" />

@@ -5,7 +5,7 @@ import { useTemplateConfigSuspenseQuery } from "@/hooks/cv/use-template-config";
 import AccentColorForm from "../../forms/accent-color/accent-color-form";
 import SectionConfigForm from "../../forms/section-config/section-config-form";
 
-export default function CVConfigForm() {
+export default function CVPersonalizationForm() {
   const params = useParams();
   const id = params.id as string;
 
