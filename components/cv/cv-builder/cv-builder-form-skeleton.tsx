@@ -10,7 +10,6 @@ import PersonalInfoFormSkeleton from "@/components/forms/personal-info/personal-
 import ProjectsFormSkeleton from "@/components/forms/projects/projects-form-skeleton";
 import SkillsFormSkeleton from "@/components/forms/skills/skills-form-skeleton";
 import SummaryFormSkeleton from "@/components/forms/summary/summary-form-skeleton";
-import TemplateFormSkeleton from "@/components/forms/template/template-form-skeleton";
 import WorkExperienceFormSkeleton from "@/components/forms/work-experience/work-experience-form-skeleton";
 
 export default function CVBuilderFormSkeleton() {

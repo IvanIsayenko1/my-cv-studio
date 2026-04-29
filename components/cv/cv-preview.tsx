@@ -4,13 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAwardsSuspenseQuery } from "@/hooks/cv/use-awards";
 import { useCertificationsSuspenseQuery } from "@/hooks/cv/use-certifications";
-import { useCVData } from "@/hooks/cv/use-cv";
+import { useCVDataSuspendedQuery } from "@/hooks/cv/use-cv";
 import { useEducationSuspenseQuery } from "@/hooks/cv/use-education";
 import { useLanguagesSuspenseQuery } from "@/hooks/cv/use-languages";
 import { usePersonalInfoSuspenseQuery } from "@/hooks/cv/use-personal-info";
 import { useProjectsSuspenseQuery } from "@/hooks/cv/use-projects";
 import { useSkillsSuspenseQuery } from "@/hooks/cv/use-skills";
-import { useStatus } from "@/hooks/cv/use-status";
+import { useStatusSuspenseQuery } from "@/hooks/cv/use-status";
 import { useSummarySuspenseQuery } from "@/hooks/cv/use-summary";
 import { useTemplateSuspenseQuery } from "@/hooks/cv/use-template";
 import { useTemplateConfigSuspenseQuery } from "@/hooks/cv/use-template-config";
@@ -175,8 +175,8 @@ export default function CVPreview({
     totalHeight: PRINTABLE_HEIGHT_PX,
   });
 
-  const { data: status } = useStatus(id);
-  const { data: cvData } = useCVData(id);
+  const { data: status } = useStatusSuspenseQuery(id);
+  const { data: cvData } = useCVDataSuspendedQuery(id);
   const { data: template } = useTemplateSuspenseQuery(id);
   const { data: personalInfo } = usePersonalInfoSuspenseQuery(id);
   const { data: summary } = useSummarySuspenseQuery(id);

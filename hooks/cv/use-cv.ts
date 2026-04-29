@@ -133,7 +133,7 @@ export function useCreateCV(
  * Suspense query hook to fetch CV data.
  * @param id The ID of the CV/resume.
  */
-export function useCVData(id: string) {
+export function useCVDataSuspendedQuery(id: string) {
   return useSuspenseQuery<CV["cvData"] | null>({
     queryKey: [QUERY_KEYS.CV_DATA, id],
     queryFn: () => getCV(id),

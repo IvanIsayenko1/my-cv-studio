@@ -1,9 +1,9 @@
 "use client";
 
-import { useCVData } from "@/hooks/cv/use-cv";
+import { useCVDataSuspendedQuery } from "@/hooks/cv/use-cv";
 
 export default function CVBuilderTitle({ id }: { id: string }) {
-  const { data: cv } = useCVData(id);
+  const { data: cv } = useCVDataSuspendedQuery(id);
 
   return (
     <div className="min-w-0">

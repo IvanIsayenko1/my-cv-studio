@@ -2,10 +2,10 @@ import { CheckIcon, Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 
-import { useStatus } from "@/hooks/cv/use-status";
+import { useStatusSuspenseQuery } from "@/hooks/cv/use-status";
 
 export default function CVStatus({ id }: { id: string }) {
-  const { data } = useStatus(id);
+  const { data } = useStatusSuspenseQuery(id);
   const isCVReady = data?.isReady;
 
   return isCVReady ? (

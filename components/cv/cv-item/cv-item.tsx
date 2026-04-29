@@ -1,14 +1,18 @@
-import { CSSProperties, Suspense } from "react";
+import { CSSProperties } from "react";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import { ArrowRight } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+
 import { CV } from "@/types/cv";
-import { TemplateName } from "@/types/template";
+import { TEMPLATE_OPTIONS, TemplateName } from "@/types/template";
 
 import { ROUTES } from "@/config/routes";
 
-import CVBuilderMenu from "../cv-builder-header/cv-builder-menu";
-import CVBuilderMenuSkeleton from "../cv-builder-header/cv-builder-menu-skeleton";
+import CVItemActions from "../cv-item-actions/cv-item-actions";
 import CVStatus from "../cv-status";
 
 export default function CVItem({
@@ -19,10 +23,12 @@ export default function CVItem({
   index: number;
 }) {
   const router = useRouter();
-  const templateKey = cv.templateId ?? "ats-friendly-clean";
+  const templateKey = cv.templateId ?? "ats-friendly-simple";
   const templateLabel =
     TemplateName[templateKey as keyof typeof TemplateName] ??
     "Unknown template";
+  const template = TEMPLATE_OPTIONS.find((t) => t.id === templateKey);
+
   const createdDate = new Date(cv.createdAt);
   const createdLabel = Number.isNaN(createdDate.getTime())
     ? "Unknown date"
@@ -38,34 +44,53 @@ export default function CVItem({
 
   return (
     <div
-      key={cv.id}
       className="load-stagger"
       style={{ "--stagger": index } as CSSProperties}
     >
-      <div
-        onClick={handleCardClick}
-        className="group/card bg-card flex h-full cursor-pointer flex-col gap-3 overflow-hidden rounded-4xl border p-4 shadow-sm transition-[box-shadow] duration-300 hover:shadow-sm"
-      >
-        {/* Title */}
-        <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight transition-transform duration-300 group-hover/card:translate-x-0.5 active:scale-[0.96]">
-          {cv.title}
-        </h4>
+      <div className="group/card bg-card flex h-full flex-col overflow-hidden rounded-4xl border">
+        {/* Template preview thumbnail */}
+        {template?.previewSrc && (
+          <div className="bg-muted relative h-36 w-full overflow-hidden">
+            <Image
+              src={template.previewSrc}
+              alt={templateLabel}
+              fill
+              className="object-cover object-top"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            />
+          </div>
+        )}
 
-        {/* Info Row: Status | Date | Template */}
-        <div className="flex flex-wrap items-center gap-2">
-          <CVStatus id={cv.id} />
-          <span className="text-muted-foreground text-xs">{createdLabel}</span>
-          <span className="text-muted-foreground text-xs">{templateLabel}</span>
-        </div>
+        {/* Card body */}
+        <div className="flex flex-1 flex-col gap-3 p-4">
+          {/* Title */}
+          <h4 className="line-clamp-2 text-lg leading-tight font-semibold tracking-tight">
+            {cv.title}
+          </h4>
 
-        {/* Action Menu */}
-        <div
-          className="mt-auto flex justify-end pt-2"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Suspense fallback={<CVBuilderMenuSkeleton />}>
-            <CVBuilderMenu id={cv.id} />
-          </Suspense>
+          {/* Info Row: Status | Date | Template */}
+          <div className="flex flex-wrap items-center gap-2">
+            <CVStatus id={cv.id} />
+            <span className="text-muted-foreground text-xs">
+              {createdLabel}
+            </span>
+            <span className="text-muted-foreground text-xs">
+              {templateLabel}
+            </span>
+          </div>
+
+          {/* Action */}
+          <div className="mt-auto flex flex-col items-center gap-2 pt-2">
+            <CVItemActions id={cv.id} />
+            <Button
+              variant="secondary"
+              onClick={handleCardClick}
+              className="h-12 w-full"
+            >
+              Open
+              <ArrowRight />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

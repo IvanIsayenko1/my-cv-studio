@@ -15,7 +15,7 @@ import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
 
 import { useCVQueryData, useDownloadCV } from "@/hooks/cv/use-cv";
-import { useStatus } from "@/hooks/cv/use-status";
+import { useStatusSuspenseQuery } from "@/hooks/cv/use-status";
 
 import RenameCVDialog from "../dialogs/rename-cv-dialog";
 import {
@@ -29,7 +29,7 @@ import {
 
 export default function CVDropdownActions({ id }: { id: string }) {
   const cv = useCVQueryData({ id });
-  const { data } = useStatus(id);
+  const { data } = useStatusSuspenseQuery(id);
   const isCVReady = data?.isReady;
   const { mutate: downloadCV, isPending: isDownloadPending } = useDownloadCV(
     cv?.title || "cv.pdf"
