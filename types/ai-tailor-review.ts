@@ -14,4 +14,5 @@ export interface CVTailorReview {
   matchSummary: string;
   extractedKeywords: string[];
   titleSuggestion: CVTailorTitleSuggestion | null;
+  suggestedSummary: string;
 }

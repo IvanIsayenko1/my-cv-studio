@@ -1,4 +1,5 @@
 import MatchOverviewCard from "@/components/cv/cv-tailor/match-overview-card";
+import SummarySuggestionCard from "@/components/cv/cv-tailor/summary-suggestion-card";
 import TitleSuggestionCard from "@/components/cv/cv-tailor/title-suggestion-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,14 +40,22 @@ function EmptyReview() {
 
 function ReviewBody({
   review,
+  currentSummary,
   isApplyingTitle,
   isTitleApplied,
   onAcceptTitle,
+  isApplyingSummary,
+  isSummaryApplied,
+  onAcceptSummary,
 }: {
   review: CVTailorReview;
+  currentSummary: string;
   isApplyingTitle: boolean;
   isTitleApplied: boolean;
   onAcceptTitle: (value: string) => void;
+  isApplyingSummary: boolean;
+  isSummaryApplied: boolean;
+  onAcceptSummary: (value: string) => void;
 }) {
   return (
     <div className="flex flex-col gap-4 pb-2">
@@ -59,6 +68,13 @@ function ReviewBody({
           onAccept={onAcceptTitle}
         />
       ) : null}
+      <SummarySuggestionCard
+        currentSummary={currentSummary}
+        review={review}
+        isApplying={isApplyingSummary}
+        isApplied={isSummaryApplied}
+        onAccept={onAcceptSummary}
+      />
     </div>
   );
 }
@@ -67,25 +83,37 @@ export default function CVTailorAIAssistantDialog({
   isOpenDialog,
   setIsOpenDialog,
   review,
+  currentSummary,
   isApplyingTitle,
   isTitleApplied,
   onAcceptTitle,
+  isApplyingSummary,
+  isSummaryApplied,
+  onAcceptSummary,
 }: {
   isOpenDialog: boolean;
   setIsOpenDialog: (value: boolean) => void;
   review: CVTailorReview | null;
+  currentSummary: string;
   isApplyingTitle: boolean;
   isTitleApplied: boolean;
   onAcceptTitle: (value: string) => void;
+  isApplyingSummary: boolean;
+  isSummaryApplied: boolean;
+  onAcceptSummary: (value: string) => void;
 }) {
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const body = review ? (
     <ReviewBody
       review={review}
+      currentSummary={currentSummary}
       isApplyingTitle={isApplyingTitle}
       isTitleApplied={isTitleApplied}
       onAcceptTitle={onAcceptTitle}
+      isApplyingSummary={isApplyingSummary}
+      isSummaryApplied={isSummaryApplied}
+      onAcceptSummary={onAcceptSummary}
     />
   ) : (
     <EmptyReview />

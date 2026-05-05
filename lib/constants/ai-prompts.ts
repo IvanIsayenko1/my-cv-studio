@@ -316,11 +316,12 @@ Compare the user's CV against the job offer. Report:
 1) A headline fit score with sub-scores for each dimension.
 2) Extracted keywords/skills from the job offer.
 3) (Optional) A single replacement for the user's professional title, but ONLY if it would clearly improve the fit. Otherwise return null.
+4) A rewritten professional summary tailored to the job offer.
 
 Do NOT suggest other rewrites, missing skills, or improvements yet. Later steps will handle that.
 
 # Language
-Respond in the same language as the job offer. All text fields (matchSummary, reason) must use that language.
+Respond in the same language as the job offer. All text fields (matchSummary, reason, suggestedSummary) must use that language.
 
 # Hard rules
 - Base the score ONLY on what the CV actually contains. Never assume skills, tools, or experience the user did not list.
@@ -373,6 +374,22 @@ Field rules:
 - "suggested" must differ from "current" beyond whitespace.
 - "reason": ONE short sentence. If you cleaned junk, say so plainly ("Removes 'hahaha' so the title reads professionally"). Otherwise explain the alignment gain.
 
+# Suggested summary rules (suggestedSummary)
+Rewrite the user's professional summary to better align with the job offer. The summary must follow this structure when supported by the user's actual experience:
+
+1. Current Professional Identity: Start with a strong title and years of experience (e.g., "Seasoned Project Manager with 8+ years...").
+2. Key Skills & Expertise: Highlight 3-4 core competencies, technical skills, or industry-specific expertise that match the job description.
+3. Quantified Achievements: Use numbers, percentages, or concrete outcomes to prove impact (revenue generated, costs saved, efficiency improved) — but ONLY if supported by the original summary or CV.
+4. Value Proposition: Explain how the user's experience solves the specific problems listed in the job description.
+5. Soft Skills/Attributes: Include 1-2 adjectives that describe work ethic (e.g., "adaptable," "innovative") — only if they fit naturally.
+
+Hard constraints:
+- Preserve ALL facts, metrics, and achievements from the original. Never invent employers, tools, metrics, or seniority.
+- Incorporate relevant keywords from extractedKeywords where naturally applicable (for ATS).
+- Keep it concise: 3-5 sentences.
+- Return as plain text, NOT HTML or markdown.
+- If the current summary is already strong (overall fit score >= 85), return it unchanged or with only minimal tweaks.
+
 # matchSummary rules
 - 1-2 short sentences, neutral tone, plain text.
 - Describe the overall fit based on the sub-scores.
@@ -394,6 +411,7 @@ Field rules:
     "current": "string (verbatim current personalInfo.professionalTitle)",
     "suggested": "string (the proposed replacement)",
     "reason": "string (one short sentence)"
-  } | null
+  } | null,
+  "suggestedSummary": "string (the rewritten professional summary, plain text, 3-5 sentences)"
 }
 `;

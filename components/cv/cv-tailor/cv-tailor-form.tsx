@@ -30,6 +30,7 @@ import {
   usePersonalInfoSuspenseQuery,
   useSavePersonalInfo,
 } from "@/hooks/cv/use-personal-info";
+import { useSaveSummary } from "@/hooks/cv/use-summary";
 
 import { buildTailorMessages } from "@/lib/utils/ai";
 
@@ -41,11 +42,13 @@ export default function CVTailorForm({ id }: { id: string }) {
   const fullCV = useCompleteCvSuspenseQuery(id);
   const { data: personalInfo } = usePersonalInfoSuspenseQuery(id);
   const savePersonalInfo = useSavePersonalInfo(id);
+  const saveSummary = useSaveSummary(id);
 
   const [isConsultingAI, setIsConsultingAI] = useState(false);
   const [review, setReview] = useState<CVTailorReview | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isTitleApplied, setIsTitleApplied] = useState(false);
+  const [isSummaryApplied, setIsSummaryApplied] = useState(false);
 
   const form = useForm<TailorFormValues>({
     resolver: zodResolver(tailorSchema),
@@ -86,15 +89,27 @@ export default function CVTailorForm({ id }: { id: string }) {
     );
   };
 
+  const handleAcceptSummary = (value: string) => {
+    if (!value.trim()) return;
+    saveSummary.mutate(
+      { professionalSummary: value.trim() },
+      { onSuccess: () => setIsSummaryApplied(true) }
+    );
+  };
+
   return (
     <div className="mb-4 w-full p-[1px]">
       <CVTailorAIAssistantDialog
         isOpenDialog={isReviewOpen}
         setIsOpenDialog={setIsReviewOpen}
         review={review}
+        currentSummary={fullCV?.professionalSummary || ""}
         isApplyingTitle={savePersonalInfo.isPending}
         isTitleApplied={isTitleApplied}
         onAcceptTitle={handleAcceptTitle}
+        isApplyingSummary={saveSummary.isPending}
+        isSummaryApplied={isSummaryApplied}
+        onAcceptSummary={handleAcceptSummary}
       />
       <Card className="w-full">
         <CardHeader>
