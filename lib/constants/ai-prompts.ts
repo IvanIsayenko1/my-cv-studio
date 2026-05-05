@@ -313,28 +313,40 @@ Expected JSON shape:
 
 export const CV_TAILOR_MODULE = `
 Compare the user's CV against the job offer. Report:
-1) A headline fit score.
-2) (Optional) A single replacement for the user's professional title, but ONLY if it would clearly improve the fit. Otherwise return null.
+1) A headline fit score with sub-scores for each dimension.
+2) Extracted keywords/skills from the job offer.
+3) (Optional) A single replacement for the user's professional title, but ONLY if it would clearly improve the fit. Otherwise return null.
 
 Do NOT suggest other rewrites, missing skills, or improvements yet. Later steps will handle that.
+
+# Language
+Respond in the same language as the job offer. All text fields (matchSummary, reason) must use that language.
 
 # Hard rules
 - Base the score ONLY on what the CV actually contains. Never assume skills, tools, or experience the user did not list.
 - Never inflate. If evidence is missing, the score must reflect that.
 - Use the visible text of any HTML fields. Ignore the markup.
+- If the job offer is extremely short or vague (e.g. fewer than 3 concrete requirements), set matchPercentage to 50 or below and state that the offer lacks detail in matchSummary.
 
 # How to score (matchPercentage, integer 0-100)
-Holistic overall fit, weighted roughly:
-- ~50% required skills, tools, and technologies the offer explicitly asks for and the CV demonstrates.
-- ~25% role / seniority alignment (job title, years of experience, scope).
-- ~15% domain or industry relevance.
-- ~10% nice-to-haves and softer signals.
+Compute sub-scores first, then derive the overall score:
 
-Anchors:
-- 85-100: strong fit, the user is clearly qualified.
-- 65-84: solid fit with a few real gaps.
+  matchPercentage = round(skillScore * 0.50 + seniorityScore * 0.25 + domainScore * 0.15 + niceToHaveScore * 0.10)
+
+Sub-score definitions (each is an integer 0-100):
+- skillScore: required skills, tools, and technologies the offer explicitly asks for and the CV demonstrates.
+- seniorityScore: role / seniority alignment (job title, years of experience, scope).
+- domainScore: domain or industry relevance.
+- niceToHaveScore: nice-to-haves and softer signals.
+
+Anchors for each sub-score:
+- 85-100: strong match, clearly demonstrated.
+- 65-84: solid match with a few real gaps.
 - 40-64: partial fit, several important requirements missing.
-- 0-39: weak fit, fundamentally different role or missing core requirements.
+- 0-39: weak fit, fundamentally different or missing core requirements.
+
+# Extracted keywords (extractedKeywords)
+List the key skills, tools, technologies, methodologies, and role-specific terms explicitly mentioned in the job offer. Include only the ones that are relevant for ATS matching. Keep the list concise (5-15 items). Use the same language as the offer.
 
 # Title suggestion rules (titleSuggestion)
 Inspect the user's current personalInfo.professionalTitle.
@@ -361,12 +373,23 @@ Field rules:
 - "suggested" must differ from "current" beyond whitespace.
 - "reason": ONE short sentence. If you cleaned junk, say so plainly ("Removes 'hahaha' so the title reads professionally"). Otherwise explain the alignment gain.
 
-# JSON schema (return ONLY this object, no prose, no fences)
+# matchSummary rules
+- 1-2 short sentences, neutral tone, plain text.
+- Describe the overall fit based on the sub-scores.
+- Do NOT list specific changes or suggest improvements — later steps handle that.
+- Do NOT repeat the extracted keywords.
+
+# JSON schema (return ONLY this object, no prose, no fences, no additional fields)
 
 {
   "jobTitle": "string (the role title from the OFFER — copied or normalized, never the user's current CV title)",
   "matchPercentage": "integer 0-100",
-  "matchSummary": "string (1-2 short sentences, neutral tone, plain text — describe the overall fit. Do NOT list specific changes; later steps handle that.)",
+  "skillScore": "integer 0-100",
+  "seniorityScore": "integer 0-100",
+  "domainScore": "integer 0-100",
+  "niceToHaveScore": "integer 0-100",
+  "matchSummary": "string (1-2 short sentences, neutral tone, plain text)",
+  "extractedKeywords": ["string (5-15 key terms from the offer)"],
   "titleSuggestion": {
     "current": "string (verbatim current personalInfo.professionalTitle)",
     "suggested": "string (the proposed replacement)",

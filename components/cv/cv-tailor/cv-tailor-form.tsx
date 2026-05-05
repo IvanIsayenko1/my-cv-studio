@@ -78,10 +78,10 @@ export default function CVTailorForm({ id }: { id: string }) {
     }
   };
 
-  const handleAcceptTitle = () => {
-    if (!review?.titleSuggestion || !personalInfo) return;
+  const handleAcceptTitle = (value: string) => {
+    if (!personalInfo || !value.trim()) return;
     savePersonalInfo.mutate(
-      { ...personalInfo, professionalTitle: review.titleSuggestion.suggested },
+      { ...personalInfo, professionalTitle: value.trim() },
       { onSuccess: () => setIsTitleApplied(true) }
     );
   };
@@ -100,7 +100,7 @@ export default function CVTailorForm({ id }: { id: string }) {
         <CardHeader>
           <CardTitle>Tailor Your CV</CardTitle>
           <CardDescription>
-            Addapt your CV to specific job offers by analyzing the offer
+            Adapt your CV to specific job offers by analyzing the offer
             description and providing tailored suggestions for improvements.
           </CardDescription>
         </CardHeader>

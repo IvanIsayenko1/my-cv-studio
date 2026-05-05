@@ -46,7 +46,7 @@ function ReviewBody({
   review: CVTailorReview;
   isApplyingTitle: boolean;
   isTitleApplied: boolean;
-  onAcceptTitle: () => void;
+  onAcceptTitle: (value: string) => void;
 }) {
   return (
     <div className="flex flex-col gap-4 pb-2">
@@ -76,7 +76,7 @@ export default function CVTailorAIAssistantDialog({
   review: CVTailorReview | null;
   isApplyingTitle: boolean;
   isTitleApplied: boolean;
-  onAcceptTitle: () => void;
+  onAcceptTitle: (value: string) => void;
 }) {
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 

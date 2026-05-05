@@ -7,6 +7,11 @@ export interface CVTailorTitleSuggestion {
 export interface CVTailorReview {
   jobTitle: string;
   matchPercentage: number;
+  skillScore: number;
+  seniorityScore: number;
+  domainScore: number;
+  niceToHaveScore: number;
   matchSummary: string;
+  extractedKeywords: string[];
   titleSuggestion: CVTailorTitleSuggestion | null;
 }

@@ -1,7 +1,11 @@
-import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+
+import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
 import { CVTailorTitleSuggestion } from "@/types/ai-tailor-review";
 
@@ -14,54 +18,65 @@ export default function TitleSuggestionCard({
   suggestion: CVTailorTitleSuggestion;
   isApplying: boolean;
   isApplied: boolean;
-  onAccept: () => void;
+  onAccept: (value: string) => void;
 }) {
+  const [editedTitle, setEditedTitle] = useState(suggestion.suggested);
+
   return (
     <Card className="m-[1px]">
       <CardContent className="flex flex-col gap-4 p-5">
         <div>
           <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-            Suggested title change
+            Suggested professional title
           </p>
           <p className="text-muted-foreground mt-2 text-sm">
             {suggestion.reason}
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
-          <div className="flex-1 rounded-lg border bg-muted/40 p-3">
-            <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-              Current
-            </p>
-            <p className="mt-1 text-sm font-medium leading-snug">
-              {suggestion.current}
-            </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-3">
+          <div className="flex-1">
+            <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
+              Current title
+            </label>
+            <Input
+              value={suggestion.current}
+              disabled
+              className="pointer-events-none opacity-70"
+            />
           </div>
-          <div className="flex items-center justify-center sm:px-1">
-            <ArrowRight className="text-muted-foreground size-4 rotate-90 sm:rotate-0" />
-          </div>
-          <div className="flex-1 rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 dark:border-emerald-800 dark:bg-emerald-950/30">
-            <p className="text-[10px] font-semibold tracking-widest text-emerald-700 uppercase dark:text-emerald-400">
-              Suggested
-            </p>
-            <p className="mt-1 text-sm font-semibold leading-snug">
-              {suggestion.suggested}
-            </p>
+          <div className="flex-1">
+            <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
+              New title
+            </label>
+            <Input
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              placeholder="Enter your new professional title..."
+              disabled={isApplied}
+            />
           </div>
         </div>
 
         <div className="flex justify-end">
           <Button
-            size="sm"
             className="cv-form-primary-action"
-            onClick={onAccept}
-            disabled={isApplying || isApplied}
+            onClick={() => onAccept(editedTitle)}
+            disabled={isApplying || isApplied || !editedTitle.trim()}
           >
-            {isApplied
-              ? "Applied"
-              : isApplying
-                ? "Applying..."
-                : "Apply this title"}
+            {isApplying ? (
+              <>
+                <Spinner />
+                Applying...
+              </>
+            ) : isApplied ? (
+              "Applied"
+            ) : (
+              <>
+                <Save className="size-4" />
+                Apply change
+              </>
+            )}
           </Button>
         </div>
       </CardContent>
