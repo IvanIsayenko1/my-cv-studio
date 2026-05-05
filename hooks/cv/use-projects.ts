@@ -15,7 +15,7 @@ import { ProjectsFormValues } from "@/types/projects";
  * Cleans the input data by removing empty strings and filtering out empty projects.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveProjects(id: string) {
+export const useSaveProjects = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -49,17 +49,30 @@ export function useSaveProjects(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch projects data.
  * @param id The ID of the CV/resume.
  */
-export function useProjectsSuspenseQuery(id: string): {
+export const useProjectsSuspenseQuery = (
+  id: string
+): {
   data: ProjectsFormValues;
-} {
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.PROJECTS, id],
     queryFn: () => fetchProjects(id),
   });
-}
+};
+
+/**
+ * Retrieves the projects data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useProjectsQueryData = (
+  id: string
+): ProjectsFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.PROJECTS, id]);
+};

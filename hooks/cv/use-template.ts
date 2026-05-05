@@ -14,7 +14,7 @@ import { TemplateFormValues } from "@/types/template";
  * Mutation hook to save template settings.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveTemplate(id: string) {
+export const useSaveTemplate = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -33,17 +33,28 @@ export function useSaveTemplate(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch template settings.
  * @param id The ID of the CV/resume.
  */
-export function useTemplateSuspenseQuery(id: string): {
-  data: TemplateFormValues;
-} {
+export const useTemplateSuspenseQuery = (
+  id: string
+): { data: TemplateFormValues | null } => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.TEMPLATE, id],
     queryFn: () => fetchTemplate(id),
   });
-}
+};
+
+/**
+ * Retrieves the template data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useTemplateQueryData = (
+  id: string
+): TemplateFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.TEMPLATE, id]);
+};

@@ -10,6 +10,7 @@ import CVPersonalizationForm from "../cv-personalization/cv-personalization-form
 import CVPersonalizationFormSkeleton from "../cv-personalization/cv-personalization-form-skeleton";
 import CVPreview from "../cv-preview";
 import CVPreviewSkeleton from "../cv-preview-skeleton";
+import CVTailorForm from "../cv-tailor/cv-tailor-form";
 import CVTemplateForm from "../cv-template-form";
 import CVUnsavedChangesDialog from "../cv-unsaved-changes-dialog";
 import CVBuilderFormSkeleton from "./cv-builder-form-skeleton";
@@ -35,7 +36,10 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
               <TabsList>
                 <TabsTrigger value="data">Data</TabsTrigger>
                 <TabsTrigger value="template">Template</TabsTrigger>
-                <TabsTrigger value="config">Personalization</TabsTrigger>
+                <TabsTrigger value="personalization">
+                  Personalization
+                </TabsTrigger>
+                <TabsTrigger value="tailor">Tailor</TabsTrigger>
                 <TabsTrigger value="preview" className="lg:hidden">
                   Preview
                 </TabsTrigger>
@@ -62,7 +66,7 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
               </TabsContent>
 
               <TabsContent
-                value="config"
+                value="personalization"
                 className="flex w-full overflow-y-auto pt-1"
               >
                 <div
@@ -74,6 +78,13 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
                     <CVPersonalizationForm />
                   </Suspense>
                 </div>
+              </TabsContent>
+
+              <TabsContent
+                value="tailor"
+                className="flex w-full overflow-y-auto pt-1"
+              >
+                <CVTailorForm id={id} />
               </TabsContent>
 
               <TabsContent

@@ -14,7 +14,7 @@ import { SummaryFormValues } from "@/types/summary";
  * Mutation hook to save the professional summary.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveSummary(id: string) {
+export const useSaveSummary = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -30,17 +30,30 @@ export function useSaveSummary(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch the professional summary.
  * @param id The ID of the CV/resume.
  */
-export function useSummarySuspenseQuery(id: string): {
+export const useSummarySuspenseQuery = (
+  id: string
+): {
   data: SummaryFormValues;
-} {
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.SUMMARY, id],
     queryFn: () => fetchSummary(id),
   });
-}
+};
+
+/**
+ * Retrieves the summary data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useSummaryQueryData = (
+  id: string
+): SummaryFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.SUMMARY, id]);
+};

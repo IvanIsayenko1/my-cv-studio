@@ -14,7 +14,7 @@ import { PersonalInfoFormValues } from "@/types/personal-info";
  * Mutation hook to save the personal information section.
  * @param id The ID of the CV/resume to update.
  */
-export function useSavePersonalInfo(id: string) {
+export const useSavePersonalInfo = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -33,17 +33,30 @@ export function useSavePersonalInfo(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch personal information.
  * @param id The ID of the CV/resume.
  */
-export function usePersonalInfoSuspenseQuery(id: string): {
+export const usePersonalInfoSuspenseQuery = (
+  id: string
+): {
   data: PersonalInfoFormValues;
-} {
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.PERSONAL_INFO, id],
     queryFn: () => getPersonalInfo(id),
   });
-}
+};
+
+/**
+ * Retrieves the personal information data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const usePersonalInfoQueryData = (
+  id: string
+): PersonalInfoFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.PERSONAL_INFO, id]);
+};

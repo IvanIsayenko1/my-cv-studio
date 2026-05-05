@@ -18,7 +18,7 @@ import { CertificationsFormValues } from "@/types/certifications";
  * Filters empty certifications before sending to the API.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveCertifications(id: string) {
+export const useSaveCertifications = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -47,17 +47,30 @@ export function useSaveCertifications(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch certifications data.
  * @param id The ID of the CV/resume.
  */
-export function useCertificationsSuspenseQuery(id: string): {
+export const useCertificationsSuspenseQuery = (
+  id: string
+): {
   data: CertificationsFormValues;
-} {
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.CERTIFICATIONS, id],
     queryFn: () => fetchCertifications(id),
   });
-}
+};
+
+/**
+ * Retrieves the certifications data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useCertificationsQueryData = (
+  id: string
+): CertificationsFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.CERTIFICATIONS, id]);
+};

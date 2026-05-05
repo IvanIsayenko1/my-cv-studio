@@ -10,7 +10,7 @@ import CVBuilderAIAssistant from "@/components/cv/cv-builder-ai-assistant/cv-bui
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import ProfessionalSummaryAIAssistantDialog from "@/components/dialogs/professional-summary-ai-assistant-dialog";
 import FormStatusBedge from "@/components/form-status-bedge";
-import SectionRequieredsBedge from "@/components/section-requiered-bedge";
+import SectionRequiredsBedge from "@/components/section-required-bedge";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -73,7 +73,7 @@ export function SummaryForm({
       status={
         <div className="space-x-2">
           <FormStatusBedge isNotSaved={form.formState.isDirty} />
-          <SectionRequieredsBedge isReady={isComplete} />
+          <SectionRequiredsBedge isReady={isComplete} />
         </div>
       }
     >

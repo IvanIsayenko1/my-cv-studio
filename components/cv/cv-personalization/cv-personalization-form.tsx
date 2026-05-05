@@ -12,7 +12,7 @@ export default function CVPersonalizationForm() {
   const { data: configData } = useTemplateConfigSuspenseQuery(id);
 
   return (
-    <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto pb-4">
+    <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto p-[1px] pb-4">
       <AccentColorForm id={id} configData={configData} />
       <SectionConfigForm id={id} configData={configData} />
     </div>

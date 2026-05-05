@@ -11,7 +11,7 @@ import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import PersonalInfoAIAssistantDialog from "@/components/dialogs/personal-info-ai-assitant-dialog";
 import { RemoveLinkDialog } from "@/components/dialogs/remove-link-dialog";
 import FormStatusBedge from "@/components/form-status-bedge";
-import SectionRequieredsBedge from "@/components/section-requiered-bedge";
+import SectionRequiredsBedge from "@/components/section-required-bedge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -110,7 +110,7 @@ export function PersonalInfoForm({
       status={
         <div className="space-x-2">
           <FormStatusBedge isNotSaved={form.formState.isDirty} />
-          <SectionRequieredsBedge isReady={isComplete} />
+          <SectionRequiredsBedge isReady={isComplete} />
         </div>
       }
     >

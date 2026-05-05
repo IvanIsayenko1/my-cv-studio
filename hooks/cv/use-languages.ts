@@ -15,7 +15,7 @@ import { LanguagesFormValues } from "@/schemas/languages";
  * Cleans the input data by filtering out empty languages.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveLanguages(id: string) {
+export const useSaveLanguages = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -43,17 +43,30 @@ export function useSaveLanguages(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch languages data.
  * @param id The ID of the CV/resume.
  */
-export function useLanguagesSuspenseQuery(id: string): {
+export const useLanguagesSuspenseQuery = (
+  id: string
+): {
   data: LanguagesFormValues;
-} {
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.LANGUAGES, id],
     queryFn: () => getLanguages(id),
   });
-}
+};
+
+/**
+ * Retrieves the languages data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useLanguagesQueryData = (
+  id: string
+): LanguagesFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.LANGUAGES, id]);
+};

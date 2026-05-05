@@ -9,7 +9,7 @@ import { Plus, Save, Trash2, X } from "lucide-react";
 import SectionWrapper from "@/components/cv/cv-form-section-wrapper";
 import { RemoveEducationDialog } from "@/components/dialogs/remove-education-dialog";
 import FormStatusBedge from "@/components/form-status-bedge";
-import SectionRequieredsBedge from "@/components/section-requiered-bedge";
+import SectionRequiredsBedge from "@/components/section-required-bedge";
 import {
   Accordion,
   AccordionContent,
@@ -116,7 +116,7 @@ export function EducationForm({
         status={
           <div className="space-x-2">
             <FormStatusBedge isNotSaved={form.formState.isDirty} />
-            <SectionRequieredsBedge isReady={isComplete} />
+            <SectionRequiredsBedge isReady={isComplete} />
           </div>
         }
       >

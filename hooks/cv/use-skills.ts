@@ -15,7 +15,7 @@ import { SkillsFormValues } from "@/types/skills";
  * Cleans the input data by filtering out empty skills.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveSkills(id: string) {
+export const useSaveSkills = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -43,15 +43,28 @@ export function useSaveSkills(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch skills data.
  * @param id The ID of the CV/resume.
  */
-export function useSkillsSuspenseQuery(id: string): { data: SkillsFormValues } {
+export const useSkillsSuspenseQuery = (
+  id: string
+): { data: SkillsFormValues } => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.SKILLS, id],
     queryFn: () => getSkills(id),
   });
-}
+};
+
+/**
+ * Retrieves the skills data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useSkillsQueryData = (
+  id: string
+): SkillsFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.SKILLS, id]);
+};

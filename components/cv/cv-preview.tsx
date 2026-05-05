@@ -2,24 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useAwardsSuspenseQuery } from "@/hooks/cv/use-awards";
-import { useCertificationsSuspenseQuery } from "@/hooks/cv/use-certifications";
-import { useCVDataSuspendedQuery } from "@/hooks/cv/use-cv";
-import { useEducationSuspenseQuery } from "@/hooks/cv/use-education";
-import { useLanguagesSuspenseQuery } from "@/hooks/cv/use-languages";
-import { usePersonalInfoSuspenseQuery } from "@/hooks/cv/use-personal-info";
-import { useProjectsSuspenseQuery } from "@/hooks/cv/use-projects";
-import { useSkillsSuspenseQuery } from "@/hooks/cv/use-skills";
+import { useCompleteCvSuspenseQuery } from "@/hooks/cv/use-cv";
 import { useStatusSuspenseQuery } from "@/hooks/cv/use-status";
-import { useSummarySuspenseQuery } from "@/hooks/cv/use-summary";
-import { useTemplateSuspenseQuery } from "@/hooks/cv/use-template";
 import { useTemplateConfigSuspenseQuery } from "@/hooks/cv/use-template-config";
-import { useWorkExperienceSuspenseQuery } from "@/hooks/cv/use-work-experience";
 
 import { renderPreviewHTML } from "@/lib/pdf/templates/render-preview-html";
-
-import { CV } from "@/types/cv";
-import { TemplateId } from "@/types/template";
 
 const MM_TO_PX = 96 / 25.4;
 const PAGE_WIDTH_MM = 210;
@@ -176,96 +163,9 @@ export default function CVPreview({
   });
 
   const { data: status } = useStatusSuspenseQuery(id);
-  const { data: cvData } = useCVDataSuspendedQuery(id);
-  const { data: template } = useTemplateSuspenseQuery(id);
-  const { data: personalInfo } = usePersonalInfoSuspenseQuery(id);
-  const { data: summary } = useSummarySuspenseQuery(id);
-  const { data: workExperience } = useWorkExperienceSuspenseQuery(id);
-  const { data: education } = useEducationSuspenseQuery(id);
-  const { data: skills } = useSkillsSuspenseQuery(id);
-  const { data: languages } = useLanguagesSuspenseQuery(id);
-  const { data: projects } = useProjectsSuspenseQuery(id);
-  const { data: certifications } = useCertificationsSuspenseQuery(id);
-  const { data: awards } = useAwardsSuspenseQuery(id);
   const { data: templateConfigData } = useTemplateConfigSuspenseQuery(id);
 
-  const fullCV = useMemo<CV | null>(() => {
-    if (!cvData) return null;
-
-    return {
-      cvData,
-      personalInfo: personalInfo ?? {
-        firstName: "",
-        lastName: "",
-        professionalTitle: "",
-        email: "",
-        phone: "",
-        city: "",
-        country: "",
-        linkedIn: "",
-        portfolio: "",
-      },
-      professionalSummary: summary?.professionalSummary ?? "",
-      workExperience: (workExperience?.workExperience ?? []).map((item) => ({
-        jobTitle: item.jobTitle,
-        company: item.company,
-        location: item.location,
-        employmentType: item.employmentType,
-        startDate: item.startDate,
-        endDate: item.endDate,
-        achievements: item.achievements ?? "",
-        toolsAndMethods: item.toolsAndMethods ?? [],
-        sortOrder: 0,
-      })),
-      education: (education?.education ?? []).map((item) => ({
-        degree: item.degree,
-        fieldOfStudy: item.fieldOfStudy,
-        institution: item.institution,
-        location: item.location,
-        graduationDate: item.graduationDate,
-        grade: item.grade ?? "",
-        gradingScale: item.gradingScale ?? "",
-        honors: item.honors ?? "",
-      })),
-      skills: skills ?? { categories: [] },
-      languages: languages?.languages ?? [],
-      certifications: (certifications?.certifications ?? []).map((item) => ({
-        name: item.name,
-        issuingOrg: item.issuingOrg,
-        issueDate: item.issueDate,
-        expirationDate: item.expirationDate ?? "",
-        credentialId: item.credentialId ?? "",
-      })),
-      projects: (projects?.projects ?? []).map((item) => ({
-        name: item.name,
-        role: item.role,
-        startDate: item.startDate,
-        endDate: item.endDate,
-        description: item.description,
-        url: item.url || undefined,
-      })),
-      awards: (awards?.awards ?? []).map((item) => ({
-        name: item.name,
-        issuer: item.issuer,
-        date: item.date,
-        description: item.description,
-      })),
-      templateId:
-        (template?.id as TemplateId) ?? TemplateId.ATS_FRIENDLY_SIMPLE,
-    };
-  }, [
-    awards,
-    certifications,
-    cvData,
-    education,
-    languages,
-    personalInfo,
-    projects,
-    skills,
-    summary,
-    template,
-    workExperience,
-  ]);
+  const fullCV = useCompleteCvSuspenseQuery(id);
 
   const htmlPreview = useMemo(() => {
     if (!fullCV) return "";

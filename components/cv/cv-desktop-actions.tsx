@@ -15,7 +15,7 @@ import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 
-import { useCVDataSuspendedQuery, useDownloadCV } from "@/hooks/cv/use-cv";
+import { useCVDataSuspenseQuery, useDownloadCV } from "@/hooks/cv/use-cv";
 import { useStatusSuspenseQuery } from "@/hooks/cv/use-status";
 
 import RenameCVDialog from "../dialogs/rename-cv-dialog";
@@ -30,7 +30,7 @@ import {
 
 export default function CVDesktopActions({ id }: { id: string }) {
   // custom hooks
-  const { data: cvData } = useCVDataSuspendedQuery(id);
+  const { data: cvData } = useCVDataSuspenseQuery(id);
   const { data } = useStatusSuspenseQuery(id);
   const isCVReady = data?.isReady;
 

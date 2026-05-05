@@ -14,11 +14,11 @@ import RenameCVDialog from "@/components/dialogs/rename-cv-dialog";
 import ShareCVDialog from "@/components/dialogs/share-cv-dialog";
 import { Button } from "@/components/ui/button";
 
-import { useCVDataSuspendedQuery, useDownloadCV } from "@/hooks/cv/use-cv";
+import { useCVDataSuspenseQuery, useDownloadCV } from "@/hooks/cv/use-cv";
 import { useStatusSuspenseQuery } from "@/hooks/cv/use-status";
 
 export default function CVItemActions({ id }: { id: string }) {
-  const { data: cvData } = useCVDataSuspendedQuery(id);
+  const { data: cvData } = useCVDataSuspenseQuery(id);
   const { data } = useStatusSuspenseQuery(id);
   const isCVReady = data?.isReady;
 

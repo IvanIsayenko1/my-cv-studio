@@ -15,7 +15,7 @@ import { AwardsFormValues } from "@/types/awards";
  * Cleans the input data by filtering out empty awards suitable for backend processing.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveAwards(id: string) {
+export const useSaveAwards = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -41,15 +41,30 @@ export function useSaveAwards(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch awards data.
  * @param id The ID of the CV/resume.
  */
-export function useAwardsSuspenseQuery(id: string): { data: AwardsFormValues } {
+export const useAwardsSuspenseQuery = (
+  id: string
+): {
+  data: AwardsFormValues;
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.AWARDS, id],
     queryFn: () => fetchAwards(id),
   });
-}
+};
+
+/**
+ * Retrieves the awards data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useAwardsQueryData = (
+  id: string
+): AwardsFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.AWARDS, id]);
+};

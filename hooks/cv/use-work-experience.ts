@@ -18,7 +18,7 @@ import { WorkExperienceFormValues } from "@/types/work-experience";
  * Cleans the tools/methods array by trimming and filtering empty strings.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveWorkExperience(id: string) {
+export const useSaveWorkExperience = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -46,17 +46,30 @@ export function useSaveWorkExperience(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch work experience data.
  * @param id The ID of the CV/resume.
  */
-export function useWorkExperienceSuspenseQuery(id: string): {
+export const useWorkExperienceSuspenseQuery = (
+  id: string
+): {
   data: WorkExperienceFormValues;
-} {
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.WORK_EXPERIENCE, id],
     queryFn: () => fetchWorkExperience(id),
   });
-}
+};
+
+/**
+ * Retrieves the work experience data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useWorkExperienceQueryData = (
+  id: string
+): WorkExperienceFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.WORK_EXPERIENCE, id]);
+};

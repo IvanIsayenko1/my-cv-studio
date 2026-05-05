@@ -47,7 +47,7 @@ export function CollapsibleCard({
   return (
     <section
       className={cn(
-        "bg-card text-card-foreground rounded-4xl border shadow-sm",
+        "group/card bg-card ring-foreground/5 dark:ring-foreground/10 text-mobile-sm flex w-full flex-col gap-6 overflow-hidden rounded-4xl shadow-sm ring-1 has-[>img:first-child]:pt-0 data-[size=sm]:gap-4 data-[size=sm]:py-4 *:[img:first-child]:rounded-t-4xl *:[img:last-child]:rounded-b-4xl",
         className
       )}
     >

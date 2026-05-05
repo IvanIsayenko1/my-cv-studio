@@ -310,3 +310,67 @@ Expected JSON shape:
   ]
 }
 `;
+
+export const CV_TAILOR_MODULE = `
+Compare the user's CV against the job offer. Report:
+1) A headline fit score.
+2) (Optional) A single replacement for the user's professional title, but ONLY if it would clearly improve the fit. Otherwise return null.
+
+Do NOT suggest other rewrites, missing skills, or improvements yet. Later steps will handle that.
+
+# Hard rules
+- Base the score ONLY on what the CV actually contains. Never assume skills, tools, or experience the user did not list.
+- Never inflate. If evidence is missing, the score must reflect that.
+- Use the visible text of any HTML fields. Ignore the markup.
+
+# How to score (matchPercentage, integer 0-100)
+Holistic overall fit, weighted roughly:
+- ~50% required skills, tools, and technologies the offer explicitly asks for and the CV demonstrates.
+- ~25% role / seniority alignment (job title, years of experience, scope).
+- ~15% domain or industry relevance.
+- ~10% nice-to-haves and softer signals.
+
+Anchors:
+- 85-100: strong fit, the user is clearly qualified.
+- 65-84: solid fit with a few real gaps.
+- 40-64: partial fit, several important requirements missing.
+- 0-39: weak fit, fundamentally different role or missing core requirements.
+
+# Title suggestion rules (titleSuggestion)
+Inspect the user's current personalInfo.professionalTitle.
+
+Suggest a replacement when ANY of these is true:
+- The title contains obvious junk, jokes, emoji, typos, or non-professional text (e.g. "hahaha", "lol", "(WIP)", random punctuation, mojibake).
+- The title is overly long, cluttered, or buried under parentheticals that hurt readability.
+- The title misrepresents the user's role family or seniority compared to what the CV actually shows.
+- The title's role family or seniority is meaningfully misaligned with the offer (e.g. CV shows backend, offer is full-stack lead).
+
+Return null when ALL of these are true:
+- The title reads as clean, professional, recruiter-ready.
+- The title's role family and seniority align reasonably with both the CV evidence and the offer.
+- Any further change would be a purely stylistic tweak.
+
+Hard rules for the suggested title:
+- Must be supported by what the CV actually shows. Do not invent or upgrade seniority (no Junior → Senior, no IC → Lead, no Engineer → Architect unless the CV clearly demonstrates it).
+- Concise: 2-8 words, never more than 12.
+- No emoji, no jokes, no parentheticals unless they add real signal (e.g. a primary stack like "(React, TypeScript)" is fine; "(hahaha)" is not).
+- Never copy the offer's title verbatim if it overstates the user's seniority — adapt down if needed.
+
+Field rules:
+- "current" must be the exact current value of personalInfo.professionalTitle (verbatim, including any junk).
+- "suggested" must differ from "current" beyond whitespace.
+- "reason": ONE short sentence. If you cleaned junk, say so plainly ("Removes 'hahaha' so the title reads professionally"). Otherwise explain the alignment gain.
+
+# JSON schema (return ONLY this object, no prose, no fences)
+
+{
+  "jobTitle": "string (the role title from the OFFER — copied or normalized, never the user's current CV title)",
+  "matchPercentage": "integer 0-100",
+  "matchSummary": "string (1-2 short sentences, neutral tone, plain text — describe the overall fit. Do NOT list specific changes; later steps handle that.)",
+  "titleSuggestion": {
+    "current": "string (verbatim current personalInfo.professionalTitle)",
+    "suggested": "string (the proposed replacement)",
+    "reason": "string (one short sentence)"
+  } | null
+}
+`;

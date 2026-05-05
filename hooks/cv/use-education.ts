@@ -14,7 +14,7 @@ import { EducationFormValues } from "@/types/education";
  * Mutation hook to save education details.
  * @param id The ID of the CV/resume to update.
  */
-export function useSaveEducation(id: string) {
+export const useSaveEducation = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -30,17 +30,30 @@ export function useSaveEducation(id: string) {
       console.error(error);
     },
   });
-}
+};
 
 /**
  * Suspense query hook to fetch education data.
  * @param id The ID of the CV/resume.
  */
-export function useEducationSuspenseQuery(id: string): {
+export const useEducationSuspenseQuery = (
+  id: string
+): {
   data: EducationFormValues;
-} {
+} => {
   return useSuspenseQuery({
     queryKey: [QUERY_KEYS.EDUCATION, id],
     queryFn: () => fetchEducation(id),
   });
-}
+};
+
+/**
+ * Retrieves the education data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useEducationQueryData = (
+  id: string
+): EducationFormValues | undefined => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.EDUCATION, id]);
+};

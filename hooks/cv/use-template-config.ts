@@ -49,3 +49,12 @@ export function useTemplateConfigSuspenseQuery(id: string): {
     queryFn: () => fetchTemplateConfig(id),
   });
 }
+
+/**
+ * Retrieves the template config data from the query client.
+ * @param id The ID of the CV/resume.
+ */
+export const useTemplateConfigQueryData = (id: string) => {
+  const queryClient = useQueryClient();
+  return queryClient.getQueryData([QUERY_KEYS.TEMPLATE_CONFIG, id]);
+};

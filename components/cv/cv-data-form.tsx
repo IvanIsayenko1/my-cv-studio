@@ -53,16 +53,48 @@ export default function CVDataForm() {
   };
 
   return (
-    <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto pb-4">
+    <div className="no-scrollbar min-h-0 w-full flex-1 space-y-2 overflow-y-auto p-[1px] pb-4">
       <PersonalInfoForm id={id} formData={personalInfoData} />
-      <SummaryForm id={id} formData={summaryData} {...getSectionProps("summary")} />
-      <WorkExperienceForm id={id} formData={workExperienceData} {...getSectionProps("experience")} />
-      <SkillsForm id={id} formData={skillsData} {...getSectionProps("skills")} />
-      <EducationForm id={id} formData={educationData} {...getSectionProps("education")} />
-      <LanguagesForm id={id} formData={languagesData} {...getSectionProps("languages")} />
-      <CertificationsForm id={id} formData={certificationsData} {...getSectionProps("certifications")} />
-      <ProjectsForm id={id} formData={projectsData} {...getSectionProps("projects")} />
-      <AwardsForm id={id} formData={awardsData} {...getSectionProps("awards")} />
+      <SummaryForm
+        id={id}
+        formData={summaryData}
+        {...getSectionProps("summary")}
+      />
+      <WorkExperienceForm
+        id={id}
+        formData={workExperienceData}
+        {...getSectionProps("experience")}
+      />
+      <SkillsForm
+        id={id}
+        formData={skillsData}
+        {...getSectionProps("skills")}
+      />
+      <EducationForm
+        id={id}
+        formData={educationData}
+        {...getSectionProps("education")}
+      />
+      <LanguagesForm
+        id={id}
+        formData={languagesData}
+        {...getSectionProps("languages")}
+      />
+      <CertificationsForm
+        id={id}
+        formData={certificationsData}
+        {...getSectionProps("certifications")}
+      />
+      <ProjectsForm
+        id={id}
+        formData={projectsData}
+        {...getSectionProps("projects")}
+      />
+      <AwardsForm
+        id={id}
+        formData={awardsData}
+        {...getSectionProps("awards")}
+      />
     </div>
   );
 }
