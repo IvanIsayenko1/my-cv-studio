@@ -16,41 +16,13 @@ const stripHtmlNoise = (html: string | undefined): string | undefined => {
 };
 
 const slimCvForTailor = (cv: CV) => ({
-  personalInfo: {
-    professionalTitle: cv.personalInfo.professionalTitle,
-  },
+  professionalTitle: cv.personalInfo.professionalTitle,
   professionalSummary: stripHtmlNoise(cv.professionalSummary),
   workExperience: cv.workExperience.map((w) => ({
     jobTitle: w.jobTitle,
     company: w.company,
-    startDate: w.startDate,
-    endDate: w.endDate,
     achievements: stripHtmlNoise(w.achievements),
-    toolsAndMethods: w.toolsAndMethods,
   })),
-  education: cv.education.map((e) => ({
-    degree: e.degree,
-    fieldOfStudy: e.fieldOfStudy,
-    institution: e.institution,
-    graduationDate: e.graduationDate,
-  })),
-  skills: {
-    categories: cv.skills.categories.map((c) => ({
-      name: c.name,
-      items: stripHtmlNoise(c.items),
-    })),
-  },
-  languages: cv.languages,
-  certifications: cv.certifications,
-  projects: cv.projects?.map((p) => ({
-    name: p.name,
-    role: p.role,
-    startDate: p.startDate,
-    endDate: p.endDate,
-    description: stripHtmlNoise(p.description),
-  })),
-  awards: cv.awards,
-  sections: cv.sections,
 });
 
 export const buildPrompt = <T>(object: T, specificField: string) => `

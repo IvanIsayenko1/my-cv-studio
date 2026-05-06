@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -13,6 +12,8 @@ import {
   useSaveSummary,
   useSummarySuspenseQuery,
 } from "@/hooks/cv/use-summary";
+
+import SectionWrapper from "../cv-form-section-wrapper";
 
 function plainToHtml(text: string) {
   if (!text.trim()) return "";
@@ -42,22 +43,17 @@ export default function SummarySuggestionCard({
   };
 
   return (
-    <Card className="m-[1px]">
-      <CardContent className="flex flex-col gap-4 p-5">
-        <div>
-          <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-            Suggested professional summary
-          </p>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Tailored to match the role requirements while preserving your actual
-            experience.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
+    <SectionWrapper
+      cvId={cvId}
+      sectionId="suggested-summary"
+      title="Suggested Professional Summary"
+      description="Tailored to match the role requirements while preserving your actual experience."
+    >
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
           <div className="flex-1">
             <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              Current summary
+              Current
             </label>
             <RichTextEditor
               value={summary?.professionalSummary || ""}
@@ -69,7 +65,7 @@ export default function SummarySuggestionCard({
           </div>
           <div className="flex-1">
             <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              New summary
+              New
             </label>
             <RichTextEditor
               value={editedSummary}
@@ -80,8 +76,7 @@ export default function SummarySuggestionCard({
             />
           </div>
         </div>
-
-        <div className="flex justify-end">
+        <div className="cv-form-actions">
           <Button
             size="sm"
             className="cv-form-primary-action"
@@ -102,8 +97,8 @@ export default function SummarySuggestionCard({
               </>
             )}
           </Button>
-        </div>
-      </CardContent>
-    </Card>
+        </div>{" "}
+      </div>
+    </SectionWrapper>
   );
 }

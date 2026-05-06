@@ -1,10 +1,4 @@
-import AwardSuggestionCard from "@/components/cv/cv-tailor/award-suggestion-card";
-import CertificationSuggestionCard from "@/components/cv/cv-tailor/certification-suggestion-card";
 import ExperienceSuggestionCard from "@/components/cv/cv-tailor/experience-suggestion-card";
-import LanguageSuggestionCard from "@/components/cv/cv-tailor/language-suggestion-card";
-import MatchOverviewCard from "@/components/cv/cv-tailor/match-overview-card";
-import ProjectSuggestionCard from "@/components/cv/cv-tailor/project-suggestion-card";
-import SkillsSuggestionCard from "@/components/cv/cv-tailor/skills-suggestion-card";
 import SummarySuggestionCard from "@/components/cv/cv-tailor/summary-suggestion-card";
 import TitleSuggestionCard from "@/components/cv/cv-tailor/title-suggestion-card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Drawer,
   DrawerClose,
@@ -37,7 +36,7 @@ function EmptyReview() {
       <CardHeader>
         <CardTitle>No review yet</CardTitle>
         <CardDescription>
-          Submit a job offer to see how well your CV matches.
+          Submit a job offer to see tailored suggestions.
         </CardDescription>
       </CardHeader>
     </Card>
@@ -56,36 +55,16 @@ export default function CVTailorAIAssistantDialog({
   const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
   const body = review ? (
-    <div className="flex flex-col gap-4 pb-2">
-      <MatchOverviewCard review={review} />
-      {review.titleSuggestion ? (
+    <div className="flex flex-col gap-4 p-[1px] pb-2">
+      {review.titleSuggestion && (
         <TitleSuggestionCard suggestion={review.titleSuggestion} />
-      ) : null}
-      <SummarySuggestionCard suggestedSummary={review.suggestedSummary} />
-      {review.suggestedExperience?.map((exp) => (
-        <ExperienceSuggestionCard key={exp.roleIndex} suggestion={exp} />
-      ))}
-      {review.suggestedSkills?.map((skills) => (
-        <SkillsSuggestionCard key={skills.categoryIndex} suggestion={skills} />
-      ))}
-      {review.suggestedProjects?.map((project) => (
-        <ProjectSuggestionCard
-          key={project.projectIndex}
-          suggestion={project}
-        />
-      ))}
-      {review.suggestedCertifications?.map((cert) => (
-        <CertificationSuggestionCard
-          key={cert.certificationIndex}
-          suggestion={cert}
-        />
-      ))}
-      {review.suggestedAwards?.map((award) => (
-        <AwardSuggestionCard key={award.awardIndex} suggestion={award} />
-      ))}
-      {review.suggestedLanguages?.map((lang) => (
-        <LanguageSuggestionCard key={lang.languageIndex} suggestion={lang} />
-      ))}
+      )}
+      {review.suggestedSummary && (
+        <SummarySuggestionCard suggestedSummary={review.suggestedSummary} />
+      )}
+      {review.suggestedExperience && (
+        <ExperienceSuggestionCard suggestions={review.suggestedExperience} />
+      )}
     </div>
   ) : (
     <EmptyReview />
@@ -96,7 +75,7 @@ export default function CVTailorAIAssistantDialog({
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
         <DialogContent className="flex max-h-[min(85vh,48rem)] flex-col overflow-hidden sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>How your CV matches this offer</DialogTitle>
+            <DialogTitle>Tailored suggestions</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto pr-1">{body}</div>
         </DialogContent>
@@ -111,7 +90,7 @@ export default function CVTailorAIAssistantDialog({
         onPointerDownOutside={() => setIsOpenDialog(false)}
       >
         <DrawerHeader>
-          <DrawerTitle>How your CV matches this offer</DrawerTitle>
+          <DrawerTitle>Tailored suggestions</DrawerTitle>
         </DrawerHeader>
 
         <DrawerDescription asChild>

@@ -42,3 +42,4 @@ export const workExperienceSchema = z.object({
 });
 
 export type WorkExperienceFormValues = z.infer<typeof workExperienceSchema>;
+export type WorkExperienceItem = z.infer<typeof workExperienceItemSchema>;

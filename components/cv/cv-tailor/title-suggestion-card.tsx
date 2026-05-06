@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -15,6 +14,8 @@ import {
 } from "@/hooks/cv/use-personal-info";
 
 import { CVTailorTitleSuggestion } from "@/types/ai-tailor-review";
+
+import SectionWrapper from "../cv-form-section-wrapper";
 
 export default function TitleSuggestionCard({
   suggestion,
@@ -33,21 +34,17 @@ export default function TitleSuggestionCard({
   };
 
   return (
-    <Card className="m-[1px]">
-      <CardContent className="flex flex-col gap-4 p-5">
-        <div>
-          <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-            Suggested professional title
-          </p>
-          <p className="text-muted-foreground mt-2 text-sm">
-            {suggestion.reason}
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-3">
+    <SectionWrapper
+      cvId={cvId}
+      sectionId="suggested-title"
+      title="Suggested Professional Title"
+      description={suggestion.reason}
+    >
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
           <div className="flex-1">
             <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              Current title
+              Current
             </label>
             <Input
               value={suggestion.current}
@@ -57,7 +54,7 @@ export default function TitleSuggestionCard({
           </div>
           <div className="flex-1">
             <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              New title
+              New
             </label>
             <Input
               value={editedTitle}
@@ -67,9 +64,9 @@ export default function TitleSuggestionCard({
             />
           </div>
         </div>
-
-        <div className="flex justify-end">
+        <div className="cv-form-actions">
           <Button
+            size="sm"
             className="cv-form-primary-action"
             onClick={handleAccept}
             disabled={isPending || isSuccess || !editedTitle.trim()}
@@ -89,7 +86,7 @@ export default function TitleSuggestionCard({
             )}
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SectionWrapper>
   );
 }

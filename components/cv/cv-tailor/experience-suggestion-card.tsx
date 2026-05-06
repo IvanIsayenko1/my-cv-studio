@@ -2,13 +2,11 @@ import { useState } from "react";
 
 import { useParams } from "next/navigation";
 
-import { Save } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { Spinner } from "@/components/ui/spinner";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import {
   useSaveWorkExperience,
@@ -17,131 +15,100 @@ import {
 
 import { CVTailorExperienceSuggestion } from "@/types/ai-tailor-review";
 
+import SectionWrapper from "../cv-form-section-wrapper";
+import ExperienceSuggestionContent from "./experience-suggestion-content";
+
 export default function ExperienceSuggestionCard({
-  suggestion,
+  suggestions,
 }: {
-  suggestion: CVTailorExperienceSuggestion;
+  suggestions: CVTailorExperienceSuggestion[];
 }) {
   const cvId = useParams().id as string;
   const { data: workExperienceData } = useWorkExperienceSuspenseQuery(cvId);
-  const { mutate, isPending, isSuccess } = useSaveWorkExperience(cvId);
+  const [isApplying, setIsApplying] = useState(false);
+  const [openItems, setOpenItems] = useState<string[]>([]);
 
-  const [edited, setEdited] = useState(suggestion.suggested);
-
-  const currentRole = workExperienceData?.workExperience[suggestion.roleIndex];
-
-  const handleAccept = () => {
-    if (!edited.trim() || !workExperienceData) return;
-    const updated = workExperienceData.workExperience.map((role, index) =>
-      index === suggestion.roleIndex
-        ? { ...role, achievements: edited.trim() }
-        : role
-    );
-    mutate({ workExperience: updated });
+  const getWorkExperienceTitle = (index: number) => {
+    const role = workExperienceData?.workExperience[index];
+    return role
+      ? `${role.jobTitle}${role.company ? ` at ${role.company}` : ""}`
+      : `Role ${index + 1}`;
   };
 
-  const roleLabel = suggestion.jobTitle
-    ? `${suggestion.jobTitle}${suggestion.company ? ` at ${suggestion.company}` : ""}`
-    : `Role ${suggestion.roleIndex + 1}`;
-
   return (
-    <Card className="m-[1px]">
-      <CardContent className="flex flex-col gap-4 p-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-            Suggested experience improvement
-          </p>
-          {suggestion.issues.length > 0 && (
-            <Badge variant="outline" className="text-xs font-normal">
-              {suggestion.issues.length} issue
-              {suggestion.issues.length > 1 ? "s" : ""} found
-            </Badge>
-          )}
-        </div>
+    <SectionWrapper
+      cvId={cvId}
+      sectionId={`suggested-experience`}
+      title="Suggested Achievements"
+      description="AI-tailored achievements based on the job offer description."
+    >
+      <Accordion type="multiple" value={openItems} onValueChange={setOpenItems}>
+        {suggestions.map((suggestion, index) => (
+          <AccordionItem key={index} value={`item-${index}`}>
+            <AccordionTrigger>{getWorkExperienceTitle(index)}</AccordionTrigger>
 
-        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-          {roleLabel}
-        </h4>
-
-        {suggestion.keyImprovements?.length > 0 && (
-          <div className="flex flex-col gap-1.5">
-            <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-              Changes made
-            </p>
-            <ul className="list-inside list-disc text-sm leading-relaxed">
-              {suggestion.keyImprovements.map((imp, i) => (
-                <li key={i} className="text-muted-foreground">
-                  {imp}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {suggestion.issues.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {suggestion.issues.map((issue, i) => (
-              <Badge
-                key={i}
-                variant="destructive"
-                className="text-xs font-normal"
-              >
-                {issue}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-2">
-          <div className="flex-1">
-            <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              Current
-            </label>
-            <RichTextEditor
-              value={currentRole?.achievements || ""}
-              onChange={() => {}}
-              disabled
-              placeholder="(empty)"
-              minHeightClassName="min-h-[120px]"
+            <ExperienceSuggestionContent
+              index={index}
+              suggestion={suggestion}
+              workExperienceData={workExperienceData}
+              isApplying={isApplying}
+              setIsApplying={setIsApplying}
             />
-          </div>
-          <div className="flex-1">
-            <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              New
-            </label>
-            <RichTextEditor
-              value={edited}
-              onChange={setEdited}
-              placeholder="Tailored achievements..."
-              minHeightClassName="min-h-[120px]"
-              disabled={isSuccess}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <Button
-            size="sm"
-            className="cv-form-primary-action"
-            onClick={handleAccept}
-            disabled={isPending || isSuccess || !edited.trim()}
-          >
-            {isPending ? (
-              <>
-                <Spinner />
-                Applying...
-              </>
-            ) : isSuccess ? (
-              "Applied"
-            ) : (
-              <>
-                <Save className="size-4" />
-                Apply change
-              </>
-            )}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+            {/* <AccordionContent className="mb-0 max-h-none space-y-4">
+              <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-4">
+                  <div className="flex-1">
+                    <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
+                      Current
+                    </label>
+                    <RichTextEditor
+                      value={getWorkExperienceAchievements(index)}
+                      onChange={() => {}}
+                      disabled
+                      placeholder="(empty)"
+                      minHeightClassName="min-h-[120px]"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
+                      New
+                    </label>
+                    <RichTextEditor
+                      value={suggestion.suggested.trim()}
+                      onChange={() => {}}
+                      placeholder="Tailored achievements..."
+                      minHeightClassName="min-h-[120px]"
+                      disabled={true}
+                    />
+                  </div>
+                </div>
+                <div className="cv-form-actions">
+                  <Button
+                    size="sm"
+                    className="cv-form-primary-action"
+                    onClick={() => handleAccept(index)}
+                    disabled={isPending || isSuccess}
+                  >
+                    {isPending ? (
+                      <>
+                        <Spinner />
+                        Applying...
+                      </>
+                    ) : isSuccess ? (
+                      "Applied"
+                    ) : (
+                      <>
+                        <Save className="size-4" />
+                        Apply change
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </AccordionContent> */}
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </SectionWrapper>
   );
 }
