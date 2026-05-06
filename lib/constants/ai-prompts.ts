@@ -318,6 +318,7 @@ Compare the user's CV against the job offer. Report:
 3) (Optional) A single replacement for the user's professional title, but ONLY if it would clearly improve the fit. Otherwise return null.
 4) A rewritten professional summary tailored to the job offer.
 5) Tailored achievement rewrites for each work experience role, aligned with the job offer.
+6) Tailored skill category rewrites for each skills category, aligned with the job offer.
 
 # Language
 Respond in the same language as the job offer. All text fields (matchSummary, reason, suggestedSummary) must use that language.
@@ -426,6 +427,36 @@ Hard constraints:
 - Include every role from the input workExperience array in the output, in the same order.
 - "roleIndex" must match the 0-based position in the input array.
 
+# Suggested skills rules (suggestedSkills)
+For each category in the user's skills.categories array, produce a tailored rewrite of the items aligned with the job offer.
+
+Goals:
+- Reorder items so that those most relevant to the job offer come first.
+- Remove or de-emphasize items the user does NOT clearly demonstrate elsewhere if they would dilute the category.
+- Keep only what the CV actually supports. NEVER add tools, technologies, or skills not already implied by the user's CV.
+- Suggest a clearer category name when the current name is vague or misaligned with the offer's terminology.
+
+Scoring (score field, integer 0-100):
+- 85-100: already strong; only minor tweaks needed for the offer
+- 65-84: good but needs reordering or renaming to better match the offer
+- 40-64: vague or misaligned; needs meaningful rewrite
+- 0-39: very weak, empty, or misleading category
+
+Key improvements (keyImprovements field):
+List 1-4 specific changes you made and why, referencing the job offer. Examples:
+- "Moved 'React, TypeScript' to the top (explicitly required in the offer)"
+- "Renamed 'Tech Stuff' to 'Frontend Stack' for clarity"
+- "Removed generic 'team player' which is not a technical skill"
+
+Hard constraints:
+- Preserve ALL items present in the source unless they are clearly off-topic for the category. Never invent new items.
+- If the category is already strong, return the current items with only minimal changes and set suggestedName equal to categoryName.
+- Return "suggested" as HTML using <ul>/<ol>/<li>.
+- Return "current" as HTML matching the source.
+- Include every category from the input skills.categories array in the output, in the same order.
+- "categoryIndex" must match the 0-based position in the input array.
+- "suggestedName" must always be present (use the original name when no rename is warranted).
+
 # matchSummary rules
 - 1-2 short sentences, neutral tone, plain text.
 - Describe the overall fit based on the sub-scores.
@@ -459,6 +490,18 @@ Hard constraints:
       "score": "integer 0-100 (how weak the current achievements are before tailoring)",
       "issues": ["string (list any typos, bad wording, or clarity problems found)"],
       "keyImprovements": ["string (2-4 specific changes made and why, referencing the job offer)"]
+    }
+  ],
+  "suggestedSkills": [
+    {
+      "categoryIndex": "integer (0-based index matching the input skills.categories array)",
+      "categoryName": "string (the user's current category name)",
+      "current": "string (the user's current items for this category, as HTML)",
+      "suggested": "string (the tailored items, as HTML using <ul>/<ol>/<li>)",
+      "suggestedName": "string (proposed category name; equal to categoryName when no rename is warranted)",
+      "score": "integer 0-100 (how weak the current category is before tailoring)",
+      "issues": ["string (list any typos, bad wording, or clarity problems found)"],
+      "keyImprovements": ["string (1-4 specific changes made and why, referencing the job offer)"]
     }
   ]
 }

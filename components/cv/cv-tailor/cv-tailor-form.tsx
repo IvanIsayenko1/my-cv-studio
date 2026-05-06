@@ -59,6 +59,7 @@ export default function CVTailorForm({ id }: { id: string }) {
       );
       setReview(response);
       setIsReviewOpen(true);
+      console.log("Tailor review received:", response);
     } catch (err) {
       console.error("Tailor request failed:", err);
     } finally {

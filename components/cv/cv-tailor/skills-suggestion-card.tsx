@@ -7,49 +7,47 @@ import { Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
 import {
-  useSaveWorkExperience,
-  useWorkExperienceSuspenseQuery,
-} from "@/hooks/cv/use-work-experience";
+  useSaveSkills,
+  useSkillsSuspenseQuery,
+} from "@/hooks/cv/use-skills";
 
-import { CVTailorExperienceSuggestion } from "@/types/ai-tailor-review";
+import { CVTailorSkillsSuggestion } from "@/types/ai-tailor-review";
 
-export default function ExperienceSuggestionCard({
+export default function SkillsSuggestionCard({
   suggestion,
 }: {
-  suggestion: CVTailorExperienceSuggestion;
+  suggestion: CVTailorSkillsSuggestion;
 }) {
   const cvId = useParams().id as string;
-  const { data: workExperienceData } = useWorkExperienceSuspenseQuery(cvId);
-  const { mutate, isPending, isSuccess } = useSaveWorkExperience(cvId);
+  const { data: skillsData } = useSkillsSuspenseQuery(cvId);
+  const { mutate, isPending, isSuccess } = useSaveSkills(cvId);
 
-  const [edited, setEdited] = useState(suggestion.suggested);
+  const [editedItems, setEditedItems] = useState(suggestion.suggested);
+  const [editedName, setEditedName] = useState(suggestion.suggestedName);
 
-  const currentRole = workExperienceData?.workExperience[suggestion.roleIndex];
+  const currentCategory = skillsData?.categories[suggestion.categoryIndex];
 
   const handleAccept = () => {
-    if (!edited.trim() || !workExperienceData) return;
-    const updated = workExperienceData.workExperience.map((role, index) =>
-      index === suggestion.roleIndex
-        ? { ...role, achievements: edited.trim() }
-        : role
+    if (!editedItems.trim() || !editedName.trim() || !skillsData) return;
+    const updated = skillsData.categories.map((category, index) =>
+      index === suggestion.categoryIndex
+        ? { name: editedName.trim(), items: editedItems.trim() }
+        : category
     );
-    mutate({ workExperience: updated });
+    mutate({ categories: updated });
   };
-
-  const roleLabel = suggestion.jobTitle
-    ? `${suggestion.jobTitle}${suggestion.company ? ` at ${suggestion.company}` : ""}`
-    : `Role ${suggestion.roleIndex + 1}`;
 
   return (
     <Card className="m-[1px]">
       <CardContent className="flex flex-col gap-4 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-            Suggested experience improvement
+            Suggested skill category
           </p>
           {suggestion.issues.length > 0 && (
             <Badge variant="outline" className="text-xs font-normal">
@@ -59,9 +57,7 @@ export default function ExperienceSuggestionCard({
           )}
         </div>
 
-        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-          {roleLabel}
-        </h4>
+        <p className="text-sm font-medium">{suggestion.categoryName}</p>
 
         {suggestion.keyImprovements?.length > 0 && (
           <div className="flex flex-col gap-1.5">
@@ -92,13 +88,37 @@ export default function ExperienceSuggestionCard({
           </div>
         )}
 
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-3">
+          <div className="flex-1">
+            <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
+              Current name
+            </label>
+            <Input
+              value={currentCategory?.name || ""}
+              disabled
+              className="pointer-events-none opacity-70"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
+              New name
+            </label>
+            <Input
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              placeholder="Category name..."
+              disabled={isSuccess}
+            />
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2">
           <div className="flex-1">
             <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              Current
+              Current items
             </label>
             <RichTextEditor
-              value={currentRole?.achievements || ""}
+              value={currentCategory?.items || ""}
               onChange={() => {}}
               disabled
               placeholder="(empty)"
@@ -107,12 +127,12 @@ export default function ExperienceSuggestionCard({
           </div>
           <div className="flex-1">
             <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-              New
+              New items
             </label>
             <RichTextEditor
-              value={edited}
-              onChange={setEdited}
-              placeholder="Tailored achievements..."
+              value={editedItems}
+              onChange={setEditedItems}
+              placeholder="Tailored items..."
               minHeightClassName="min-h-[120px]"
               disabled={isSuccess}
             />
@@ -124,7 +144,12 @@ export default function ExperienceSuggestionCard({
             size="sm"
             className="cv-form-primary-action"
             onClick={handleAccept}
-            disabled={isPending || isSuccess || !edited.trim()}
+            disabled={
+              isPending ||
+              isSuccess ||
+              !editedItems.trim() ||
+              !editedName.trim()
+            }
           >
             {isPending ? (
               <>

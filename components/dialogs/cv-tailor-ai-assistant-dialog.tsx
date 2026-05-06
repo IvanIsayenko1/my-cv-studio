@@ -1,5 +1,6 @@
 import ExperienceSuggestionCard from "@/components/cv/cv-tailor/experience-suggestion-card";
 import MatchOverviewCard from "@/components/cv/cv-tailor/match-overview-card";
+import SkillsSuggestionCard from "@/components/cv/cv-tailor/skills-suggestion-card";
 import SummarySuggestionCard from "@/components/cv/cv-tailor/summary-suggestion-card";
 import TitleSuggestionCard from "@/components/cv/cv-tailor/title-suggestion-card";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,9 @@ export default function CVTailorAIAssistantDialog({
       <SummarySuggestionCard suggestedSummary={review.suggestedSummary} />
       {review.suggestedExperience?.map((exp) => (
         <ExperienceSuggestionCard key={exp.roleIndex} suggestion={exp} />
+      ))}
+      {review.suggestedSkills?.map((skills) => (
+        <SkillsSuggestionCard key={skills.categoryIndex} suggestion={skills} />
       ))}
     </div>
   ) : (
