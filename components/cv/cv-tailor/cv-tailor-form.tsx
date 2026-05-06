@@ -53,6 +53,7 @@ export default function CVTailorForm({ id }: { id: string }) {
       return;
     }
     setIsConsultingAI(true);
+    console.log("Submitting tailor form with values:", fullCV);
     try {
       const response = await askGroqTailor<CVTailorReview>(
         buildTailorMessages(fullCV, values.offerDescription)

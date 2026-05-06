@@ -312,197 +312,85 @@ Expected JSON shape:
 `;
 
 export const CV_TAILOR_MODULE = `
-Compare the user's CV against the job offer. Report:
-1) A headline fit score with sub-scores for each dimension.
-2) Extracted keywords/skills from the job offer.
-3) (Optional) A single replacement for the user's professional title, but ONLY if it would clearly improve the fit. Otherwise return null.
-4) A rewritten professional summary tailored to the job offer.
-5) Tailored achievement rewrites for each work experience role, aligned with the job offer.
-6) Tailored skill category rewrites for each skills category, aligned with the job offer.
+Compare the user's CV against the job offer and return ONLY the JSON object below — no prose, no markdown, no fences.
 
 # Language
-Respond in the same language as the job offer. All text fields (matchSummary, reason, suggestedSummary) must use that language.
+Respond in the same language as the job offer (matchSummary, reason, all suggested* text).
 
-# Hard rules
-- Base the score ONLY on what the CV actually contains. Never assume skills, tools, or experience the user did not list.
-- Never inflate. If evidence is missing, the score must reflect that.
-- Use the visible text of any HTML fields. Ignore the markup.
-- If the job offer is extremely short or vague (e.g. fewer than 3 concrete requirements), set matchPercentage to 50 or below and state that the offer lacks detail in matchSummary.
+# Universal rules (apply everywhere)
+- Base everything ONLY on what the CV contains. Never invent skills, tools, employers, metrics, seniority, or outcomes.
+- Use the visible text of HTML fields; ignore markup.
+- For every array section (suggestedExperience, suggestedSkills, suggestedProjects, suggestedCertifications, suggestedAwards, suggestedLanguages): emit one entry per input item, in input order, with the *Index field matching the 0-based position.
+- Score scale (integer 0-100, same everywhere): 85-100 strong/clean, 65-84 minor cleanup, 40-64 real issues, 0-39 weak/empty.
+- If an item is already strong (score >= 85), set suggested* fields equal to current values with only minimal cleanup.
+- Do NOT echo the user's existing values back. The client already has them. Only output the "suggested*" fields and metadata listed in the schema.
 
-# How to score (matchPercentage, integer 0-100)
-Compute sub-scores first, then derive the overall score:
-
-  matchPercentage = round(skillScore * 0.50 + seniorityScore * 0.25 + domainScore * 0.15 + niceToHaveScore * 0.10)
-
-Sub-score definitions (each is an integer 0-100):
-- skillScore: required skills, tools, and technologies the offer explicitly asks for and the CV demonstrates.
-- seniorityScore: role / seniority alignment (job title, years of experience, scope).
+# matchPercentage
+matchPercentage = round(skillScore * 0.50 + seniorityScore * 0.25 + domainScore * 0.15 + niceToHaveScore * 0.10).
+Sub-scores (each 0-100):
+- skillScore: required skills/tools the offer asks for and the CV demonstrates.
+- seniorityScore: role/seniority alignment.
 - domainScore: domain or industry relevance.
 - niceToHaveScore: nice-to-haves and softer signals.
+If the offer has fewer than 3 concrete requirements, cap matchPercentage at 50 and note this in matchSummary.
 
-Anchors for each sub-score:
-- 85-100: strong match, clearly demonstrated.
-- 65-84: solid match with a few real gaps.
-- 40-64: partial fit, several important requirements missing.
-- 0-39: weak fit, fundamentally different or missing core requirements.
+# extractedKeywords
+5-15 ATS-relevant skills/tools/methods/role terms explicitly mentioned in the offer.
 
-# Extracted keywords (extractedKeywords)
-List the key skills, tools, technologies, methodologies, and role-specific terms explicitly mentioned in the job offer. Include only the ones that are relevant for ATS matching. Keep the list concise (5-15 items). Use the same language as the offer.
+# matchSummary
+1-2 neutral plain-text sentences on overall fit. Do NOT list changes or repeat keywords.
 
-# Title suggestion rules (titleSuggestion)
-Inspect the user's current personalInfo.professionalTitle.
+# titleSuggestion
+Suggest a replacement when ANY is true: title contains junk/jokes/emoji/typos; is overly long or cluttered; misrepresents role or seniority vs. CV evidence; is meaningfully misaligned with the offer. Otherwise return null.
+Constraints: 2-8 words (max 12); never upgrade seniority beyond CV evidence; "current" verbatim; "suggested" must differ beyond whitespace; "reason" = one short sentence.
 
-Suggest a replacement when ANY of these is true:
-- The title contains obvious junk, jokes, emoji, typos, or non-professional text (e.g. "hahaha", "lol", "(WIP)", random punctuation, mojibake).
-- The title is overly long, cluttered, or buried under parentheticals that hurt readability.
-- The title misrepresents the user's role family or seniority compared to what the CV actually shows.
-- The title's role family or seniority is meaningfully misaligned with the offer (e.g. CV shows backend, offer is full-stack lead).
+# suggestedSummary
+Plain text, 3-5 sentences. Cover when supported: identity + experience, 3-4 core skills matching the offer, quantified achievements (only if backed by source), value proposition for the offer, 1-2 natural soft-skill adjectives. Incorporate offer keywords where they naturally apply. If already strong, return nearly unchanged.
 
-Return null when ALL of these are true:
-- The title reads as clean, professional, recruiter-ready.
-- The title's role family and seniority align reasonably with both the CV evidence and the offer.
-- Any further change would be a purely stylistic tweak.
+# suggestedExperience (per role)
+Rewrite achievements as bullets emphasizing impact, action verbs, and offer keywords that match real experience. Flag issues (typos, awkward phrasing, generic statements, responsibility-focused language, repetition, filler). "suggested" is HTML (<ul>/<ol>/<li> for bullets, <p>/<br> otherwise). keyImprovements: 2-4 specific changes referencing the offer (e.g. "Reordered to lead with React/TypeScript (offer requirement)", "Fixed typo: 'managment' → 'management'").
 
-Hard rules for the suggested title:
-- Must be supported by what the CV actually shows. Do not invent or upgrade seniority (no Junior → Senior, no IC → Lead, no Engineer → Architect unless the CV clearly demonstrates it).
-- Concise: 2-8 words, never more than 12.
-- No emoji, no jokes, no parentheticals unless they add real signal (e.g. a primary stack like "(React, TypeScript)" is fine; "(hahaha)" is not).
-- Never copy the offer's title verbatim if it overstates the user's seniority — adapt down if needed.
+# suggestedSkills (per category)
+Reorder items so offer-relevant ones come first. Drop items not supported by the rest of the CV. Rename the category if vague or off-target. Never add items the CV doesn't imply. "suggested" is HTML <ul>/<ol>/<li>. "suggestedName" always present (use original when no rename). keyImprovements: 1-4 specific changes.
 
-Field rules:
-- "current" must be the exact current value of personalInfo.professionalTitle (verbatim, including any junk).
-- "suggested" must differ from "current" beyond whitespace.
-- "reason": ONE short sentence. If you cleaned junk, say so plainly ("Removes 'hahaha' so the title reads professionally"). Otherwise explain the alignment gain.
+# Description polish (suggestedProjects, suggestedAwards)
+Polish the description for typos, grammar, clarity. NOT a tailoring step — do NOT inject offer keywords; stay close to the original. "suggested" is HTML (<ul>/<ol>/<li> or <p>/<br>). keyImprovements: 1-4 specific polish changes.
 
-# Suggested summary rules (suggestedSummary)
-Rewrite the user's professional summary to better align with the job offer. The summary must follow this structure when supported by the user's actual experience:
+# Field polish (suggestedCertifications, suggestedLanguages)
+Only fix typos and non-standard wording. Do NOT change correct, well-spelled values. For languages, normalize proficiency to a standard label (native/fluent/advanced/intermediate/basic or CEFR A1-C2) only when the current value is unclear. Set suggested* equal to current* when no fix is needed.
 
-1. Current Professional Identity: Start with a strong title and years of experience (e.g., "Seasoned Project Manager with 8+ years...").
-2. Key Skills & Expertise: Highlight 3-4 core competencies, technical skills, or industry-specific expertise that match the job description.
-3. Quantified Achievements: Use numbers, percentages, or concrete outcomes to prove impact (revenue generated, costs saved, efficiency improved) — but ONLY if supported by the original summary or CV.
-4. Value Proposition: Explain how the user's experience solves the specific problems listed in the job description.
-5. Soft Skills/Attributes: Include 1-2 adjectives that describe work ethic (e.g., "adaptable," "innovative") — only if they fit naturally.
-
-Hard constraints:
-- Preserve ALL facts, metrics, and achievements from the original. Never invent employers, tools, metrics, or seniority.
-- Incorporate relevant keywords from extractedKeywords where naturally applicable (for ATS).
-- Keep it concise: 3-5 sentences.
-- Return as plain text, NOT HTML or markdown.
-- If the current summary is already strong (overall fit score >= 85), return it unchanged or with only minimal tweaks.
-
-# Suggested experience rules (suggestedExperience)
-For each role in the user's workExperience array, produce a tailored rewrite of the achievements that aligns with the job offer.
-
-Structure the rewritten achievements as bullet points highlighting:
-- Impact and outcomes over responsibilities (e.g., "Reduced page load time by 40%" not "Responsible for performance optimization").
-- Keywords from the job offer where they naturally match the user's actual experience.
-- Quantified results when available; if no numbers exist, use concrete descriptions of scope or contribution.
-- Clear action verbs at the start of each bullet (e.g., "Led," "Built," "Optimized," "Delivered").
-
-Also flag any issues in the current achievements:
-- Typos or spelling errors
-- Awkward phrasing or bad wording
-- Overly generic or interchangeable statements
-- Responsibility-focused language instead of achievement-focused
-- Repetition or filler
-
-Scoring (score field, integer 0-100):
-- 85-100: already strong; only minor tweaks needed for the offer
-- 65-84: good but needs rewording to better match the offer
-- 40-64: vague or responsibility-focused; needs meaningful rewrite
-- 0-39: very weak, empty, or missing achievements
-
-Key improvements (keyImprovements field):
-List 2-4 specific changes you made and why, referencing the job offer. Examples:
-- "Reordered to highlight React/TypeScript experience first (explicitly required in the offer)"
-- "Replaced responsibility-focused bullet with impact-focused version ('Reduced load time by 40%')"
-- "Added mention of CI/CD pipeline experience (listed as required skill in the offer)"
-- "Fixed typo: 'managment' → 'management'"
-
-Hard constraints:
-- Preserve ALL facts from the original. Never invent metrics, tools, employers, or seniority.
-- If a role's achievements are already strong, return the current text with only minimal changes.
-- Return "suggested" as HTML: use <ul>/<ol>/<li> for bullet lists, or <p>/<br> for paragraphs.
-- Return "current" as plain text (strip any HTML from the input).
-- Include every role from the input workExperience array in the output, in the same order.
-- "roleIndex" must match the 0-based position in the input array.
-
-# Suggested skills rules (suggestedSkills)
-For each category in the user's skills.categories array, produce a tailored rewrite of the items aligned with the job offer.
-
-Goals:
-- Reorder items so that those most relevant to the job offer come first.
-- Remove or de-emphasize items the user does NOT clearly demonstrate elsewhere if they would dilute the category.
-- Keep only what the CV actually supports. NEVER add tools, technologies, or skills not already implied by the user's CV.
-- Suggest a clearer category name when the current name is vague or misaligned with the offer's terminology.
-
-Scoring (score field, integer 0-100):
-- 85-100: already strong; only minor tweaks needed for the offer
-- 65-84: good but needs reordering or renaming to better match the offer
-- 40-64: vague or misaligned; needs meaningful rewrite
-- 0-39: very weak, empty, or misleading category
-
-Key improvements (keyImprovements field):
-List 1-4 specific changes you made and why, referencing the job offer. Examples:
-- "Moved 'React, TypeScript' to the top (explicitly required in the offer)"
-- "Renamed 'Tech Stuff' to 'Frontend Stack' for clarity"
-- "Removed generic 'team player' which is not a technical skill"
-
-Hard constraints:
-- Preserve ALL items present in the source unless they are clearly off-topic for the category. Never invent new items.
-- If the category is already strong, return the current items with only minimal changes and set suggestedName equal to categoryName.
-- Return "suggested" as HTML using <ul>/<ol>/<li>.
-- Return "current" as HTML matching the source.
-- Include every category from the input skills.categories array in the output, in the same order.
-- "categoryIndex" must match the 0-based position in the input array.
-- "suggestedName" must always be present (use the original name when no rename is warranted).
-
-# matchSummary rules
-- 1-2 short sentences, neutral tone, plain text.
-- Describe the overall fit based on the sub-scores.
-- Do NOT list specific changes or suggest improvements — later steps handle that.
-- Do NOT repeat the extracted keywords.
-
-# JSON schema (return ONLY this object, no prose, no fences, no additional fields)
+# JSON schema
+Return ONE single JSON object with ALL of the keys below at the top level, in this order. Do not split it into multiple objects. Every key must be present.
+"titleSuggestion" is either an object with the shape shown, or the JSON literal null — never omitted.
 
 {
-  "jobTitle": "string (the role title from the OFFER — copied or normalized, never the user's current CV title)",
-  "matchPercentage": "integer 0-100",
-  "skillScore": "integer 0-100",
-  "seniorityScore": "integer 0-100",
-  "domainScore": "integer 0-100",
-  "niceToHaveScore": "integer 0-100",
-  "matchSummary": "string (1-2 short sentences, neutral tone, plain text)",
-  "extractedKeywords": ["string (5-15 key terms from the offer)"],
-  "titleSuggestion": {
-    "current": "string (verbatim current personalInfo.professionalTitle)",
-    "suggested": "string (the proposed replacement)",
-    "reason": "string (one short sentence)"
-  } | null,
-  "suggestedSummary": "string (the rewritten professional summary, plain text, 3-5 sentences)",
+  "jobTitle": "string (role title from the OFFER, never the user's CV title)",
+  "matchPercentage": "int 0-100",
+  "skillScore": "int 0-100",
+  "seniorityScore": "int 0-100",
+  "domainScore": "int 0-100",
+  "niceToHaveScore": "int 0-100",
+  "matchSummary": "string",
+  "extractedKeywords": ["string"],
+  "titleSuggestion": { "current": "string", "suggested": "string", "reason": "string" },
+  "suggestedSummary": "string (plain text, 3-5 sentences)",
   "suggestedExperience": [
-    {
-      "roleIndex": "integer (0-based index matching the input workExperience array)",
-      "jobTitle": "string (the user's current jobTitle for this role)",
-      "company": "string (the user's current company for this role)",
-      "current": "string (the user's current achievements for this role, as plain text)",
-      "suggested": "string (the tailored achievements, as HTML using <ul>/<ol>/<li> or <p>/<br>)",
-      "score": "integer 0-100 (how weak the current achievements are before tailoring)",
-      "issues": ["string (list any typos, bad wording, or clarity problems found)"],
-      "keyImprovements": ["string (2-4 specific changes made and why, referencing the job offer)"]
-    }
+    { "roleIndex": "int", "jobTitle": "string", "company": "string", "suggested": "string (HTML)", "score": "int 0-100", "issues": ["string"], "keyImprovements": ["string"] }
   ],
   "suggestedSkills": [
-    {
-      "categoryIndex": "integer (0-based index matching the input skills.categories array)",
-      "categoryName": "string (the user's current category name)",
-      "current": "string (the user's current items for this category, as HTML)",
-      "suggested": "string (the tailored items, as HTML using <ul>/<ol>/<li>)",
-      "suggestedName": "string (proposed category name; equal to categoryName when no rename is warranted)",
-      "score": "integer 0-100 (how weak the current category is before tailoring)",
-      "issues": ["string (list any typos, bad wording, or clarity problems found)"],
-      "keyImprovements": ["string (1-4 specific changes made and why, referencing the job offer)"]
-    }
+    { "categoryIndex": "int", "categoryName": "string", "suggested": "string (HTML)", "suggestedName": "string", "score": "int 0-100", "issues": ["string"], "keyImprovements": ["string"] }
+  ],
+  "suggestedProjects": [
+    { "projectIndex": "int", "projectName": "string", "suggested": "string (HTML)", "score": "int 0-100", "issues": ["string"], "keyImprovements": ["string"] }
+  ],
+  "suggestedCertifications": [
+    { "certificationIndex": "int", "suggestedName": "string", "suggestedIssuer": "string", "score": "int 0-100", "issues": ["string"] }
+  ],
+  "suggestedAwards": [
+    { "awardIndex": "int", "awardName": "string", "suggested": "string", "score": "int 0-100", "issues": ["string"], "keyImprovements": ["string"] }
+  ],
+  "suggestedLanguages": [
+    { "languageIndex": "int", "suggestedLanguage": "string", "suggestedProficiency": "string", "score": "int 0-100", "issues": ["string"] }
   ]
 }
 `;

@@ -1,5 +1,9 @@
+import AwardSuggestionCard from "@/components/cv/cv-tailor/award-suggestion-card";
+import CertificationSuggestionCard from "@/components/cv/cv-tailor/certification-suggestion-card";
 import ExperienceSuggestionCard from "@/components/cv/cv-tailor/experience-suggestion-card";
+import LanguageSuggestionCard from "@/components/cv/cv-tailor/language-suggestion-card";
 import MatchOverviewCard from "@/components/cv/cv-tailor/match-overview-card";
+import ProjectSuggestionCard from "@/components/cv/cv-tailor/project-suggestion-card";
 import SkillsSuggestionCard from "@/components/cv/cv-tailor/skills-suggestion-card";
 import SummarySuggestionCard from "@/components/cv/cv-tailor/summary-suggestion-card";
 import TitleSuggestionCard from "@/components/cv/cv-tailor/title-suggestion-card";
@@ -63,6 +67,24 @@ export default function CVTailorAIAssistantDialog({
       ))}
       {review.suggestedSkills?.map((skills) => (
         <SkillsSuggestionCard key={skills.categoryIndex} suggestion={skills} />
+      ))}
+      {review.suggestedProjects?.map((project) => (
+        <ProjectSuggestionCard
+          key={project.projectIndex}
+          suggestion={project}
+        />
+      ))}
+      {review.suggestedCertifications?.map((cert) => (
+        <CertificationSuggestionCard
+          key={cert.certificationIndex}
+          suggestion={cert}
+        />
+      ))}
+      {review.suggestedAwards?.map((award) => (
+        <AwardSuggestionCard key={award.awardIndex} suggestion={award} />
+      ))}
+      {review.suggestedLanguages?.map((lang) => (
+        <LanguageSuggestionCard key={lang.languageIndex} suggestion={lang} />
       ))}
     </div>
   ) : (
