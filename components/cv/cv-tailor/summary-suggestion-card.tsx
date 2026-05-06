@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { useParams } from "next/navigation";
 
 import { Save } from "lucide-react";
 
@@ -7,7 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
-import { CVTailorReview } from "@/types/ai-tailor-review";
+import {
+  useSaveSummary,
+  useSummarySuspenseQuery,
+} from "@/hooks/cv/use-summary";
 
 function plainToHtml(text: string) {
   if (!text.trim()) return "";
@@ -19,25 +24,22 @@ function plainToHtml(text: string) {
 }
 
 export default function SummarySuggestionCard({
-  currentSummary,
-  review,
-  isApplying,
-  isApplied,
-  onAccept,
+  suggestedSummary,
 }: {
-  currentSummary: string;
-  review: CVTailorReview;
-  isApplying: boolean;
-  isApplied: boolean;
-  onAccept: (value: string) => void;
+  suggestedSummary: string;
 }) {
+  const cvId = useParams().id as string;
+  const { data: summary } = useSummarySuspenseQuery(cvId);
+  const { mutate, isPending, isSuccess } = useSaveSummary(cvId);
+
   const [editedSummary, setEditedSummary] = useState(
-    plainToHtml(review.suggestedSummary)
+    plainToHtml(suggestedSummary)
   );
 
-  useEffect(() => {
-    setEditedSummary(plainToHtml(review.suggestedSummary));
-  }, [review.suggestedSummary]);
+  const handleAccept = () => {
+    if (!editedSummary.trim()) return;
+    mutate({ professionalSummary: editedSummary.trim() });
+  };
 
   return (
     <Card className="m-[1px]">
@@ -58,7 +60,7 @@ export default function SummarySuggestionCard({
               Current summary
             </label>
             <RichTextEditor
-              value={currentSummary}
+              value={summary?.professionalSummary || ""}
               onChange={() => {}}
               disabled
               placeholder="(empty)"
@@ -74,7 +76,7 @@ export default function SummarySuggestionCard({
               onChange={setEditedSummary}
               placeholder="Your tailored professional summary..."
               minHeightClassName="min-h-[120px]"
-              disabled={isApplied}
+              disabled={isSuccess}
             />
           </div>
         </div>
@@ -83,15 +85,15 @@ export default function SummarySuggestionCard({
           <Button
             size="sm"
             className="cv-form-primary-action"
-            onClick={() => onAccept(editedSummary)}
-            disabled={isApplying || isApplied || !editedSummary.trim()}
+            onClick={handleAccept}
+            disabled={isPending || isSuccess || !editedSummary.trim()}
           >
-            {isApplying ? (
+            {isPending ? (
               <>
                 <Spinner />
                 Applying...
               </>
-            ) : isApplied ? (
+            ) : isSuccess ? (
               "Applied"
             ) : (
               <>

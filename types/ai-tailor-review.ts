@@ -4,6 +4,17 @@ export interface CVTailorTitleSuggestion {
   reason: string;
 }
 
+export interface CVTailorExperienceSuggestion {
+  roleIndex: number;
+  jobTitle: string;
+  company: string;
+  current: string;
+  suggested: string;
+  score: number;
+  issues: string[];
+  keyImprovements: string[];
+}
+
 export interface CVTailorReview {
   jobTitle: string;
   matchPercentage: number;
@@ -15,4 +26,5 @@ export interface CVTailorReview {
   extractedKeywords: string[];
   titleSuggestion: CVTailorTitleSuggestion | null;
   suggestedSummary: string;
+  suggestedExperience: CVTailorExperienceSuggestion[];
 }

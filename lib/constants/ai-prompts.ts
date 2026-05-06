@@ -175,19 +175,19 @@ How to judge:
 - Different wording alone is NOT a reason to lower the score.
 
 What counts as genuinely weak:
-- mostly responsibilities instead of achievements
-- vague wording with little concrete meaning
-- obvious repetition or filler
-- confusing structure
-- statements that sound generic and interchangeable
-- skill/tool dumping without showing contribution
+- Mostly responsibilities instead of achievements
+- Vague wording with little concrete meaning
+- Obvious repetition or filler
+- Confusing structure
+- Statements that sound generic and interchangeable
+- Skill/tool dumping without showing contribution
 
 What counts as already good:
-- clear and credible wording
-- specific contribution or improvement
-- achievement-oriented phrasing
-- understandable business/product/context details when present
-- clean structure that reads well on a CV
+- Clear and credible wording
+- Specific contribution or improvement
+- Achievement-oriented phrasing
+- Understandable business/product/context details when present
+- Clean structure that reads well on a CV
 
 Important constraints:
 - The achievements field may contain HTML from a rich-text editor. Evaluate the visible text content, not the markup itself.
@@ -317,8 +317,7 @@ Compare the user's CV against the job offer. Report:
 2) Extracted keywords/skills from the job offer.
 3) (Optional) A single replacement for the user's professional title, but ONLY if it would clearly improve the fit. Otherwise return null.
 4) A rewritten professional summary tailored to the job offer.
-
-Do NOT suggest other rewrites, missing skills, or improvements yet. Later steps will handle that.
+5) Tailored achievement rewrites for each work experience role, aligned with the job offer.
 
 # Language
 Respond in the same language as the job offer. All text fields (matchSummary, reason, suggestedSummary) must use that language.
@@ -390,6 +389,43 @@ Hard constraints:
 - Return as plain text, NOT HTML or markdown.
 - If the current summary is already strong (overall fit score >= 85), return it unchanged or with only minimal tweaks.
 
+# Suggested experience rules (suggestedExperience)
+For each role in the user's workExperience array, produce a tailored rewrite of the achievements that aligns with the job offer.
+
+Structure the rewritten achievements as bullet points highlighting:
+- Impact and outcomes over responsibilities (e.g., "Reduced page load time by 40%" not "Responsible for performance optimization").
+- Keywords from the job offer where they naturally match the user's actual experience.
+- Quantified results when available; if no numbers exist, use concrete descriptions of scope or contribution.
+- Clear action verbs at the start of each bullet (e.g., "Led," "Built," "Optimized," "Delivered").
+
+Also flag any issues in the current achievements:
+- Typos or spelling errors
+- Awkward phrasing or bad wording
+- Overly generic or interchangeable statements
+- Responsibility-focused language instead of achievement-focused
+- Repetition or filler
+
+Scoring (score field, integer 0-100):
+- 85-100: already strong; only minor tweaks needed for the offer
+- 65-84: good but needs rewording to better match the offer
+- 40-64: vague or responsibility-focused; needs meaningful rewrite
+- 0-39: very weak, empty, or missing achievements
+
+Key improvements (keyImprovements field):
+List 2-4 specific changes you made and why, referencing the job offer. Examples:
+- "Reordered to highlight React/TypeScript experience first (explicitly required in the offer)"
+- "Replaced responsibility-focused bullet with impact-focused version ('Reduced load time by 40%')"
+- "Added mention of CI/CD pipeline experience (listed as required skill in the offer)"
+- "Fixed typo: 'managment' → 'management'"
+
+Hard constraints:
+- Preserve ALL facts from the original. Never invent metrics, tools, employers, or seniority.
+- If a role's achievements are already strong, return the current text with only minimal changes.
+- Return "suggested" as HTML: use <ul>/<ol>/<li> for bullet lists, or <p>/<br> for paragraphs.
+- Return "current" as plain text (strip any HTML from the input).
+- Include every role from the input workExperience array in the output, in the same order.
+- "roleIndex" must match the 0-based position in the input array.
+
 # matchSummary rules
 - 1-2 short sentences, neutral tone, plain text.
 - Describe the overall fit based on the sub-scores.
@@ -412,6 +448,18 @@ Hard constraints:
     "suggested": "string (the proposed replacement)",
     "reason": "string (one short sentence)"
   } | null,
-  "suggestedSummary": "string (the rewritten professional summary, plain text, 3-5 sentences)"
+  "suggestedSummary": "string (the rewritten professional summary, plain text, 3-5 sentences)",
+  "suggestedExperience": [
+    {
+      "roleIndex": "integer (0-based index matching the input workExperience array)",
+      "jobTitle": "string (the user's current jobTitle for this role)",
+      "company": "string (the user's current company for this role)",
+      "current": "string (the user's current achievements for this role, as plain text)",
+      "suggested": "string (the tailored achievements, as HTML using <ul>/<ol>/<li> or <p>/<br>)",
+      "score": "integer 0-100 (how weak the current achievements are before tailoring)",
+      "issues": ["string (list any typos, bad wording, or clarity problems found)"],
+      "keyImprovements": ["string (2-4 specific changes made and why, referencing the job offer)"]
+    }
+  ]
 }
 `;

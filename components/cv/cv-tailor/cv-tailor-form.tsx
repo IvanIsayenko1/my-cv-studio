@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { askGroqTailor } from "@/app/actions/groq";
@@ -26,11 +26,6 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
 
 import { useCompleteCvSuspenseQuery } from "@/hooks/cv/use-cv";
-import {
-  usePersonalInfoSuspenseQuery,
-  useSavePersonalInfo,
-} from "@/hooks/cv/use-personal-info";
-import { useSaveSummary } from "@/hooks/cv/use-summary";
 
 import { buildTailorMessages } from "@/lib/utils/ai";
 
@@ -40,15 +35,10 @@ import { TailorFormValues, tailorSchema } from "@/schemas/tailor";
 
 export default function CVTailorForm({ id }: { id: string }) {
   const fullCV = useCompleteCvSuspenseQuery(id);
-  const { data: personalInfo } = usePersonalInfoSuspenseQuery(id);
-  const savePersonalInfo = useSavePersonalInfo(id);
-  const saveSummary = useSaveSummary(id);
 
   const [isConsultingAI, setIsConsultingAI] = useState(false);
-  const [review, setReview] = useState<CVTailorReview | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [isTitleApplied, setIsTitleApplied] = useState(false);
-  const [isSummaryApplied, setIsSummaryApplied] = useState(false);
+  const [review, setReview] = useState<CVTailorReview | null>(null);
 
   const form = useForm<TailorFormValues>({
     resolver: zodResolver(tailorSchema),
@@ -56,10 +46,6 @@ export default function CVTailorForm({ id }: { id: string }) {
       offerDescription: "",
     },
   });
-
-  useEffect(() => {
-    setIsTitleApplied(false);
-  }, [review]);
 
   const onSubmit = async (values: TailorFormValues) => {
     if (!fullCV) {
@@ -73,7 +59,6 @@ export default function CVTailorForm({ id }: { id: string }) {
       );
       setReview(response);
       setIsReviewOpen(true);
-      console.log("Tailor review received:", response);
     } catch (err) {
       console.error("Tailor request failed:", err);
     } finally {
@@ -81,97 +66,76 @@ export default function CVTailorForm({ id }: { id: string }) {
     }
   };
 
-  const handleAcceptTitle = (value: string) => {
-    if (!personalInfo || !value.trim()) return;
-    savePersonalInfo.mutate(
-      { ...personalInfo, professionalTitle: value.trim() },
-      { onSuccess: () => setIsTitleApplied(true) }
-    );
-  };
-
-  const handleAcceptSummary = (value: string) => {
-    if (!value.trim()) return;
-    saveSummary.mutate(
-      { professionalSummary: value.trim() },
-      { onSuccess: () => setIsSummaryApplied(true) }
-    );
-  };
-
   return (
-    <div className="mb-4 w-full p-[1px]">
+    <>
+      <div className="mb-4 w-full p-[1px]">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Tailor Your CV</CardTitle>
+            <CardDescription>
+              Adapt your CV to specific job offers by analyzing the offer
+              description and providing tailored suggestions for improvements.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col gap-8"
+                id="tailor-form"
+              >
+                <FormField
+                  control={form.control}
+                  name="offerDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Offer Description
+                        <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <RichTextEditor
+                          key={field.name}
+                          {...field}
+                          placeholder="Paste the job offer description here..."
+                          minHeightClassName="min-h-[400px]"
+                        />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="cv-form-actions">
+            {review ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsReviewOpen(true)}
+              >
+                View last review
+              </Button>
+            ) : null}
+            <Button
+              type="submit"
+              form="tailor-form"
+              className="cv-form-primary-action ml-auto"
+              disabled={isConsultingAI}
+            >
+              {isConsultingAI && <Spinner />}
+              {isConsultingAI ? "Consulting AI..." : "Get Tailored Suggestions"}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
       <CVTailorAIAssistantDialog
         isOpenDialog={isReviewOpen}
         setIsOpenDialog={setIsReviewOpen}
         review={review}
-        currentSummary={fullCV?.professionalSummary || ""}
-        isApplyingTitle={savePersonalInfo.isPending}
-        isTitleApplied={isTitleApplied}
-        onAcceptTitle={handleAcceptTitle}
-        isApplyingSummary={saveSummary.isPending}
-        isSummaryApplied={isSummaryApplied}
-        onAcceptSummary={handleAcceptSummary}
       />
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Tailor Your CV</CardTitle>
-          <CardDescription>
-            Adapt your CV to specific job offers by analyzing the offer
-            description and providing tailored suggestions for improvements.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col gap-8"
-              id="tailor-form"
-            >
-              <FormField
-                control={form.control}
-                name="offerDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Offer Description
-                      <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <RichTextEditor
-                        key={field.name}
-                        {...field}
-                        placeholder="Paste the job offer description here..."
-                        minHeightClassName="min-h-[400px]"
-                      />
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="cv-form-actions">
-          {review ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsReviewOpen(true)}
-            >
-              View last review
-            </Button>
-          ) : null}
-          <Button
-            type="submit"
-            form="tailor-form"
-            className="cv-form-primary-action ml-auto"
-            disabled={isConsultingAI}
-          >
-            {isConsultingAI && <Spinner />}
-            {isConsultingAI ? "Consulting AI..." : "Get Tailored Suggestions"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+    </>
   );
 }

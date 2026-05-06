@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { useParams } from "next/navigation";
+
 import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -7,20 +9,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
+import {
+  usePersonalInfoSuspenseQuery,
+  useSavePersonalInfo,
+} from "@/hooks/cv/use-personal-info";
+
 import { CVTailorTitleSuggestion } from "@/types/ai-tailor-review";
 
 export default function TitleSuggestionCard({
   suggestion,
-  isApplying,
-  isApplied,
-  onAccept,
 }: {
   suggestion: CVTailorTitleSuggestion;
-  isApplying: boolean;
-  isApplied: boolean;
-  onAccept: (value: string) => void;
 }) {
+  const cvId = useParams().id as string;
+  const { data: personalInfo } = usePersonalInfoSuspenseQuery(cvId);
+  const { mutate, isPending, isSuccess } = useSavePersonalInfo(cvId);
+
   const [editedTitle, setEditedTitle] = useState(suggestion.suggested);
+
+  const handleAccept = () => {
+    if (!editedTitle.trim() || !personalInfo) return;
+    mutate({ ...personalInfo, professionalTitle: editedTitle.trim() });
+  };
 
   return (
     <Card className="m-[1px]">
@@ -53,7 +63,7 @@ export default function TitleSuggestionCard({
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
               placeholder="Enter your new professional title..."
-              disabled={isApplied}
+              disabled={isSuccess}
             />
           </div>
         </div>
@@ -61,15 +71,15 @@ export default function TitleSuggestionCard({
         <div className="flex justify-end">
           <Button
             className="cv-form-primary-action"
-            onClick={() => onAccept(editedTitle)}
-            disabled={isApplying || isApplied || !editedTitle.trim()}
+            onClick={handleAccept}
+            disabled={isPending || isSuccess || !editedTitle.trim()}
           >
-            {isApplying ? (
+            {isPending ? (
               <>
                 <Spinner />
                 Applying...
               </>
-            ) : isApplied ? (
+            ) : isSuccess ? (
               "Applied"
             ) : (
               <>

@@ -207,7 +207,7 @@ export default function WorkExperienceAIAssistantDialog({
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
         <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Review the AI Suggestions 1</DialogTitle>
+            <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>
           <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-1">
             {dialogContent}
