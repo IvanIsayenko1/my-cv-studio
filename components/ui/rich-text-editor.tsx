@@ -291,6 +291,18 @@ export function RichTextEditor({
     emitChange();
   };
 
+  /**
+   * Strips formatting from pasted clipboard content so it inherits the editor's styles.
+   * @param event - The paste clipboard event from the editable area
+   */
+  const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    event.preventDefault();
+    const text = event.clipboardData.getData("text/plain");
+    if (!text) return;
+    document.execCommand("insertText", false, text);
+  };
+
   const ensureDefaultListContext = () => {
     ensureListOnlyContext();
     refreshToolbarState();
@@ -334,6 +346,7 @@ export function RichTextEditor({
         data-placeholder={placeholder}
         onFocus={ensureDefaultListContext}
         onInput={emitChange}
+        onPaste={handlePaste}
         onKeyUp={() => {
           saveSelection();
           refreshToolbarState();
