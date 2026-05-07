@@ -22,7 +22,7 @@ export default function AIContentSuggestionCard({
   children: React.ReactNode;
   cardKey: string;
   title: string;
-  summary: string;
+  summary?: string;
   issues: string[];
   typos?: {
     hasTypos: boolean;
@@ -37,7 +37,7 @@ export default function AIContentSuggestionCard({
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>
-          {summary}
+          {summary ? <p>{summary}</p> : null}
           {issues.length > 0 ? (
             <ul className="mt-2 list-disc pl-6">
               {issues.map((issue, index) => (

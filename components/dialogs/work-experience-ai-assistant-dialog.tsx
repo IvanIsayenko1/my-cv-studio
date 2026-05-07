@@ -8,7 +8,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { QUERY_KEYS } from "@/lib/constants/query-keys";
 import { RESOLUTIONS } from "@/lib/constants/resolutions";
 
-import { CVWorkExperienceAIReview } from "@/types/ai-work-experience-review";
+import type { WorkExperienceAIAssistantDialogProps } from "@/types/ai-work-experience-review";
 import { WorkExperienceFormValues } from "@/types/work-experience";
 
 import AIContentSuggestionCard from "../ai/ai-content-suggestion-card";
@@ -40,59 +40,27 @@ export default function WorkExperienceAIAssistantDialog({
   formId,
   currentValues,
   onLocalApplySuggestion,
-}: {
-  isOpenDialog: boolean;
-  setIsOpenDialog: (value: boolean) => void;
-  aiReview: CVWorkExperienceAIReview | null;
-  formId: string;
-  currentValues: WorkExperienceFormValues;
-  onLocalApplySuggestion: (roleIndex: number, achievements: string) => void;
-}) {
-  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
-  const queryClient = useQueryClient();
-  const { mutate, isPending } = useSaveWorkExperience(formId);
+}: WorkExperienceAIAssistantDialogProps) {
+  // React built-in hooks
   const [pendingSuggestionKey, setPendingSuggestionKey] = useState<
     string | null
   >(null);
 
+  // Custom hooks
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useSaveWorkExperience(formId);
+
+  // Filter reviews that have issues needing attention
   const reviewNeedsAttention = aiReview
-    ? aiReview.results.filter((result) => result.score < 8)
+    ? aiReview.results.filter((result) => result.issues.length > 0)
     : [];
 
-  const handleAcceptSuggestion = (
-    roleIndex: number,
-    suggestionIndex: number,
-    suggestedValue: string
-  ) => {
-    if (!suggestedValue) return;
-    if (!currentValues.workExperience[roleIndex]) return;
-    const normalizedSuggestion = toEditorHtml(suggestedValue);
-
-    const nextValues: WorkExperienceFormValues = {
-      workExperience: currentValues.workExperience.map((role, index) =>
-        index === roleIndex
-          ? { ...role, achievements: normalizedSuggestion }
-          : role
-      ),
-    };
-
-    const suggestionKey = `${roleIndex}-${suggestionIndex}`;
-    setPendingSuggestionKey(suggestionKey);
-    mutate(nextValues, {
-      onSuccess: () => {
-        onLocalApplySuggestion(roleIndex, normalizedSuggestion);
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.STATUS, formId],
-        });
-      },
-      onSettled: () => {
-        setPendingSuggestionKey((current) =>
-          current === suggestionKey ? null : current
-        );
-      },
-    });
-  };
-
+  /**
+   * Converts raw text or markdown to editor-compatible HTML format
+   * @param value - The input string to convert (can be plain text, markdown, or HTML)
+   * @returns Formatted HTML string for the rich text editor
+   */
   const toEditorHtml = (value: string) => {
     const trimmed = value.trim();
     if (!trimmed) return "";
@@ -117,6 +85,44 @@ export default function WorkExperienceAIAssistantDialog({
     return `<p>${trimmed}</p>`;
   };
 
+  /**
+   * Handles accepting an AI suggestion for a specific work experience role
+   * @param roleIndex - The index of the work experience role to update
+   * @param suggestedValue - The AI-suggested achievements text to apply
+   */
+  const handleAcceptSuggestion = (
+    roleIndex: number,
+    suggestedValue: string
+  ) => {
+    if (!suggestedValue) return;
+    if (!currentValues.workExperience[roleIndex]) return;
+    const normalizedSuggestion = toEditorHtml(suggestedValue);
+
+    const nextValues: WorkExperienceFormValues = {
+      workExperience: currentValues.workExperience.map((role, index) =>
+        index === roleIndex
+          ? { ...role, achievements: normalizedSuggestion }
+          : role
+      ),
+    };
+
+    setPendingSuggestionKey(`${roleIndex}`);
+    mutate(nextValues, {
+      onSuccess: () => {
+        onLocalApplySuggestion(roleIndex, normalizedSuggestion);
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.STATUS, formId],
+        });
+      },
+      onSettled: () => {
+        setPendingSuggestionKey((current) =>
+          current === `${roleIndex}` ? null : current
+        );
+      },
+    });
+  };
+
+  // Render dialog content based on AI review results
   const dialogContent =
     reviewNeedsAttention.length > 0 ? (
       reviewNeedsAttention.map((review) => {
@@ -126,29 +132,27 @@ export default function WorkExperienceAIAssistantDialog({
           : `Role ${review.roleIndex + 1}`;
 
         return (
-          <AIContentSuggestionCard
-            cardKey={`role-${review.roleIndex}`}
-            title={roleTitle}
-            summary={review.summary}
-            issues={review.issues}
-            typos={review.typos}
-            onAccept={() => {}}
-            isPending={false}
-            showDefaultAction={false}
-          >
-            <CardContent className="space-y-4">
-              {review.suggestions.map((suggestion, suggestionIndex) => (
-                <Field
-                  key={`${review.roleIndex}-${suggestionIndex}`}
-                  className="gap-2"
-                >
+          <div className="mb-4">
+            <AIContentSuggestionCard
+              cardKey={`role-${review.roleIndex}`}
+              title={roleTitle}
+              issues={review.issues}
+              onAccept={() =>
+                handleAcceptSuggestion(review.roleIndex, review.suggested)
+              }
+              isPending={
+                isPending && pendingSuggestionKey === `${review.roleIndex}`
+              }
+            >
+              <CardContent className="space-y-4">
+                <Field className="gap-2">
                   <FieldLabel
-                    htmlFor={`work-experience-ai-${review.roleIndex}-${suggestionIndex}`}
+                    htmlFor={`work-experience-ai-${review.roleIndex}`}
                   >
-                    Suggestion
+                    Suggested Achievements
                   </FieldLabel>
                   <RichTextEditor
-                    value={toEditorHtml(suggestion)}
+                    value={toEditorHtml(review.suggested)}
                     onChange={() => {}}
                     disabled
                     minHeightClassName="min-h-32"
@@ -159,34 +163,10 @@ export default function WorkExperienceAIAssistantDialog({
                     achieved in the role instead of listing responsibilities
                     only.
                   </FieldDescription>
-                  <div className="flex justify-end">
-                    <Button
-                      type="button"
-                      className="cv-form-primary-action"
-                      disabled={
-                        isPending &&
-                        pendingSuggestionKey ===
-                          `${review.roleIndex}-${suggestionIndex}`
-                      }
-                      onClick={() =>
-                        handleAcceptSuggestion(
-                          review.roleIndex,
-                          suggestionIndex,
-                          suggestion
-                        )
-                      }
-                    >
-                      {isPending &&
-                      pendingSuggestionKey ===
-                        `${review.roleIndex}-${suggestionIndex}`
-                        ? "Applying..."
-                        : "Apply Suggestion"}
-                    </Button>
-                  </div>
                 </Field>
-              ))}
-            </CardContent>
-          </AIContentSuggestionCard>
+              </CardContent>
+            </AIContentSuggestionCard>
+          </div>
         );
       })
     ) : (
@@ -205,11 +185,11 @@ export default function WorkExperienceAIAssistantDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden">
+        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>
-          <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-1">
+          <div className="scrollbar-hide space-y-4 overflow-y-auto p-1">
             {dialogContent}
           </div>
         </DialogContent>

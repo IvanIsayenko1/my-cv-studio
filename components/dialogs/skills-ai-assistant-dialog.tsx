@@ -55,7 +55,7 @@ export default function SkillsAIAssistantDialog({
   >(null);
 
   const reviewNeedsAttention = aiReview
-    ? aiReview.results.filter((result) => result.score < 8)
+    ? aiReview.results.filter((result) => result.issues.length > 0)
     : [];
 
   const handleAcceptSuggestion = (
@@ -122,9 +122,7 @@ export default function SkillsAIAssistantDialog({
             key={`skills-${review.categoryIndex}`}
             cardKey={`skills-${review.categoryIndex}`}
             title={title}
-            summary={review.summary}
             issues={review.issues}
-            typos={review.typos}
             onAccept={() =>
               handleAcceptSuggestion(
                 review.categoryIndex,
@@ -185,7 +183,7 @@ export default function SkillsAIAssistantDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden">
+        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>

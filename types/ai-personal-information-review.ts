@@ -1,23 +1,14 @@
 import { z } from "zod";
 
-import { baseFieldAIReviewSchema } from "./ai-base-review";
-
-export const professionalTitleAIReviewSchema = baseFieldAIReviewSchema.extend({
+export const professionalTitleAIReviewSchema = z.object({
   field: z.literal("professionalTitle"),
-  improvements: z.object({
-    atsOptimized: z.string().min(1),
-    balanced: z.string().min(1),
-    humanFriendly: z.string().min(1),
-  }),
-  keywords: z.object({
-    detected: z.array(z.string()),
-    missing: z.array(z.string()),
-  }),
+  issues: z.array(z.string()),
+  suggested: z.string().min(1),
 });
 
-export const emailAIReviewSchema = baseFieldAIReviewSchema.extend({
+export const emailAIReviewSchema = z.object({
   field: z.literal("email"),
-  isProfessional: z.boolean(),
+  issues: z.array(z.string()),
   suggestions: z.array(z.string()),
 });
 

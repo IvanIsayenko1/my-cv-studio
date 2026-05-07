@@ -48,7 +48,7 @@ export default function PersonalInfoAIAssistantDialog({
   const { data: personalInfo } = usePersonalInfoSuspenseQuery(formId);
   const { mutate, isPending } = useSavePersonalInfo(formId);
   const reviewNeedsAttention = aiReview
-    ? aiReview.results.filter((result) => result.score < 8)
+    ? aiReview.results.filter((result) => result.issues.length > 0)
     : [];
 
   const fieldConfig = {
@@ -98,7 +98,7 @@ export default function PersonalInfoAIAssistantDialog({
         return {
           ...config,
           field: review.field,
-          suggestedValue: review.improvements.balanced,
+          suggestedValue: review.suggested,
         };
       }
       case "email": {
@@ -137,9 +137,7 @@ export default function PersonalInfoAIAssistantDialog({
           <AIContentSuggestionCard
             cardKey={review.field}
             title={presentation.title}
-            summary={review.summary}
             issues={review.issues}
-            typos={review.typos}
             onAccept={() =>
               handleAcceptSuggestion(
                 presentation.field,
@@ -181,7 +179,7 @@ export default function PersonalInfoAIAssistantDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden">
+        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>

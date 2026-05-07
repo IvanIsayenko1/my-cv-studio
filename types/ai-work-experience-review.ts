@@ -1,14 +1,12 @@
 import { z } from "zod";
 
-import { baseFieldAIReviewSchema } from "./ai-base-review";
+import { WorkExperienceFormValues } from "./work-experience";
 
-export const workExperienceAchievementAIReviewSchema =
-  baseFieldAIReviewSchema.extend({
-    field: z.literal("achievements"),
-    roleIndex: z.number().int().min(0),
-    isImpactFocused: z.boolean(),
-    suggestions: z.array(z.string()),
-  });
+export const workExperienceAchievementAIReviewSchema = z.object({
+  roleIndex: z.number().int().min(0),
+  issues: z.array(z.string()),
+  suggested: z.string().min(1),
+});
 
 export const cvWorkExperienceAIReviewSchema = z
   .object({
@@ -36,3 +34,12 @@ export type WorkExperienceAchievementAIReview = z.infer<
 export type CVWorkExperienceAIReview = z.infer<
   typeof cvWorkExperienceAIReviewSchema
 >;
+
+export interface WorkExperienceAIAssistantDialogProps {
+  isOpenDialog: boolean;
+  setIsOpenDialog: (value: boolean) => void;
+  aiReview: CVWorkExperienceAIReview | null;
+  formId: string;
+  currentValues: WorkExperienceFormValues;
+  onLocalApplySuggestion: (roleIndex: number, achievements: string) => void;
+}

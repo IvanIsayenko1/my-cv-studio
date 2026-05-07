@@ -1,11 +1,9 @@
 import { z } from "zod";
 
-import { baseFieldAIReviewSchema } from "./ai-base-review";
-
-export const cvProfessionalSummaryReviewSchema = baseFieldAIReviewSchema
-  .extend({
+export const cvProfessionalSummaryReviewSchema = z
+  .object({
     field: z.literal("professionalSummary"),
-    isProfessional: z.boolean(),
+    issues: z.array(z.string()),
     suggestions: z.array(z.string()),
   })
   .superRefine((value, ctx) => {

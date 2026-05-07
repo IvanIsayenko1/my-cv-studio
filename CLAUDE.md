@@ -110,3 +110,49 @@ case TemplateId.YOUR_NEW_TEMPLATE:
 - [ ] New `TemplateId` added to `types/template.ts`
 - [ ] New `case` added in `render-preview-html.ts`
 - [ ] Template preview image added to `public/cv-templates/<template-id>.webp`
+
+---
+
+## Component Structure & Naming Conventions
+
+### File & Component Naming
+- All component files use **kebab-case** (e.g., `create-cv-dialog.tsx`, `cv-builder.tsx`)
+- Component exports use **PascalCase** matching the file name (e.g., `CreateCvDialog` from `create-cv-dialog.tsx`)
+- Non-JSX files use `.ts` extension, JSX-containing components use `.tsx`
+
+### Folder Organization
+- `components/ui/`: Shared, reusable base components (buttons, inputs, modals). Use CVA for variants.
+- Feature-based grouping: Co-locate related components in domain folders (`cv/`, `auth/`, `dialogs/`, `layout/`, `forms/`)
+- Complex features: Use nested subfolders for subcomponents (e.g., `cv/cv-builder/`, `cv/cv-tailor/`)
+- Dialogs: Place all dialog components in `components/dialogs/` with `-dialog` suffix
+
+### Special Patterns
+- Loading skeletons: Use `-skeleton` suffix (e.g., `cv-builder-form-skeleton.tsx`)
+- Client components: Add `"use client"` directive at the top when using client-side hooks/features
+- Imports: Use `@/` path aliases for internal imports, avoid relative paths for cross-folder imports
+- UI components: Prefer CVA (class-variance-authority) for styling variants, follow `button.tsx` pattern
+
+### Component Internal Rules
+- **`useEffect` restriction**: Use of `useEffect` is forbidden unless absolutely necessary. Only use `useEffect` for imperative integrations (e.g., DOM manipulations, subscriptions) where no other React hook (e.g., `useMemo`, `useCallback`, derived state) suffices.
+- **Type/Interface placement**: Never declare interfaces or types inside the component file. Always import types/interfaces from dedicated type/schema files (e.g., `@/types/*`, `@/schemas/*`).
+- **Component body order** (inside the component function):
+  1. React built-in hooks (`useState`, `useParams`, `useMemo`, `useRef`, etc.)
+  2. Third-party hooks (`useForm`, `useFieldArray`, `useWatch` from react-hook-form, etc.)
+  3. Custom hooks (`useCreateCV`, `useMediaQuery`, `useFormDirtyState`, etc.)
+  4. Extract values from hook returns (e.g., `const { control, handleSubmit } = form`)
+  5. Variables/derived values (add a single-line comment for every variable)
+  6. Arrow functions only (add JSDoc comment for every function)
+- **Function syntax**: Use only arrow functions for component-internal functions.
+- **Function comments**: Component-internal functions must use JSDoc-style comments with:
+  - A description of what the function does
+  - `@param` tags for each parameter (describing the parameter's purpose)
+  - `@returns` tag describing the return value (if applicable)
+  Example format:
+  ```ts
+  /**
+   * Converts raw text to editor-compatible HTML format
+   * @param value - The input string to convert
+   * @returns Formatted HTML string for the rich text editor
+   */
+  ```
+- **Documentation**: Comment every variable and function declared inside the component. Variables require a brief single-line comment explaining their purpose.

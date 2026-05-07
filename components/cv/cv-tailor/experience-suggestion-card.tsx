@@ -8,10 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import {
-  useSaveWorkExperience,
-  useWorkExperienceSuspenseQuery,
-} from "@/hooks/cv/use-work-experience";
+import { useWorkExperienceSuspenseQuery } from "@/hooks/cv/use-work-experience";
 
 import { CVTailorExperienceSuggestion } from "@/types/ai-tailor-review";
 
@@ -54,58 +51,6 @@ export default function ExperienceSuggestionCard({
               isApplying={isApplying}
               setIsApplying={setIsApplying}
             />
-            {/* <AccordionContent className="mb-0 max-h-none space-y-4">
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-col gap-4">
-                  <div className="flex-1">
-                    <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-                      Current
-                    </label>
-                    <RichTextEditor
-                      value={getWorkExperienceAchievements(index)}
-                      onChange={() => {}}
-                      disabled
-                      placeholder="(empty)"
-                      minHeightClassName="min-h-[120px]"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-muted-foreground mb-1.5 block text-[10px] font-semibold tracking-widest uppercase">
-                      New
-                    </label>
-                    <RichTextEditor
-                      value={suggestion.suggested.trim()}
-                      onChange={() => {}}
-                      placeholder="Tailored achievements..."
-                      minHeightClassName="min-h-[120px]"
-                      disabled={true}
-                    />
-                  </div>
-                </div>
-                <div className="cv-form-actions">
-                  <Button
-                    size="sm"
-                    className="cv-form-primary-action"
-                    onClick={() => handleAccept(index)}
-                    disabled={isPending || isSuccess}
-                  >
-                    {isPending ? (
-                      <>
-                        <Spinner />
-                        Applying...
-                      </>
-                    ) : isSuccess ? (
-                      "Applied"
-                    ) : (
-                      <>
-                        <Save className="size-4" />
-                        Apply change
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </AccordionContent> */}
           </AccordionItem>
         ))}
       </Accordion>

@@ -64,6 +64,7 @@ export function WorkExperienceForm({
   sectionLabel,
   sectionVisible,
 }: BuilderFormProps<WorkExperienceFormValues>) {
+  // React built-in hooks
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [employmentPickerIndex, setEmploymentPickerIndex] = useState<
@@ -73,10 +74,8 @@ export function WorkExperienceForm({
   const [aiReview, setAIReview] = useState<CVWorkExperienceAIReview | null>(
     null
   );
-  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
 
-  const { mutate, isPending } = useSaveWorkExperience(id);
-
+  // Third-party hooks (react-hook-form)
   const form = useForm<WorkExperienceFormValues>({
     resolver: zodResolver(workExperienceSchema),
     defaultValues: {
@@ -98,30 +97,32 @@ export function WorkExperienceForm({
     },
   });
 
-  // Track unsaved changes
-  useFormDirtyState("work-experience", form.formState.isDirty);
-
-  const { control, handleSubmit, formState } = form;
-  const isComplete = formState.isValid;
-
   const { fields, append, remove } = useFieldArray({
-    control,
+    control: form.control,
     name: "workExperience",
   });
-
-  const onSubmit = (values: WorkExperienceFormValues) => {
-    mutate(values, {
-      onSuccess: () => form.reset(values),
-    });
-  };
 
   // Watch all workExperience items for "can add another role" logic
   const watchedExperiences = useWatch({
-    control,
+    control: form.control,
     name: "workExperience",
   });
 
+  // Custom hooks
+  const isDesktop = useMediaQuery(RESOLUTIONS.DESKTOP);
+  const { mutate, isPending } = useSaveWorkExperience(id);
+  // Track unsaved changes
+  useFormDirtyState("work-experience", form.formState.isDirty);
+
+  // Extract values from hook returns
+  const { control, handleSubmit, formState } = form;
+
+  // Form validity state
+  const isComplete = formState.isValid;
+
+  // Last work experience item for checking if new role can be added
   const last = watchedExperiences?.[watchedExperiences.length - 1];
+  // Checks if all required fields are filled for the last role
   const requiredFilledForLast =
     !!last &&
     last.jobTitle?.trim() &&
@@ -130,6 +131,21 @@ export function WorkExperienceForm({
     last.startDate?.trim() &&
     last.endDate?.trim();
 
+  /**
+   * Handles form submission and saves work experience data
+   * @param values - The form values containing work experience data
+   */
+  const onSubmit = (values: WorkExperienceFormValues) => {
+    mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
+  };
+
+  /**
+   * Generates the display title for a work experience section
+   * @param index - The index of the work experience item
+   * @returns Formatted title string with job title and company, or fallback "Role X"
+   */
   const getSectionTitle = (index: number) => {
     return watchedExperiences[index] &&
       watchedExperiences[index].jobTitle &&

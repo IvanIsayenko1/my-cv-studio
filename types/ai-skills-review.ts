@@ -1,11 +1,8 @@
 import { z } from "zod";
 
-import { baseFieldAIReviewSchema } from "./ai-base-review";
-
-export const skillsCategoryAIReviewSchema = baseFieldAIReviewSchema.extend({
-  field: z.literal("skillsCategory"),
+export const skillsCategoryAIReviewSchema = z.object({
   categoryIndex: z.number().int().min(0),
-  isCoherent: z.boolean(),
+  issues: z.array(z.string()),
   suggestedName: z.string().min(1),
   suggestedItems: z.string().min(1),
 });

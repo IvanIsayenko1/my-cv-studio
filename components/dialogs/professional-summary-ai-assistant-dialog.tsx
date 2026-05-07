@@ -44,7 +44,7 @@ export default function ProfessionalSummaryAIAssistantDialog({
   const { mutate, isPending } = useSaveSummary(formId);
   const [isApplyingSuggestion, setIsApplyingSuggestion] = useState(false);
 
-  const reviewNeedsAttention = aiReview ? aiReview.score < 8 : false;
+  const reviewNeedsAttention = aiReview ? aiReview.issues.length > 0 : false;
   const suggestedSummary = aiReview?.suggestions[0] ?? "";
 
   const handleAcceptSuggestion = () => {
@@ -68,9 +68,7 @@ export default function ProfessionalSummaryAIAssistantDialog({
       <AIContentSuggestionCard
         cardKey={aiReview.field}
         title="Professional Summary"
-        summary={aiReview.summary}
         issues={aiReview.issues}
-        typos={aiReview.typos}
         onAccept={handleAcceptSuggestion}
         isPending={isPending && isApplyingSuggestion}
       >
@@ -107,7 +105,7 @@ export default function ProfessionalSummaryAIAssistantDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden">
+        <DialogContent className="flex max-h-[min(85vh,42rem)] flex-col overflow-hidden sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Review the AI Suggestions</DialogTitle>
           </DialogHeader>

@@ -11,6 +11,7 @@ import CVPersonalizationFormSkeleton from "../cv-personalization/cv-personalizat
 import CVPreview from "../cv-preview";
 import CVPreviewSkeleton from "../cv-preview-skeleton";
 import CVTailorForm from "../cv-tailor/cv-tailor-form";
+import CVTailorFormSkeleton from "../cv-tailor/cv-tailor-form-skeleton";
 import CVTemplateForm from "../cv-template-form";
 import CVUnsavedChangesDialog from "../cv-unsaved-changes-dialog";
 import CVBuilderFormSkeleton from "./cv-builder-form-skeleton";
@@ -82,9 +83,12 @@ export default function CVBuilder({ fontDataUri }: { fontDataUri: string }) {
 
               <TabsContent
                 value="tailor"
-                className="flex w-full overflow-y-auto pt-1"
+                className="load-stagger flex w-full flex-col overflow-y-auto pt-1"
+                style={stagger(2)}
               >
-                <CVTailorForm id={id} />
+                <Suspense fallback={<CVTailorFormSkeleton />}>
+                  <CVTailorForm id={id} />
+                </Suspense>
               </TabsContent>
 
               <TabsContent
