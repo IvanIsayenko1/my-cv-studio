@@ -6,6 +6,7 @@ export const professionalLinkSchema = z.object({
     .min(1, "Link label is required")
     .max(40, "Link label must be less than 40 characters"),
   url: z.string().url("Please enter a valid URL"),
+  showLabelOnly: z.boolean().default(false),
 });
 
 export const personalInfoSchema = z.object({

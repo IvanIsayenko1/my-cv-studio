@@ -19,7 +19,11 @@ export interface CV {
     phone: string;
     city: string;
     country: string;
-    professionalLinks?: Array<{ label: string; url: string }>;
+    professionalLinks?: Array<{
+      label: string;
+      url: string;
+      showLabelOnly?: boolean;
+    }>;
     linkedIn?: string;
     portfolio?: string;
     photo?: string; // URL

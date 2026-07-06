@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
 
 import { useSavePersonalInfo } from "@/hooks/cv/use-personal-info";
 import { useFormDirtyState } from "@/hooks/use-form-dirty-state";
@@ -286,7 +287,7 @@ export function PersonalInfoForm({
               {fields.map((field, index) => (
                 <Card key={field.id}>
                   <CardContent>
-                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_2fr_auto] lg:items-end">
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_2fr_auto_auto] lg:items-end">
                       <FormField
                         control={form.control}
                         name={`professionalLinks.${index}.label`}
@@ -317,6 +318,24 @@ export function PersonalInfoForm({
                           </FormItem>
                         )}
                       />
+                      <FormField
+                        control={form.control}
+                        name={`professionalLinks.${index}.showLabelOnly`}
+                        render={({ field }) => (
+                          <FormItem className="flex min-h-9 items-center gap-2">
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                aria-label="Show only the linked label on the CV"
+                              />
+                            </FormControl>
+                            <FormLabel className="whitespace-nowrap">
+                              Show label only
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
                       <div className="flex items-end">
                         <Button
                           type="button"
@@ -339,7 +358,9 @@ export function PersonalInfoForm({
                 type="button"
                 variant="secondary"
                 disabled={!isLastProfessionaLinkFilled}
-                onClick={() => append({ label: "", url: "" })}
+                onClick={() =>
+                  append({ label: "", url: "", showLabelOnly: false })
+                }
                 className="cv-form-primary-action"
               >
                 {!fields.length ? "Add link" : "Add another link"}

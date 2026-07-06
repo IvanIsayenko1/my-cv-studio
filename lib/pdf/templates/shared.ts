@@ -70,17 +70,23 @@ function renderContactLineHTML(email: string, phone: string): string {
   const parts: string[] = [];
 
   if (email) {
-    parts.push(`<a href="mailto:${escapeHtml(email)}" target="_blank" rel="noopener noreferrer">${escapeHtml(email)}</a>`);
+    parts.push(
+      `<a href="mailto:${escapeHtml(email)}" target="_blank" rel="noopener noreferrer">${escapeHtml(email)}</a>`
+    );
   }
   if (phone) {
-    parts.push(`<a href="tel:${escapeHtml(phone)}" target="_blank" rel="noopener noreferrer">${escapeHtml(phone)}</a>`);
+    parts.push(
+      `<a href="tel:${escapeHtml(phone)}" target="_blank" rel="noopener noreferrer">${escapeHtml(phone)}</a>`
+    );
   }
 
   return parts.join(" • ");
 }
 
 function renderLinksLineHTML(
-  professionalLinks: Array<{ label: string; url: string }> | undefined,
+  professionalLinks:
+    | Array<{ label: string; url: string; showLabelOnly?: boolean }>
+    | undefined,
   linkedIn: string | undefined,
   portfolio: string | undefined
 ): string {
@@ -90,13 +96,21 @@ function renderLinksLineHTML(
     ) ?? [];
 
   const links = linkItems.length
-    ? linkItems.map(
-        (item) =>
-          `<span>${escapeHtml(item.label.trim())}: <a href="${escapeHtml(item.url.trim())}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.url.trim())}</a></span>`
-      )
+    ? linkItems.map((item) => {
+        const label = escapeHtml(item.label.trim());
+        const url = escapeHtml(item.url.trim());
+
+        return item.showLabelOnly
+          ? `<span><a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a></span>`
+          : `<span>${label}: <a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a></span>`;
+      })
     : [
-        linkedIn ? `<span>LinkedIn: <a href="${escapeHtml(linkedIn)}" target="_blank" rel="noopener noreferrer">${escapeHtml(linkedIn)}</a></span>` : null,
-        portfolio ? `<span>Portfolio: <a href="${escapeHtml(portfolio)}" target="_blank" rel="noopener noreferrer">${escapeHtml(portfolio)}</a></span>` : null,
+        linkedIn
+          ? `<span>LinkedIn: <a href="${escapeHtml(linkedIn)}" target="_blank" rel="noopener noreferrer">${escapeHtml(linkedIn)}</a></span>`
+          : null,
+        portfolio
+          ? `<span>Portfolio: <a href="${escapeHtml(portfolio)}" target="_blank" rel="noopener noreferrer">${escapeHtml(portfolio)}</a></span>`
+          : null,
       ].filter(Boolean);
 
   return links.join(" | ");
@@ -122,7 +136,11 @@ export function getSharedTemplateData(cv: CV) {
     ) ?? [];
   const linksLine = linkItems.length
     ? linkItems
-        .map((item) => `${item.label.trim()}: ${item.url.trim()}`)
+        .map((item) =>
+          item.showLabelOnly
+            ? item.label.trim()
+            : `${item.label.trim()}: ${item.url.trim()}`
+        )
         .join(" | ")
     : [cv.personalInfo.linkedIn, cv.personalInfo.portfolio]
         .filter(Boolean)

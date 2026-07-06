@@ -1,6 +1,10 @@
-type Link = { label: string; url: string };
+type Link = { label: string; url: string; showLabelOnly?: boolean };
 type PersonalLinksInput = {
-  professionalLinks?: Array<{ label?: string; url?: string }>;
+  professionalLinks?: Array<{
+    label?: string;
+    url?: string;
+    showLabelOnly?: boolean;
+  }>;
   linkedIn?: string | null;
   portfolio?: string | null;
 };
@@ -25,7 +29,9 @@ export function parseProfessionalLinksFromStorage({
 }): Link[] {
   const links: Link[] = [];
 
-  if (linkedIn && isValidURL(linkedIn)) {
+  const hasVersionedLinks = portfolio?.startsWith(V2_PREFIX) === true;
+
+  if (linkedIn && isValidURL(linkedIn) && !hasVersionedLinks) {
     links.push({ label: "LinkedIn", url: linkedIn });
   }
 
@@ -36,14 +42,22 @@ export function parseProfessionalLinksFromStorage({
         const parsed = JSON.parse(raw) as unknown;
         if (Array.isArray(parsed)) {
           parsed.forEach((item) => {
-            const link = item as { label?: unknown; url?: unknown };
+            const link = item as {
+              label?: unknown;
+              url?: unknown;
+              showLabelOnly?: unknown;
+            };
             if (
               typeof link.label === "string" &&
               typeof link.url === "string" &&
               link.label.trim() &&
               isValidURL(link.url.trim())
             ) {
-              links.push({ label: link.label.trim(), url: link.url.trim() });
+              links.push({
+                label: link.label.trim(),
+                url: link.url.trim(),
+                showLabelOnly: link.showLabelOnly === true,
+              });
             }
           });
         }
@@ -71,7 +85,7 @@ export function serializeProfessionalLinksForStorage(
     .map((link) => {
       const label = typeof link.label === "string" ? link.label.trim() : "";
       const url = typeof link.url === "string" ? link.url.trim() : "";
-      return { label, url };
+      return { label, url, showLabelOnly: link.showLabelOnly === true };
     })
     .filter((link) => link.label && isValidURL(link.url));
 
